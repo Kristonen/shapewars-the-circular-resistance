@@ -5,6 +5,10 @@ import rl "vendor:raylib"
 import "core:fmt"
 import "core:mem"
 
+//////////////////////////////////////////////////////
+//   Project to learn the odin programming language //
+//////////////////////////////////////////////////////
+
 main :: proc(){
     fmt.println("Hello World")
 
