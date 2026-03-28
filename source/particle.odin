@@ -38,7 +38,7 @@ create_hit_particles :: proc(game : ^Game_State, pos : rl.Vector2){
         p : Particle = {
             pos = pos,
             vel = {math.cos(angle) * speed, math.sin(angle) * speed},
-            color = rl.ORANGE,
+            color = rl.RED,
             max_life = f32(rl.GetRandomValue(5, 10)) / 10,
             life = 0,
             size = f32(rl.GetRandomValue(2, 5)),
