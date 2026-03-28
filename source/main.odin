@@ -43,12 +43,15 @@ main :: proc(){
             zoom = 1,
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
+
         helper_activated = false,
     }
     game.camera.target = game.player.pos
 
     defer{
         delete(game.player_bullets)
+        delete(game.particles)
+        delete(game.enemies)
         rl.CloseWindow()
     }
 
@@ -98,12 +101,18 @@ update_game :: proc(game : ^Game_State, dt : f32) {
     for &b, idx in game.enemies{
         //Enemy Behavior Code
     }
+
+    for &p, idx in game.particles{
+        update_particle(&p, dt)
+    }
 }
 
 check_collisions :: proc(game : ^Game_State){
     for e, idx_e in game.enemies{
         for b, idx_b in game.player_bullets{
             if check_bullet_enemy(b, e){
+                particle_pos : rl.Vector2 = {e.pos.x + (e.width/2), e.pos.y + (e.height/2)}
+                create_hit_particles(game, particle_pos)
                 unordered_remove(&game.player_bullets, idx_b)
                 unordered_remove(&game.enemies, idx_e)
             }
@@ -136,6 +145,13 @@ draw_game :: proc(game : ^Game_State){
         draw_enemy(enemy)
         if game.helper_activated{
             draw_collider(enemy.pos, enemy.collidor)
+        }
+    }
+
+    for p, idx in game.particles{
+        draw_particles(p)
+        if(!p.alive){
+            unordered_remove(&game.particles, idx)
         }
     }
 

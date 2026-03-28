@@ -10,6 +10,7 @@ Game_State :: struct{
 
     player_bullets : [dynamic]Bullet,
     enemies : [dynamic]Dummy_Enemy,
+    particles : [dynamic]Particle,
 
     helper_activated : bool,
 }
