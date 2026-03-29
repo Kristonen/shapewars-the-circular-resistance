@@ -1,5 +1,7 @@
 package game
 
+import "core:mem/virtual"
+import "core:encoding/json"
 import "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
@@ -18,6 +20,11 @@ main :: proc(){
     track : mem.Tracking_Allocator
     mem.tracking_allocator_init(&track, context.allocator)
     context.allocator = mem.tracking_allocator(&track)
+
+    arena : virtual.Arena
+    err := virtual.arena_init_growing(&arena)
+    map_allocator := virtual.arena_allocator(&arena)
+
     defer{
         for _, entry in track.allocation_map{
             fmt.eprintf("%v leaked %v bytes\n", entry.location, entry.size)
@@ -26,6 +33,7 @@ main :: proc(){
             fmt.eprintf("%v bad free\n", entry.location)
         }
         mem.tracking_allocator_destroy(&track)
+        virtual.arena_free_all(&arena)
     }
      
 
@@ -55,11 +63,13 @@ main :: proc(){
         rl.CloseWindow()
     }
 
-    level, ok := load_map("assets/test_map.json")
+    level, ok := load_map("assets/test_map.json", map_allocator)
     if ok{
         game.level = level
         give_player_spawn_pos(&game)
         fmt.println(game.player.pos)
+    } else{
+        panic("Could not load the level!")
     }
 
 
@@ -118,16 +128,20 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 check_collisions :: proc(game : ^Game_State){
 
     for b, idx_b in game.player_bullets{
-        for e, idx_e in game.enemies{
+        for &e, idx_e in game.enemies{
             if check_bullet_enemy(b, e){
                 particle_pos : rl.Vector2 = {e.pos.x + (e.width/2), e.pos.y + (e.height/2)}
                 create_hit_particles(game, particle_pos)
+                take_damage(b, &e.health)
+                if e.health.is_dead{
+                    unordered_remove(&game.enemies, idx_e)
+                }
                 unordered_remove(&game.player_bullets, idx_b)
-                unordered_remove(&game.enemies, idx_e)
             }
-            
         }
         if check_bullet_wall(b.pos, b.radius, game.level){
+            particle_pos : rl.Vector2 = {b.pos.x + b.radius, b.pos.y + b.radius}
+            create_destroy_bullet_particle(game, particle_pos)
             unordered_remove(&game.player_bullets, idx_b)
         }
     }

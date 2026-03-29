@@ -4,12 +4,13 @@ import "core:fmt"
 import rl "vendor:raylib"
 
 Bullet :: struct {
+    damage : f32,
     pos : rl.Vector2,
     dir : rl.Vector2,
     vel : rl.Vector2,
     speed : f32,
     radius : f32,
-    collider : Collider
+    collider : Collider,
 }
 
 Weapon :: struct {
@@ -62,6 +63,7 @@ update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (Bullet,
         mouse_pos := rl.GetMousePosition()
         world_mouse := rl.GetScreenToWorld2D(mouse_pos, camera)
         bullet := Bullet{
+            damage = 10,
             pos = p.pos,
             speed = 500,
             radius = 8,

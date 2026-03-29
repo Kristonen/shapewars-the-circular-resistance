@@ -1,5 +1,6 @@
 package game
 
+import "core:mem"
 import "core:fmt"
 
 
@@ -51,15 +52,13 @@ Tiled_Layer :: struct{
     objects : [dynamic]Tiled_Object,
 }
 
-load_map :: proc(path : string) -> (Tiled_Map, bool){
-    allocator := context.allocator
+load_map :: proc(path : string, allocator : mem.Allocator) -> (Tiled_Map, bool){
     data, ok := os.read_entire_file(path, allocator)
-    defer delete(data)
     if ok != os.General_Error.None{
         return {}, false
     }
     level_map : Tiled_Map
-    json_err := json.unmarshal(data, &level_map)
+    json_err := json.unmarshal(data, &level_map, allocator = allocator)
 
     if json_err !=  nil{
         fmt.printfln("Error: %v", json_err)

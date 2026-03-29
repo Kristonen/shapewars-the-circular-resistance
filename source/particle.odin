@@ -47,3 +47,21 @@ create_hit_particles :: proc(game : ^Game_State, pos : rl.Vector2){
         append(&game.particles, p)
     }
 }
+
+create_destroy_bullet_particle :: proc(game : ^Game_State, pos : rl.Vector2){
+    amount := rl.GetRandomValue(10, 20)
+    for _ in 0..<amount{
+        angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
+        speed := f32(rl.GetRandomValue(25, 50))
+        p : Particle = {
+            pos = pos,
+            vel = {math.cos(angle) * speed, math.sin(angle) * speed},
+            color = rl.GRAY,
+            max_life = f32(rl.GetRandomValue(3, 5)) / 10,
+            life = 0,
+            size = f32(rl.GetRandomValue(2, 5)),
+            alive = true
+        }
+        append(&game.particles, p)
+    }
+}
