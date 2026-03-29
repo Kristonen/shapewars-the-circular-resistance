@@ -57,12 +57,12 @@ update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (Bullet,
         world_mouse := rl.GetScreenToWorld2D(mouse_pos, camera)
         bullet := Bullet{
             pos = p.pos,
-            speed = 500,
-            radius = 8,
+            speed = 250,
+            radius = 2,
             dir = rl.Vector2Normalize(world_mouse - p.pos),
             collider = {
                 type = .Circle,
-                radius = 8,
+                radius = 2,
             }
         }
         return bullet, true

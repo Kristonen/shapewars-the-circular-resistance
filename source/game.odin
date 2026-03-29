@@ -11,6 +11,7 @@ Game_State :: struct{
     player_bullets : [dynamic]Bullet,
     enemies : [dynamic]Dummy_Enemy,
     particles : [dynamic]Particle,
+    level : Tiled_Map,
 
     helper_activated : bool,
 }

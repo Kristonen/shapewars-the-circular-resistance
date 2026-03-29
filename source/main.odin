@@ -33,17 +33,16 @@ main :: proc(){
     game := Game_State {
         player = {
             pos = {640, 320},
-            speed = 600,
-            radius = 32,
+            speed = 200,
+            radius = 8,
             weapon = {
                 fire_rate = 0.5,
             }
         },
         camera = {
-            zoom = 1,
+            zoom = 6,
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
-
         helper_activated = false,
     }
     game.camera.target = game.player.pos
@@ -52,8 +51,16 @@ main :: proc(){
         delete(game.player_bullets)
         delete(game.particles)
         delete(game.enemies)
+        delete(game.level.tilesets)
+        delete(game.level.layers)
         rl.CloseWindow()
     }
+
+    level, ok := load_map("assets/test_map.json")
+    if ok{
+        game.level = level
+    }
+
 
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
@@ -132,6 +139,7 @@ check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : Bullet, bullets : ^[dyna
 }
 
 draw_game :: proc(game : ^Game_State){
+    draw_map(game.level)
     draw_player(game.player)
     
     for bullet in game.player_bullets{
