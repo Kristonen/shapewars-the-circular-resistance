@@ -32,18 +32,24 @@ Player :: struct {
     weapon : Weapon,
 }
 
-update_player :: proc(p: ^Player, dt: f32){
+update_player :: proc(p: ^Player, dt: f32, level : Tiled_Map){
     p.vel = {0, 0}
     if rl.IsKeyDown(.W) {p.vel.y = -1}
     if rl.IsKeyDown(.S) {p.vel.y = 1}
     if rl.IsKeyDown(.A) {p.vel.x = -1}
     if rl.IsKeyDown(.D) {p.vel.x = 1}
 
+
+
     if rl.Vector2Length(p.vel)> 0.01{
         p.vel = rl.Vector2Normalize(p.vel)
         p.vel *= p.speed
     }
-    p.pos += p.vel * dt
+
+    next_pos := p.pos + p.vel * dt
+    if !check_player_wall(next_pos, p.radius, level){
+        p.pos += p.vel * dt
+    }
 }
 
 update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (Bullet, bool){

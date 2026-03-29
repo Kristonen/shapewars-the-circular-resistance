@@ -88,7 +88,7 @@ update_game :: proc(game : ^Game_State, dt : f32) {
         game.play_time += dt
     }
 
-    update_player(&game.player, dt)
+    update_player(&game.player, dt, game.level)
     bullet, ok_bullet := update_shooting(&game.player, game.camera, dt)
 
     if ok_bullet{
@@ -116,6 +116,7 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 }
 
 check_collisions :: proc(game : ^Game_State){
+
     for e, idx_e in game.enemies{
         for b, idx_b in game.player_bullets{
             if check_bullet_enemy(b, e){
