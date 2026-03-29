@@ -35,6 +35,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":5,
+         "name":"SpawnPlayer",
+         "objects":[
+                {
+                 "height":72.5,
+                 "id":11,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":86.5,
+                 "x":187.5,
+                 "y":95
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":4,
          "name":"Walls",
          "objects":[
@@ -104,8 +127,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":5,
- "nextobjectid":11,
+ "nextlayerid":6,
+ "nextobjectid":12,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

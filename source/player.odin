@@ -57,8 +57,8 @@ update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (Bullet,
         world_mouse := rl.GetScreenToWorld2D(mouse_pos, camera)
         bullet := Bullet{
             pos = p.pos,
-            speed = 250,
-            radius = 2,
+            speed = 500,
+            radius = 8,
             dir = rl.Vector2Normalize(world_mouse - p.pos),
             collider = {
                 type = .Circle,
@@ -89,5 +89,18 @@ draw_collider :: proc(pos : rl.Vector2, c : Collider){
     }
     if c.type == .Rec{
         rl.DrawRectangleV(pos, {c.width, c.height}, rl.GREEN)
+    }
+}
+
+give_player_spawn_pos :: proc(g : ^Game_State){
+
+    for layer in g.level.layers{
+        if layer.type == "objectgroup" && layer.name == "SpawnPlayer"{
+            object := layer.objects[0]
+            pos_x := f32(object.x + object.width/2)
+            pos_y := f32(object.y + object.height/2)
+            g.player.pos = {pos_x, pos_y}
+            break
+        }
     }
 }

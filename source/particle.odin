@@ -27,7 +27,7 @@ draw_particles :: proc(p : Particle){
     color := p.color
     color.a = u8(alpha*255)
 
-    rl.DrawCircleV(p.pos, p.size, color)
+    rl.DrawCircleV(p.pos, p.size/2, color)
 }
 
 create_hit_particles :: proc(game : ^Game_State, pos : rl.Vector2){

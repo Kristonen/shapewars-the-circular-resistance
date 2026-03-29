@@ -10,7 +10,6 @@ import "core:mem"
 //////////////////////////////////////////////////////
 
 main :: proc(){
-    fmt.println("Hello World")
 
     rl.InitWindow(1920, 1080, "Shapewars: The Circular Resistance")
     rl.SetWindowState({.WINDOW_RESIZABLE})
@@ -32,15 +31,15 @@ main :: proc(){
 
     game := Game_State {
         player = {
-            pos = {640, 320},
-            speed = 200,
-            radius = 8,
+            // pos = {640, 320},
+            speed = 400,
+            radius = 32,
             weapon = {
                 fire_rate = 0.5,
             }
         },
         camera = {
-            zoom = 6,
+            zoom = 1,
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
         helper_activated = false,
@@ -59,6 +58,8 @@ main :: proc(){
     level, ok := load_map("assets/test_map.json")
     if ok{
         game.level = level
+        give_player_spawn_pos(&game)
+        fmt.println(game.player.pos)
     }
 
 
@@ -139,7 +140,7 @@ check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : Bullet, bullets : ^[dyna
 }
 
 draw_game :: proc(game : ^Game_State){
-    draw_map(game.level)
+    draw_map(game.level, game.helper_activated)
     draw_player(game.player)
     
     for bullet in game.player_bullets{

@@ -69,7 +69,7 @@ load_map :: proc(path : string) -> (Tiled_Map, bool){
     return level_map, true
 }
 
-draw_map :: proc(m : Tiled_Map){
+draw_map :: proc(m : Tiled_Map, helper_activated : bool){
     tileset_name := m.tilesets[0].image
     tileset_path := fmt.tprintf("assets/%s", tileset_name)
     // texture := rl.LoadTexture(rl.TextFormat("%s", tileset_path))
@@ -102,7 +102,7 @@ draw_map :: proc(m : Tiled_Map){
             }
         }
 
-        if layer.type == "objectgroup" && layer.name == "Walls" {
+        if layer.type == "objectgroup" && layer.name == "Walls" && helper_activated {
             for obj in layer.objects{
                 rect : rl.Rectangle = {
                     x = obj.x,
@@ -110,9 +110,7 @@ draw_map :: proc(m : Tiled_Map){
                     width = obj.width,
                     height = obj.height,
                 }
-
                 rl.DrawRectangleLinesEx(rect, 2, rl.RED)
-
             }
         }
     }
