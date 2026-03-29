@@ -117,14 +117,18 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 
 check_collisions :: proc(game : ^Game_State){
 
-    for e, idx_e in game.enemies{
-        for b, idx_b in game.player_bullets{
+    for b, idx_b in game.player_bullets{
+        for e, idx_e in game.enemies{
             if check_bullet_enemy(b, e){
                 particle_pos : rl.Vector2 = {e.pos.x + (e.width/2), e.pos.y + (e.height/2)}
                 create_hit_particles(game, particle_pos)
                 unordered_remove(&game.player_bullets, idx_b)
                 unordered_remove(&game.enemies, idx_e)
             }
+            
+        }
+        if check_bullet_wall(b.pos, b.radius, game.level){
+            unordered_remove(&game.player_bullets, idx_b)
         }
     }
 }
