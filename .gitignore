@@ -1,0 +1,13 @@
+# Ignore the compiled executable
+*.exe
+*.bin
+
+# Ignore Odin's temporary collection/build data
+.odin/
+bin/
+
+# Ignore .vscode
+.vscode
+
+#Ignore personal stuff
+git-helper.txt
