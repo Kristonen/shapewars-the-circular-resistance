@@ -6,6 +6,7 @@ import ab "../ability"
 import b "../bullet"
 import cl "../collider"
 import m "../map"
+import h "../health"
 
 Weapon :: struct {
     fire_rate : f32,
@@ -19,6 +20,8 @@ Player :: struct {
     speed : f32,
     weapon : Weapon,
     ability : ab.Ability,
+    health : h.Health_Bar,
+    bar : h.Health_Bar,
 }
 
 update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map){
@@ -69,15 +72,25 @@ draw_player :: proc(p : Player){
     rl.DrawCircleV(p.pos, p.radius, rl.PURPLE)
 }
 
-give_player_spawn_pos :: proc(level : m.Tiled_Map, p : ^Player){
+create_player :: proc(level : m.Tiled_Map) -> Player{
+    player : Player
+    player.speed = 400
+    player.radius = 32
+    player.weapon.fire_rate = 0.5
+    player.pos = give_player_spawn_pos(level)
+
+    return player
+}
+
+give_player_spawn_pos :: proc(level : m.Tiled_Map) -> rl.Vector2{
 
     for layer in level.layers{
         if layer.type == "objectgroup" && layer.name == "SpawnPlayer"{
             object := layer.objects[0]
             pos_x := f32(object.x + object.width/2)
             pos_y := f32(object.y + object.height/2)
-            p.pos = {pos_x, pos_y}
-            break
+            return {pos_x, pos_y}
         }
     }
+    return {}
 }

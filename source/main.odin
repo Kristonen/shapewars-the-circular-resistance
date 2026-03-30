@@ -12,6 +12,7 @@ import enemy "enemy"
 import m "map"
 import h "health"
 import pacl "particle"
+import ab "ability"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -44,21 +45,12 @@ main :: proc(){
      
 
     game := Game_State {
-        player = {
-            // pos = {640, 320},
-            speed = 400,
-            radius = 32,
-            weapon = {
-                fire_rate = 0.5,
-            }
-        },
         camera = {
             zoom = 1,
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
         helper_activated = false,
     }
-    game.camera.target = game.player.pos
 
     defer{
         delete(game.player_bullets)
@@ -72,8 +64,15 @@ main :: proc(){
     level, ok := m.load_map("assets/test_map.json", map_allocator)
     if ok{
         game.level = level
-        pl.give_player_spawn_pos(game.level, &game.player)
-        fmt.println(game.player.pos)
+        game.player = pl.create_player(game.level)
+        game.camera.target = game.player.pos
+        ability_test := ab.Radial_Liberation{
+        count = 8,
+        cooldown = {
+            cooldown = 5,
+        }
+    }
+    game.player.ability = ability_test
     } else{
         panic("Could not load the level!")
     }
@@ -105,10 +104,17 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 
     pl.update_player(&game.player, dt, game.level)
     bullet, ok_bullet := pl.update_shooting(&game.player, game.camera, dt)
+    casting := ab.update_casting(&game.player.ability)
 
     if ok_bullet{
         append(&game.player_bullets, bullet)
     }
+
+    if casting{
+        cast_ability(game)
+    }
+
+    ab.update_ability(&game.player.ability, dt)
 
     for &b, idx in game.player_bullets{
         bu.update_bullet(&b, dt)
@@ -192,8 +198,9 @@ draw_game :: proc(game : ^Game_State){
 }
 
 draw_ui :: proc(game : Game_State){
+    ability := ab.get_cooldown(game.player.ability)
     rl.DrawFPS(20, 50)
-    str := fmt.tprintf("%.2f, %.2f | %.2f", game.player.pos.x, game.player.pos.y, game.player.vel)
+    str := fmt.tprintf("%.2f, %.2f | %.2f | %.2f", game.player.pos.x, game.player.pos.y, game.player.vel, ability.timer)
     cstr := strings.clone_to_cstring(str)
     delete_cstring(cstr)
     rl.DrawText(cstr, 150, 50, 20, rl.LIGHTGRAY)
@@ -201,4 +208,11 @@ draw_ui :: proc(game : Game_State){
     cstr = strings.clone_to_cstring(str)
     rl.DrawText(cstr, 150, 100, 20, rl.LIGHTGRAY)
     delete_cstring(cstr)
+}
+
+cast_ability :: proc(g : ^Game_State){
+    switch &a in g.player.ability{
+        case ab.Radial_Liberation:
+            ab.cast_radial_liberation(a, &g.player_bullets, g.player.pos)
+    }
 }
