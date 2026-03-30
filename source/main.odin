@@ -11,6 +11,7 @@ import pl "player"
 import enemy "enemy"
 import m "map"
 import h "health"
+import pacl "particle"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -125,7 +126,7 @@ update_game :: proc(game : ^Game_State, dt : f32) {
     }
 
     for &p, idx in game.particles{
-        update_particle(&p, dt)
+        pacl.update_particle(&p, dt)
     }
 }
 
@@ -136,7 +137,7 @@ check_collisions :: proc(game : ^Game_State){
             e_rec := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
             if cl.check_bullet_enemy(b.pos, b.radius, e_rec){
                 particle_pos : rl.Vector2 = {e.pos.x + (e.width/2), e.pos.y + (e.height/2)}
-                create_hit_particles(game, particle_pos)
+                pacl.create_hit_particles(&game.particles, particle_pos)
                 h.take_damage(b, &e.health)
                 if e.health.is_dead{
                     unordered_remove(&game.enemies, idx_e)
@@ -146,7 +147,7 @@ check_collisions :: proc(game : ^Game_State){
         }
         if cl.check_bullet_wall(b.pos, b.radius, game.level){
             particle_pos : rl.Vector2 = {b.pos.x + b.radius, b.pos.y + b.radius}
-            create_destroy_bullet_particle(game, particle_pos)
+            pacl.create_destroy_bullet_particle(&game.particles, particle_pos)
             unordered_remove(&game.player_bullets, idx_b)
         }
     }
@@ -182,7 +183,7 @@ draw_game :: proc(game : ^Game_State){
     }
 
     for p, idx in game.particles{
-        draw_particles(p)
+        pacl.draw_particles(p)
         if(!p.alive){
             unordered_remove(&game.particles, idx)
         }

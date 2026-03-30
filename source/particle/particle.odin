@@ -1,4 +1,4 @@
-package game
+package particle
 
 import "core:math"
 import rl "vendor:raylib"
@@ -30,7 +30,7 @@ draw_particles :: proc(p : Particle){
     rl.DrawCircleV(p.pos, p.size/2, color)
 }
 
-create_hit_particles :: proc(game : ^Game_State, pos : rl.Vector2){
+create_hit_particles :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
     amount := rl.GetRandomValue(25, 40)
     for _ in 0..<amount{
         angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
@@ -44,11 +44,11 @@ create_hit_particles :: proc(game : ^Game_State, pos : rl.Vector2){
             size = f32(rl.GetRandomValue(2, 5)),
             alive = true
         }
-        append(&game.particles, p)
+        append(particles, p)
     }
 }
 
-create_destroy_bullet_particle :: proc(game : ^Game_State, pos : rl.Vector2){
+create_destroy_bullet_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
     amount := rl.GetRandomValue(10, 20)
     for _ in 0..<amount{
         angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
@@ -62,6 +62,6 @@ create_destroy_bullet_particle :: proc(game : ^Game_State, pos : rl.Vector2){
             size = f32(rl.GetRandomValue(2, 5)),
             alive = true
         }
-        append(&game.particles, p)
+        append(particles, p)
     }
 }
