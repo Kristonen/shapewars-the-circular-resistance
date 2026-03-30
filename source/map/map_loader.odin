@@ -1,4 +1,4 @@
-package game
+package map_loader
 
 import "core:mem"
 import "core:fmt"

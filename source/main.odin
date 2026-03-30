@@ -1,11 +1,16 @@
 package game
 
 import "core:mem/virtual"
-import "core:encoding/json"
 import "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
 import "core:mem"
+import bu "bullet"
+import cl "collider"
+import pl "player"
+import enemy "enemy"
+import m "map"
+import h "health"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -63,15 +68,14 @@ main :: proc(){
         rl.CloseWindow()
     }
 
-    level, ok := load_map("assets/test_map.json", map_allocator)
+    level, ok := m.load_map("assets/test_map.json", map_allocator)
     if ok{
         game.level = level
-        give_player_spawn_pos(&game)
+        pl.give_player_spawn_pos(game.level, &game.player)
         fmt.println(game.player.pos)
     } else{
         panic("Could not load the level!")
     }
-
 
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
@@ -98,22 +102,22 @@ update_game :: proc(game : ^Game_State, dt : f32) {
         game.play_time += dt
     }
 
-    update_player(&game.player, dt, game.level)
-    bullet, ok_bullet := update_shooting(&game.player, game.camera, dt)
+    pl.update_player(&game.player, dt, game.level)
+    bullet, ok_bullet := pl.update_shooting(&game.player, game.camera, dt)
 
     if ok_bullet{
         append(&game.player_bullets, bullet)
     }
 
     for &b, idx in game.player_bullets{
-        update_bullet(&b, dt)
+        bu.update_bullet(&b, dt)
         check_if_bullet_can_delete(game.camera, b, &game.player_bullets, idx)
     }
 
-    enemy, ok_enemy := update_spawn(game)
+    enemy_inst, ok_enemy := update_spawn(game)
 
     if ok_enemy{
-        append(&game.enemies, enemy)
+        append(&game.enemies, enemy_inst)
     }
 
     for &b, idx in game.enemies{
@@ -129,17 +133,18 @@ check_collisions :: proc(game : ^Game_State){
 
     for b, idx_b in game.player_bullets{
         for &e, idx_e in game.enemies{
-            if check_bullet_enemy(b, e){
+            e_rec := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
+            if cl.check_bullet_enemy(b.pos, b.radius, e_rec){
                 particle_pos : rl.Vector2 = {e.pos.x + (e.width/2), e.pos.y + (e.height/2)}
                 create_hit_particles(game, particle_pos)
-                take_damage(b, &e.health)
+                h.take_damage(b, &e.health)
                 if e.health.is_dead{
                     unordered_remove(&game.enemies, idx_e)
                 }
                 unordered_remove(&game.player_bullets, idx_b)
             }
         }
-        if check_bullet_wall(b.pos, b.radius, game.level){
+        if cl.check_bullet_wall(b.pos, b.radius, game.level){
             particle_pos : rl.Vector2 = {b.pos.x + b.radius, b.pos.y + b.radius}
             create_destroy_bullet_particle(game, particle_pos)
             unordered_remove(&game.player_bullets, idx_b)
@@ -147,7 +152,7 @@ check_collisions :: proc(game : ^Game_State){
     }
 }
 
-check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : Bullet, bullets : ^[dynamic]Bullet, idx : int){
+check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet, bullets : ^[dynamic]bu.Bullet, idx : int){
     view_left := c.target.x - (c.offset.x / c.zoom)
     view_right := c.target.x + (c.offset.x / c.zoom)
     view_top := c.target.y - (c.offset.y / c.zoom)
@@ -159,20 +164,20 @@ check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : Bullet, bullets : ^[dyna
 }
 
 draw_game :: proc(game : ^Game_State){
-    draw_map(game.level, game.helper_activated)
-    draw_player(game.player)
+    m.draw_map(game.level, game.helper_activated)
+    pl.draw_player(game.player)
     
     for bullet in game.player_bullets{
-        draw_bullet(bullet)
+        bu.draw_bullet(bullet)
         if game.helper_activated{
-            draw_collider(bullet.pos, bullet.collider)
+            cl.draw_collider_cirlce(bullet.pos, bullet.collider)
         }
     }
 
-    for enemy in game.enemies{
-        draw_enemy(enemy)
+    for e in game.enemies{
+        enemy.draw_enemy(e)
         if game.helper_activated{
-            draw_collider(enemy.pos, enemy.collidor)
+            cl.draw_collider_rect(e.pos, e.collidor)
         }
     }
 

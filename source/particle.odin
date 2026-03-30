@@ -34,7 +34,7 @@ create_hit_particles :: proc(game : ^Game_State, pos : rl.Vector2){
     amount := rl.GetRandomValue(25, 40)
     for _ in 0..<amount{
         angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
-        speed := f32(rl.GetRandomValue(50, 150))
+        speed := f32(rl.GetRandomValue(20, 150))
         p : Particle = {
             pos = pos,
             vel = {math.cos(angle) * speed, math.sin(angle) * speed},

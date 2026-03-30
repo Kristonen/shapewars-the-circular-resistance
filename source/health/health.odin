@@ -1,7 +1,7 @@
-package game
+package health
 
-import "core:fmt"
 import rl "vendor:raylib"
+import bu "../bullet"
 
 Health_Bar :: struct{
     rect : rl.Rectangle,
@@ -38,7 +38,7 @@ draw_health_bar :: proc(bar : Health_Bar, h : Health){
     rl.DrawRectangleV({fill_health_bar.x, fill_health_bar.y}, {fill_health_bar.width, fill_health_bar.height}, bar.fill_color)
 }
 
-take_damage :: proc(b : Bullet, h : ^Health){
+take_damage :: proc(b : bu.Bullet, h : ^Health){
     h.current -= b.damage
     if h.current <= 0{
         h.current = h.min

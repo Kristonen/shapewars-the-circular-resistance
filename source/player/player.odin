@@ -1,28 +1,15 @@
-package game
+package player
 
 import "core:fmt"
 import rl "vendor:raylib"
-
-Bullet :: struct {
-    damage : f32,
-    pos : rl.Vector2,
-    dir : rl.Vector2,
-    vel : rl.Vector2,
-    speed : f32,
-    radius : f32,
-    collider : Collider,
-}
+import ab "../ability"
+import b "../bullet"
+import cl "../collider"
+import m "../map"
 
 Weapon :: struct {
     fire_rate : f32,
     cooldown : f32,
-}
-
-Collider :: struct {
-    type : ColliderType,
-    width : f32,
-    height : f32,
-    radius : f32,
 }
 
 Player :: struct {
@@ -31,9 +18,10 @@ Player :: struct {
     radius : f32,
     speed : f32,
     weapon : Weapon,
+    ability : ab.Ability,
 }
 
-update_player :: proc(p: ^Player, dt: f32, level : Tiled_Map){
+update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map){
     p.vel = {0, 0}
     if rl.IsKeyDown(.W) {p.vel.y = -1}
     if rl.IsKeyDown(.S) {p.vel.y = 1}
@@ -48,12 +36,12 @@ update_player :: proc(p: ^Player, dt: f32, level : Tiled_Map){
     }
 
     next_pos := p.pos + p.vel * dt
-    if !check_player_wall(next_pos, p.radius, level){
+    if !cl.check_player_wall(next_pos, p.radius, level){
         p.pos += p.vel * dt
     }
 }
 
-update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (Bullet, bool){
+update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (b.Bullet, bool){
     if p.weapon.cooldown > 0{
         p.weapon.cooldown -= dt
     }
@@ -62,14 +50,13 @@ update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (Bullet,
         p.weapon.cooldown = p.weapon.fire_rate
         mouse_pos := rl.GetMousePosition()
         world_mouse := rl.GetScreenToWorld2D(mouse_pos, camera)
-        bullet := Bullet{
+        bullet := b.Bullet{
             damage = 10,
             pos = p.pos,
             speed = 500,
             radius = 8,
             dir = rl.Vector2Normalize(world_mouse - p.pos),
             collider = {
-                type = .Circle,
                 radius = 2,
             }
         }
@@ -78,36 +65,18 @@ update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (Bullet,
     return {}, false
 }
 
-update_bullet :: proc(b : ^Bullet, dt : f32){
-    b.vel = b.dir * b.speed
-    b.pos += b.vel * dt
-}
-
 draw_player :: proc(p : Player){
     rl.DrawCircleV(p.pos, p.radius, rl.PURPLE)
 }
 
-draw_bullet :: proc(b : Bullet){
-    rl.DrawCircleV(b.pos, b.radius, rl.RED)
-}
+give_player_spawn_pos :: proc(level : m.Tiled_Map, p : ^Player){
 
-draw_collider :: proc(pos : rl.Vector2, c : Collider){
-    if c.type == .Circle{
-        rl.DrawCircleV(pos, c.radius, rl.GREEN)
-    }
-    if c.type == .Rec{
-        rl.DrawRectangleV(pos, {c.width, c.height}, rl.GREEN)
-    }
-}
-
-give_player_spawn_pos :: proc(g : ^Game_State){
-
-    for layer in g.level.layers{
+    for layer in level.layers{
         if layer.type == "objectgroup" && layer.name == "SpawnPlayer"{
             object := layer.objects[0]
             pos_x := f32(object.x + object.width/2)
             pos_y := f32(object.y + object.height/2)
-            g.player.pos = {pos_x, pos_y}
+            p.pos = {pos_x, pos_y}
             break
         }
     }
