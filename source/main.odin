@@ -13,6 +13,7 @@ import m "map"
 import h "health"
 import pacl "particle"
 import ab "ability"
+import "ui"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -51,6 +52,14 @@ main :: proc(){
         },
         helper_activated = false,
     }
+
+    cooldown := ui.UI_Cooldown{
+        pos = {50, f32(rl.GetScreenHeight() - 100)},
+        width = 64,
+        height = 64,
+        icon = rl.LoadTexture("assets/igel.png")
+    }
+    append(&game.ui_elements, cooldown)
 
     defer{
         delete(game.player_bullets)
@@ -208,6 +217,13 @@ draw_ui :: proc(game : Game_State){
     cstr = strings.clone_to_cstring(str)
     rl.DrawText(cstr, 150, 100, 20, rl.LIGHTGRAY)
     delete_cstring(cstr)
+    
+    for element in game.ui_elements{
+        switch specified_element in element{
+            case ui.UI_Cooldown: ui.draw_cooldown(specified_element, ab.get_cooldown(game.player.ability))
+        }
+    }
+    
 }
 
 cast_ability :: proc(g : ^Game_State){

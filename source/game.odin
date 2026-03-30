@@ -6,6 +6,7 @@ import e "enemy"
 import pl "player"
 import m "map"
 import pacl "particle"
+import "ui"
 
 Game_State :: struct{
     player : pl.Player,
@@ -17,6 +18,7 @@ Game_State :: struct{
     player_bullets : [dynamic]b.Bullet,
     enemies : [dynamic]e.Dummy_Enemy,
     particles : [dynamic]pacl.Particle,
+    ui_elements : [dynamic]ui.UI_Element,
     level : m.Tiled_Map,
 
     helper_activated : bool,
