@@ -14,6 +14,7 @@ import h "health"
 import pacl "particle"
 import ab "ability"
 import "ui"
+import "handler"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -98,7 +99,7 @@ main :: proc(){
 
         rl.BeginDrawing()
         rl.BeginMode2D(game.camera)
-        rl.ClearBackground(rl.BLUE)
+        rl.ClearBackground(rl.BLACK)
         draw_game(&game)
         rl.EndMode2D()
         draw_ui(game)
@@ -127,7 +128,9 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 
     for &b, idx in game.player_bullets{
         bu.update_bullet(&b, dt)
-        check_if_bullet_can_delete(game.camera, b, &game.player_bullets, idx)
+        if check_if_bullet_can_delete(game.camera, b){
+            unordered_remove(&game.player_bullets, idx)
+        }
     }
 
     enemy_inst, ok_enemy := update_spawn(game)
@@ -168,15 +171,10 @@ check_collisions :: proc(game : ^Game_State){
     }
 }
 
-check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet, bullets : ^[dynamic]bu.Bullet, idx : int){
-    view_left := c.target.x - (c.offset.x / c.zoom)
-    view_right := c.target.x + (c.offset.x / c.zoom)
-    view_top := c.target.y - (c.offset.y / c.zoom)
-    view_bottom := c.target.y + (c.offset.y / c.zoom)
+check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet) -> bool{
+    c_world := handler.get_camera_world_position(c)
 
-    if b.pos.x < view_left || b.pos.x > view_right || b.pos.y < view_top || b.pos.y > view_bottom{
-        unordered_remove(bullets, idx)
-    }
+    return b.pos.x < c_world.left || b.pos.x > c_world.right || b.pos.y < c_world.top || b.pos.y > c_world.bottom 
 }
 
 draw_game :: proc(game : ^Game_State){
