@@ -55,13 +55,13 @@ main :: proc(){
         menu = ui.create_pause_menu(.Pause),
     }
 
-    // cooldown := ui.UI_Cooldown{
-    //     pos = {50, f32(rl.GetScreenHeight() - 100)},
-    //     width = 64,
-    //     height = 64,
-    //     icon = rl.LoadTexture("assets/igel.png")
-    // }
-    // append(&game.ui_elements, cooldown)
+    cooldown := ui.UI_Cooldown{
+        pos = {50, f32(rl.GetScreenHeight() - 100)},
+        width = 64,
+        height = 64,
+        icon = rl.LoadTexture("assets/igel.png")
+    }
+    append(&game.ui_elements, cooldown)
     
     defer{
         delete(game.player_bullets)

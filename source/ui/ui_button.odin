@@ -23,7 +23,7 @@ UI_Button :: struct{
 }
 
 create_button :: proc(type : Menu_Type) -> [dynamic]UI_Element{
-    btns := make([dynamic]UI_Element)
+    btns := make([dynamic]UI_Element, context.temp_allocator)
     play_btn : UI_Button
 
     play_btn.text = "Continue"
