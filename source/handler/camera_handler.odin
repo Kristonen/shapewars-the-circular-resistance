@@ -19,3 +19,13 @@ get_camera_world_position :: proc(c : rl.Camera2D) -> Camera_World{
 
     return camera_world
 }
+
+get_camera_follow_pos :: proc(pos : rl.Vector2, c : rl.Camera2D, dt : f32) -> rl.Vector2{
+    lerp_speed : f32 = 5.0
+    follow_pos : rl.Vector2
+    
+    follow_pos.x += (pos.x - c.target.x) * lerp_speed * dt
+    follow_pos.y += (pos.y - c.target.y) * lerp_speed * dt
+    
+    return follow_pos
+}

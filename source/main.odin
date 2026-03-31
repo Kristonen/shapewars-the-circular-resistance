@@ -71,9 +71,10 @@ main :: proc(){
         rl.CloseWindow()
     }
 
-    level, ok := m.load_map("assets/test_map.json", map_allocator)
+    // level, ok := m.load_map("assets/test_map.json", map_allocator)
+    ok := true
     if ok{
-        game.level = level
+        // game.level = level
         game.player = pl.create_player(game.level)
         game.camera.target = game.player.pos
         ability_test := ab.Radial_Liberation{
@@ -92,10 +93,8 @@ main :: proc(){
         activate_helper(&game)
         update_game(&game, dt)
         check_collisions(&game)
+        game.camera.target += handler.get_camera_follow_pos(game.player.pos, game.camera, dt)
 
-        lerp_speed : f32 = 5.0
-        game.camera.target.x += (game.player.pos.x - game.camera.target.x) * lerp_speed * dt
-        game.camera.target.y += (game.player.pos.y - game.camera.target.y) * lerp_speed * dt
 
         rl.BeginDrawing()
         rl.BeginMode2D(game.camera)
@@ -178,7 +177,7 @@ check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet) -> bool{
 }
 
 draw_game :: proc(game : ^Game_State){
-    m.draw_map(game.level, game.helper_activated)
+    // m.draw_map(game.level, game.helper_activated)
     pl.draw_player(game.player)
     
     for bullet in game.player_bullets{
