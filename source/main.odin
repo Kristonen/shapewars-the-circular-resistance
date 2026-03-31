@@ -52,22 +52,25 @@ main :: proc(){
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
         helper_activated = false,
+        menu = ui.create_pause_menu(.Pause),
     }
 
-    cooldown := ui.UI_Cooldown{
-        pos = {50, f32(rl.GetScreenHeight() - 100)},
-        width = 64,
-        height = 64,
-        icon = rl.LoadTexture("assets/igel.png")
-    }
-    append(&game.ui_elements, cooldown)
-
+    // cooldown := ui.UI_Cooldown{
+    //     pos = {50, f32(rl.GetScreenHeight() - 100)},
+    //     width = 64,
+    //     height = 64,
+    //     icon = rl.LoadTexture("assets/igel.png")
+    // }
+    // append(&game.ui_elements, cooldown)
+    
     defer{
         delete(game.player_bullets)
         delete(game.particles)
         delete(game.enemies)
         delete(game.level.tilesets)
         delete(game.level.layers)
+        delete(game.ui_elements)
+        // delete(game.menu.elements)
         rl.CloseWindow()
     }
 
@@ -77,17 +80,17 @@ main :: proc(){
         // game.level = level
         game.player = pl.create_player(game.level)
         game.camera.target = game.player.pos
+
         ability_test := ab.Radial_Liberation{
-        count = 8,
-        cooldown = {
-            cooldown = 5,
+            count = 8,
+            cooldown = {
+                cooldown = 5,
+            }
         }
-    }
-    game.player.ability = ability_test
+        game.player.ability = ability_test
     } else{
         panic("Could not load the level!")
     }
-
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         activate_helper(&game)
@@ -95,10 +98,8 @@ main :: proc(){
         check_collisions(&game)
         game.camera.target += handler.get_camera_follow_pos(game.player.pos, game.camera, dt)
 
-
         rl.BeginDrawing()
         rl.BeginMode2D(game.camera)
-        rl.ClearBackground(rl.BLUE)
         draw_game(&game)
         rl.EndMode2D()
         draw_ui(game)
@@ -107,9 +108,18 @@ main :: proc(){
 }
 
 update_game :: proc(game : ^Game_State, dt : f32) {
-    if !game.is_paused {
-        game.play_time += dt
+    if handler.update_pausing(){
+        game.is_paused = !game.is_paused
     }
+
+    if game.is_paused{
+        ui.update_menu(&game.menu)
+    }
+
+    if game.is_paused{
+        return
+    }
+    game.play_time += dt
 
     pl.update_player(&game.player, dt, game.level)
     bullet, ok_bullet := pl.update_shooting(&game.player, game.camera, dt)
@@ -146,6 +156,8 @@ update_game :: proc(game : ^Game_State, dt : f32) {
     for &p, idx in game.particles{
         pacl.update_particle(&p, dt)
     }
+
+    
 }
 
 check_collisions :: proc(game : ^Game_State){
@@ -160,7 +172,9 @@ check_collisions :: proc(game : ^Game_State){
                 if e.health.is_dead{
                     unordered_remove(&game.enemies, idx_e)
                 }
-                unordered_remove(&game.player_bullets, idx_b)
+                if len(game.player_bullets) - 1 >= idx_b{
+                    unordered_remove(&game.player_bullets, idx_b)
+                }
             }
         }
         if cl.check_bullet_wall(b.pos, b.radius, game.level){
@@ -178,6 +192,7 @@ check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet) -> bool{
 }
 
 draw_game :: proc(game : ^Game_State){
+    rl.ClearBackground(rl.BLUE)
     // m.draw_map(game.level, game.helper_activated)
     pl.draw_player(game.player)
     
@@ -205,6 +220,29 @@ draw_game :: proc(game : ^Game_State){
 }
 
 draw_ui :: proc(game : Game_State){
+    for element in game.ui_elements{
+        switch specified_element in element{
+            //TODO FIX
+            case ui.UI_Cooldown: ui.draw_cooldown(specified_element, ab.get_cooldown(game.player.ability))
+            case ui.UI_Button:
+            case ui.UI_Menu:
+        }
+    }
+
+    if game.is_paused{
+        ui.draw_menu(game.menu)
+    }
+    
+}
+
+cast_ability :: proc(g : ^Game_State){
+    switch &a in g.player.ability{
+        case ab.Radial_Liberation:
+            ab.cast_radial_liberation(a, &g.player_bullets, g.player.pos)
+    }
+}
+
+draw_help_stuff :: proc(game : Game_State){
     ability := ab.get_cooldown(game.player.ability)
     rl.DrawFPS(20, 50)
     str := fmt.tprintf("%.2f, %.2f | %.2f | %.2f", game.player.pos.x, game.player.pos.y, game.player.vel, ability.timer)
@@ -215,18 +253,4 @@ draw_ui :: proc(game : Game_State){
     cstr = strings.clone_to_cstring(str)
     rl.DrawText(cstr, 150, 100, 20, rl.LIGHTGRAY)
     delete_cstring(cstr)
-    
-    for element in game.ui_elements{
-        switch specified_element in element{
-            case ui.UI_Cooldown: ui.draw_cooldown(specified_element, ab.get_cooldown(game.player.ability))
-        }
-    }
-    
-}
-
-cast_ability :: proc(g : ^Game_State){
-    switch &a in g.player.ability{
-        case ab.Radial_Liberation:
-            ab.cast_radial_liberation(a, &g.player_bullets, g.player.pos)
-    }
 }

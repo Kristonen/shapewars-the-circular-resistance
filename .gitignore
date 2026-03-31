@@ -5,9 +5,10 @@
 # Ignore Odin's temporary collection/build data
 .odin/
 bin/
+build
 
 # Ignore .vscode
-.vscode
+.vscode/
 
 #Ignore personal stuff
 git-helper.txt

@@ -2,7 +2,6 @@ package handler
 
 import "core:math/rand"
 import rl "vendor:raylib"
-import "core:fmt"
 
 Spawn_Dir :: enum{
     Top, Right, Bottom, Left

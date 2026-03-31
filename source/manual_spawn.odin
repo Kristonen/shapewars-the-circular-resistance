@@ -25,8 +25,8 @@ update_spawn :: proc(game : ^Game_State) -> (e.Dummy_Enemy, bool){
         }
 
         health := h.Health{
-            current = 90,
-            max = 100,
+            current = 20,
+            max = 20,
         }
         rect := rl.Rectangle{
             x = new_pos.x,

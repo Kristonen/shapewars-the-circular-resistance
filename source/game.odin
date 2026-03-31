@@ -19,6 +19,7 @@ Game_State :: struct{
     enemies : [dynamic]e.Dummy_Enemy,
     particles : [dynamic]pacl.Particle,
     ui_elements : [dynamic]ui.UI_Element,
+    menu : ui.UI_Menu,
     level : m.Tiled_Map,
 
     helper_activated : bool,
