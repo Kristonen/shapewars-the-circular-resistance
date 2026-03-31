@@ -138,8 +138,9 @@ update_game :: proc(game : ^Game_State, dt : f32) {
         append(&game.enemies, enemy_inst)
     }
 
-    for &b, idx in game.enemies{
-        //Enemy Behavior Code
+    for &e, idx in game.enemies{
+        enemy.update_enemy(&e, game.player.pos, dt)
+        h.update_health_bar(e.pos, &e.health_bar, e.health)
     }
 
     for &p, idx in game.particles{
