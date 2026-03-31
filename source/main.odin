@@ -98,7 +98,7 @@ main :: proc(){
 
         rl.BeginDrawing()
         rl.BeginMode2D(game.camera)
-        rl.ClearBackground(rl.BLACK)
+        rl.ClearBackground(rl.BLUE)
         draw_game(&game)
         rl.EndMode2D()
         draw_ui(game)

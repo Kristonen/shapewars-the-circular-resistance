@@ -29,15 +29,7 @@ update_health_bar_pos :: proc(pos : rl.Vector2, rect : ^rl.Rectangle){
 }
 
 draw_health_bar :: proc(bar : Health_Bar, h : Health){
-    inner_health_bar := bar.rect
-    margin : f32 = 2.0
-    inner_health_bar.x += margin
-    inner_health_bar.y += margin
-    inner_health_bar.height -= margin * 2
-    inner_health_bar.width -= margin * 2
-
-    fill_health_bar := inner_health_bar
-    fill_health_bar.width = (h.current/h.max) * bar.rect.width
+    inner_health_bar, fill_health_bar := get_health_bars(bar, h, 2.0)
     rl.DrawRectangleV({bar.rect.x, bar.rect.y}, {bar.rect.width, bar.rect.height}, bar.outline_color)
     rl.DrawRectangleV({inner_health_bar.x, inner_health_bar.y}, {inner_health_bar.width, inner_health_bar.height}, bar.background_color)
     rl.DrawRectangleV({fill_health_bar.x, fill_health_bar.y}, {fill_health_bar.width, fill_health_bar.height}, bar.fill_color)
