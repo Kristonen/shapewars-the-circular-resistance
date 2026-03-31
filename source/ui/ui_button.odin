@@ -33,6 +33,7 @@ create_button :: proc(type : Menu_Type) -> [dynamic]UI_Element{
     play_btn.font_size = 50
     play_btn.n_color = rl.BROWN
     play_btn.f_color = rl.BEIGE
+    play_btn.p_color = rl.VIOLET
     play_btn.color = play_btn.n_color
     pos_x := f32(rl.GetScreenWidth()) / 2 - play_btn.width / 2
     pos_y := f32(rl.GetScreenHeight()) / 2 - play_btn.width / 2
@@ -67,6 +68,11 @@ update_button :: proc(btn : ^UI_Button){
     // }
     if rl.CheckCollisionPointRec(mouse_pos, rect){
         btn.state = .Focus
+
+        if rl.IsMouseButtonDown(.LEFT){
+            btn.state = .Press
+        }
+
     } else{
         btn.state = .None
     }

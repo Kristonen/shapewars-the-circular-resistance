@@ -25,7 +25,7 @@ create_pause_menu :: proc(type : Menu_Type) -> UI_Menu{
 }
 
 update_menu :: proc(menu : ^UI_Menu){
-    for element in menu.elements{
+    for &element in menu.elements{
         switch &e in element{
             case UI_Button: 
                 update_button(&e)
