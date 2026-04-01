@@ -1,12 +1,11 @@
 package player
 
-import "core:fmt"
 import rl "vendor:raylib"
 import ab "../ability"
-import b "../bullet"
 import cl "../collider"
 import m "../map"
 import h "../health"
+import b "../bullet"
 
 Weapon :: struct {
     fire_rate : f32,
@@ -23,6 +22,8 @@ Player :: struct {
     health_bar : h.Health_Bar,
     health : h.Health,
     bar : h.Health_Bar,
+
+    collider : cl.Collider_Circle,
 }
 
 update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map, check_col : bool){
@@ -81,6 +82,9 @@ create_player :: proc(level : m.Tiled_Map) -> Player{
         health = {
           current = 50,
           max = 100,  
+        },
+        collider = {
+            radius = 28,
         }
     }
 }

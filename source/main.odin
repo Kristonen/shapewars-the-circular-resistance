@@ -209,7 +209,6 @@ check_collisions :: proc(game : ^Game_State){
 
 check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet) -> bool{
     c_world := handler.get_camera_world_position(c)
-
     return b.pos.x < c_world.left || b.pos.x > c_world.right || b.pos.y < c_world.top || b.pos.y > c_world.bottom 
 }
 
@@ -219,6 +218,9 @@ draw_game :: proc(game : ^Game_State){
         m.draw_map(game.level, game.helper_activated)
     }
     pl.draw_player(game.player)
+    if game.helper_activated{
+        cl.draw_collider_cirlce(game.player.pos, game.player.collider)
+    }
     
     for bullet in game.player_bullets{
         bu.draw_bullet(bullet)

@@ -4,7 +4,7 @@ import "core:fmt"
 import rl "vendor:raylib"
 import m "../map"
 
-check_bullet_enemy :: proc(pos : rl.Vector2, radius : f32, rect : rl.Rectangle) -> (bool){
+check_bullet_enemy :: proc(pos : rl.Vector2, radius : f32, rect : rl.Rectangle) -> bool{
     return rl.CheckCollisionCircleRec(pos, radius, rect)
 }
 
