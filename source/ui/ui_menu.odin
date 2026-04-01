@@ -53,6 +53,7 @@ update_menu :: proc(menu : ^UI_Menu){
                 update_button(&e)
             case UI_Cooldown:
             case UI_Menu:
+            case UI_Progress_Bar:
         }
     }
 }
@@ -66,6 +67,8 @@ draw_menu :: proc(menu : UI_Menu){
             case UI_Cooldown:
                 //
             case UI_Menu:
+                //
+            case UI_Progress_Bar:
                 //
         }
     }

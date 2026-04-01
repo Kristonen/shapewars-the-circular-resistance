@@ -44,7 +44,6 @@ main :: proc(){
         mem.tracking_allocator_destroy(&track)
         virtual.arena_free_all(&arena)
     }
-     
 
     game := Game_State {
         camera = {
@@ -55,13 +54,26 @@ main :: proc(){
     }
 
     cooldown := ui.UI_Cooldown{
-        pos = {50, f32(rl.GetScreenHeight() - 100)},
+        pos = {550, f32(rl.GetScreenHeight() - 100)},
         width = 64,
         height = 64,
         icon = rl.LoadTexture("assets/igel.png")
     }
     append(&game.ui_elements, cooldown)
-    
+
+    p_bar := ui.UI_Progress_Bar{
+        rect = {
+            x = 50,
+            y = f32(rl.GetScreenHeight() - 100),
+            width = f32(rl.GetScreenWidth()) * 0.25,
+            height = 50,
+        },
+        outline_color = rl.BLACK,
+        background_color = rl.GRAY,
+        fill_color = rl.RED,
+    }
+    append(&game.ui_elements, p_bar)
+
     defer{
         delete(game.player_bullets)
         delete(game.particles)
@@ -70,8 +82,7 @@ main :: proc(){
         delete(game.level.layers)
         delete(game.ui_elements)
         delete(game.menu.elements)
-        // delete(game.last_menu.elements)
-        // delete(game.menu.elements)
+        delete(game.last_menu.elements)
         rl.CloseWindow()
     }
 
@@ -79,6 +90,7 @@ main :: proc(){
     if ok{
         game.level = level
         game.player = pl.create_player(game.level)
+        game.player.pos = m.get_player_spawn_pos(game.level)
         game.camera.target = game.player.pos
 
         ability_test := ab.Radial_Liberation{   
@@ -113,8 +125,9 @@ main :: proc(){
 update_game :: proc(game : ^Game_State, dt : f32) {
     if handler.update_pausing(){
         game.is_paused = !game.is_paused
-        game.menu = ui.create_menu(.Pause)
-        if !game.is_paused{
+        if game.is_paused{
+            game.menu = ui.create_menu(.Pause)
+        } else{
             clear(&game.menu.elements)
             clear(&game.last_menu.elements)
         }
@@ -161,7 +174,7 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 
     for &e, idx in game.enemies{
         enemy.update_enemy(&e, game.player.pos, dt)
-        h.update_health_bar(e.pos, &e.health_bar, e.health)
+        ui.update_progress_bar(&e.health_bar, e.pos)
     }
 
     for &p, idx in game.particles{
@@ -234,9 +247,12 @@ draw_ui :: proc(game : Game_State){
     for element in game.ui_elements{
         switch specified_element in element{
             //TODO FIX
-            case ui.UI_Cooldown: ui.draw_cooldown(specified_element, ab.get_cooldown(game.player.ability))
+            case ui.UI_Cooldown:
+                ui.draw_cooldown(specified_element, ab.get_cooldown(game.player.ability))
             case ui.UI_Button:
             case ui.UI_Menu:
+            case ui.UI_Progress_Bar:
+                ui.draw_progress_bar(specified_element, game.player.health.current, game.player.health.max)
         }
     }
 
@@ -275,6 +291,7 @@ check_interaction_with_menu_ui :: proc(g : ^Game_State){
                 }
             case ui.UI_Menu:
             case ui.UI_Cooldown:
+            case ui.UI_Progress_Bar:
         }
     }
 }

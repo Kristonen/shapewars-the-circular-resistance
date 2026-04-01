@@ -114,3 +114,15 @@ draw_map :: proc(m : Tiled_Map, helper_activated : bool){
         }
     }
 }
+
+get_player_spawn_pos :: proc(m : Tiled_Map) -> rl.Vector2{
+    for layer in m.layers{
+        if layer.type == "objectgroup" && layer.name == "SpawnPlayer"{
+            object := layer.objects[0]
+            pos_x := f32(object.x + object.width/2)
+            pos_y := f32(object.y + object.height/2)
+            return {pos_x, pos_y}
+        }
+    }
+    return {}
+}

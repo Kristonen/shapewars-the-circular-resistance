@@ -20,7 +20,8 @@ Player :: struct {
     speed : f32,
     weapon : Weapon,
     ability : ab.Ability,
-    health : h.Health_Bar,
+    health_bar : h.Health_Bar,
+    health : h.Health,
     bar : h.Health_Bar,
 }
 
@@ -30,8 +31,6 @@ update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map, check_col : bool
     if rl.IsKeyDown(.S) {p.vel.y = 1}
     if rl.IsKeyDown(.A) {p.vel.x = -1}
     if rl.IsKeyDown(.D) {p.vel.x = 1}
-
-
 
     if rl.Vector2Length(p.vel)> 0.01{
         p.vel = rl.Vector2Normalize(p.vel)
@@ -73,24 +72,15 @@ draw_player :: proc(p : Player){
 }
 
 create_player :: proc(level : m.Tiled_Map) -> Player{
-    player : Player
-    player.speed = 400
-    player.radius = 32
-    player.weapon.fire_rate = 0.5
-    player.pos = give_player_spawn_pos(level)
-
-    return player
-}
-
-give_player_spawn_pos :: proc(level : m.Tiled_Map) -> rl.Vector2{
-
-    for layer in level.layers{
-        if layer.type == "objectgroup" && layer.name == "SpawnPlayer"{
-            object := layer.objects[0]
-            pos_x := f32(object.x + object.width/2)
-            pos_y := f32(object.y + object.height/2)
-            return {pos_x, pos_y}
+    return {
+        speed = 400,
+        radius = 32,
+        weapon = {
+            fire_rate = 0.5,
+        },
+        health = {
+          current = 50,
+          max = 100,  
         }
     }
-    return {}
 }

@@ -3,6 +3,7 @@ package enemy
 import rl "vendor:raylib"
 import cl "../collider"
 import h "../health"
+import "../ui"
 
 Enemy_Behavior :: #type proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32)
 
@@ -16,7 +17,7 @@ Dummy_Enemy :: struct {
     update_behavior : Enemy_Behavior,
 
     health : h.Health,
-    health_bar : h.Health_Bar,
+    health_bar : ui.UI_Progress_Bar,
 }
 
 update_enemy :: proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32){
@@ -26,7 +27,7 @@ update_enemy :: proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32){
 
 draw_enemy :: proc(e : Dummy_Enemy){
     rl.DrawRectangleV(e.pos, {e.width, e.height}, e.color)
-    h.draw_health_bar(e.health_bar, e.health)
+    ui.draw_progress_bar(e.health_bar, e.health.current, e.health.max)
 }
 
 melee_enemy_behavior :: proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32){
