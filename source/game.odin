@@ -24,5 +24,6 @@ Game_State :: struct{
     level : m.Tiled_Map,
 
     helper_activated : bool,
+    map_drawing : bool,
     should_close : bool,
 }

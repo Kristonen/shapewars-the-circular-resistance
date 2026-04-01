@@ -52,7 +52,7 @@ create_buttons_for_pause_menu :: proc(m : ^UI_Menu){
 
 create_option_stuff :: proc(m : ^UI_Menu){
     back_btn := get_standard_button()
-    back_btn.pos.y = f32(rl.GetScreenHeight()) * 0.90
+    back_btn.pos.y = f32(rl.GetScreenHeight()) * 0.85
     back_btn.text = "Back"
     back_btn.type = .Back
 

@@ -18,6 +18,4 @@ draw_cooldown :: proc(e : UI_Cooldown, cd : ab.Ability_Cooldown){
     color : rl.Color = {255, 255, 255, 75}
     height := e.height * (cd.timer / cd.cooldown)
     rl.DrawRectangleV(e.pos, {e.width, height}, color)
-
-    
 }

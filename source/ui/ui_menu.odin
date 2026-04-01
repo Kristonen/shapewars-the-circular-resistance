@@ -12,7 +12,6 @@ UI_Menu :: struct{
     width : f32,
     height : f32,
     color : rl.Color,
-    is_active : bool
 }
 
 create_menu :: proc(type : Menu_Type) -> UI_Menu{
@@ -25,9 +24,7 @@ create_menu :: proc(type : Menu_Type) -> UI_Menu{
         case .Options:
             menu = create_options_menu()
             create_option_stuff(&menu)
-
     }
-
     return menu
 }
 
@@ -56,7 +53,6 @@ update_menu :: proc(menu : ^UI_Menu){
                 update_button(&e)
             case UI_Cooldown:
             case UI_Menu:
-            case:
         }
     }
 }
@@ -71,7 +67,6 @@ draw_menu :: proc(menu : UI_Menu){
                 //
             case UI_Menu:
                 //
-            case:
         }
     }
 }

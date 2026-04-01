@@ -75,10 +75,9 @@ main :: proc(){
         rl.CloseWindow()
     }
 
-    // level, ok := m.load_map("assets/test_map.json", map_allocator)
-    ok := true
+    level, ok := m.load_map("assets/test_map.json", map_allocator)
     if ok{
-        // game.level = level
+        game.level = level
         game.player = pl.create_player(game.level)
         game.camera.target = game.player.pos
 
@@ -121,6 +120,10 @@ update_game :: proc(game : ^Game_State, dt : f32) {
         }
     }
 
+    if handler.update_map_drawing(){
+        game.map_drawing = !game.map_drawing
+    }
+
     if game.is_paused{
         ui.update_menu(&game.menu)
         check_interaction_with_menu_ui(game)
@@ -129,7 +132,7 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 
     game.play_time += dt
 
-    pl.update_player(&game.player, dt, game.level)
+    pl.update_player(&game.player, dt, game.level, game.map_drawing)
     bullet, ok_bullet := pl.update_shooting(&game.player, game.camera, dt)
     casting := ab.update_casting(&game.player.ability)
 
@@ -164,8 +167,6 @@ update_game :: proc(game : ^Game_State, dt : f32) {
     for &p, idx in game.particles{
         pacl.update_particle(&p, dt)
     }
-
-    
 }
 
 check_collisions :: proc(game : ^Game_State){
@@ -201,7 +202,9 @@ check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet) -> bool{
 
 draw_game :: proc(game : ^Game_State){
     rl.ClearBackground(rl.BLUE)
-    // m.draw_map(game.level, game.helper_activated)
+    if game.map_drawing{
+        m.draw_map(game.level, game.helper_activated)
+    }
     pl.draw_player(game.player)
     
     for bullet in game.player_bullets{

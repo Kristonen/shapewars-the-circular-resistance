@@ -8,7 +8,10 @@ check_bullet_enemy :: proc(pos : rl.Vector2, radius : f32, rect : rl.Rectangle) 
     return rl.CheckCollisionCircleRec(pos, radius, rect)
 }
 
-check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, level : m.Tiled_Map) -> bool{
+check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, level : m.Tiled_Map, loaded : bool = false) -> bool{
+    if !loaded{
+        return false
+    }
     for layer in level.layers{
         if layer.name == "Walls"{
             for obj in layer.objects{

@@ -24,7 +24,7 @@ Player :: struct {
     bar : h.Health_Bar,
 }
 
-update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map){
+update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map, check_col : bool){
     p.vel = {0, 0}
     if rl.IsKeyDown(.W) {p.vel.y = -1}
     if rl.IsKeyDown(.S) {p.vel.y = 1}
@@ -39,7 +39,7 @@ update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map){
     }
 
     next_pos := p.pos + p.vel * dt
-    if !cl.check_player_wall(next_pos, p.radius, level){
+    if !cl.check_player_wall(next_pos, p.radius, level, check_col){
         p.pos += p.vel * dt
     }
 }
