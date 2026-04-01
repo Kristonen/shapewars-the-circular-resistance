@@ -4,8 +4,14 @@ import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
 
+Button_Proc :: #type proc()
+
 Button_State :: enum{
-    None, Focus, Press
+    None, Focus, Pressing, Pressed
+}
+
+Button_Type :: enum{
+    Continue, Options, Back, Exit
 }
 
 UI_Button :: struct{
@@ -20,38 +26,55 @@ UI_Button :: struct{
     width : f32,
     height : f32,
     state : Button_State,
+    type : Button_Type,
+    on_click : proc(),
 }
 
-create_button :: proc(type : Menu_Type) -> [dynamic]UI_Element{
-    btns := make([dynamic]UI_Element, context.temp_allocator)
-    play_btn : UI_Button
-
+create_buttons_for_pause_menu :: proc(m : ^UI_Menu){
+    play_btn := get_standard_button()
     play_btn.text = "Continue"
-    play_btn.width = 500
-    play_btn.height = 100
-    play_btn.text_color = rl.WHITE
-    play_btn.font_size = 50
-    play_btn.n_color = rl.BROWN
-    play_btn.f_color = rl.BEIGE
-    play_btn.p_color = rl.VIOLET
-    play_btn.color = play_btn.n_color
-    pos_x := f32(rl.GetScreenWidth()) / 2 - play_btn.width / 2
-    pos_y := f32(rl.GetScreenHeight()) / 2 - play_btn.width / 2
-    play_btn.pos = {pos_x, pos_y}
-    play_btn.state = .None
+    play_btn.type = .Continue
 
     opt_btn := play_btn
     opt_btn.text = "Options"
     opt_btn.pos.y += opt_btn.height * 2 + 50
+    opt_btn.type = .Options
     
     esc_btn := opt_btn
     esc_btn.text = "Exit"
     esc_btn.pos.y += esc_btn.height * 2 + 50
+    esc_btn.type = .Exit
 
-    append(&btns, play_btn)
-    append(&btns, opt_btn)
-    append(&btns, esc_btn)
-    return btns
+    append(&m.elements, play_btn)
+    append(&m.elements, opt_btn)
+    append(&m.elements, esc_btn)
+}
+
+create_option_stuff :: proc(m : ^UI_Menu){
+    back_btn := get_standard_button()
+    back_btn.pos.y = f32(rl.GetScreenHeight()) * 0.90
+    back_btn.text = "Back"
+    back_btn.type = .Back
+
+    append(&m.elements, back_btn)
+}
+
+get_standard_button :: proc() -> UI_Button{
+    btn : UI_Button
+    btn.text = "Continue"
+    btn.width = 500
+    btn.height = 100
+    btn.text_color = rl.WHITE
+    btn.font_size = 50
+    btn.n_color = rl.BROWN
+    btn.f_color = rl.BEIGE
+    btn.p_color = rl.VIOLET
+    btn.color = btn.n_color
+    pos_x := f32(rl.GetScreenWidth()) / 2 - btn.width / 2
+    pos_y := f32(rl.GetScreenHeight()) / 2 - btn.width / 2
+    btn.pos = {pos_x, pos_y}
+    btn.state = .None
+    return btn
 }
 
 update_button :: proc(btn : ^UI_Button){
@@ -62,15 +85,15 @@ update_button :: proc(btn : ^UI_Button){
         width = btn.width,
         height = btn.height,
     }
-    // if btn.text == "Continue"{
-    //     fmt.printfln("Mouse pos: %d | %d", mouse_pos.x, mouse_pos.y)
-    //     fmt.printfln("Btn pos: %d | %d", btn.pos.x, btn.pos.y)
-    // }
+
     if rl.CheckCollisionPointRec(mouse_pos, rect){
         btn.state = .Focus
 
         if rl.IsMouseButtonDown(.LEFT){
-            btn.state = .Press
+            btn.state = .Pressing
+        }
+        if rl.IsMouseButtonReleased(.LEFT){
+            btn.state = .Pressed
         }
 
     } else{
@@ -83,7 +106,8 @@ update_button_color :: proc(btn : ^UI_Button){
     switch btn.state{
         case .None: btn.color = btn.n_color
         case .Focus: btn.color = btn.f_color
-        case .Press: btn.color = btn.p_color
+        case .Pressing: btn.color = btn.p_color
+        case .Pressed: btn.color = rl.BLACK
     }
 }
 

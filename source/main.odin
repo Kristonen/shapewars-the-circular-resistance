@@ -52,7 +52,6 @@ main :: proc(){
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
         helper_activated = false,
-        menu = ui.create_pause_menu(.Pause),
     }
 
     cooldown := ui.UI_Cooldown{
@@ -70,6 +69,8 @@ main :: proc(){
         delete(game.level.tilesets)
         delete(game.level.layers)
         delete(game.ui_elements)
+        delete(game.menu.elements)
+        // delete(game.last_menu.elements)
         // delete(game.menu.elements)
         rl.CloseWindow()
     }
@@ -81,7 +82,7 @@ main :: proc(){
         game.player = pl.create_player(game.level)
         game.camera.target = game.player.pos
 
-        ability_test := ab.Radial_Liberation{
+        ability_test := ab.Radial_Liberation{   
             count = 8,
             cooldown = {
                 cooldown = 5,
@@ -104,21 +105,28 @@ main :: proc(){
         rl.EndMode2D()
         draw_ui(game)
         rl.EndDrawing()
+        if game.should_close{
+            break
+        }
     }
 }
 
 update_game :: proc(game : ^Game_State, dt : f32) {
     if handler.update_pausing(){
         game.is_paused = !game.is_paused
+        game.menu = ui.create_menu(.Pause)
+        if !game.is_paused{
+            clear(&game.menu.elements)
+            clear(&game.last_menu.elements)
+        }
     }
 
     if game.is_paused{
         ui.update_menu(&game.menu)
+        check_interaction_with_menu_ui(game)
+        return  
     }
 
-    if game.is_paused{
-        return
-    }
     game.play_time += dt
 
     pl.update_player(&game.player, dt, game.level)
@@ -253,4 +261,31 @@ draw_help_stuff :: proc(game : Game_State){
     cstr = strings.clone_to_cstring(str)
     rl.DrawText(cstr, 150, 100, 20, rl.LIGHTGRAY)
     delete_cstring(cstr)
+}
+
+check_interaction_with_menu_ui :: proc(g : ^Game_State){
+    for &element in g.menu.elements{
+        switch &e in element{
+            case ui.UI_Button:
+                if e.state == .Pressed{
+                    check_which_btn_was_pressed(g, &e)
+                }
+            case ui.UI_Menu:
+            case ui.UI_Cooldown:
+        }
+    }
+}
+
+check_which_btn_was_pressed :: proc(g : ^Game_State, b : ^ui.UI_Button){
+    b.state = .None
+    switch b.type{
+        case .Continue:
+            on_click_continue(g)
+        case .Options:
+            on_click_options(g)
+        case .Back:
+            on_click_back(g)
+        case .Exit:
+            on_click_quit(g)
+    }
 }
