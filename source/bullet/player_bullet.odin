@@ -1,5 +1,6 @@
 package bullet
 
+import "core:fmt"
 import rl "vendor:raylib"
 import cl "../collider"
 
@@ -14,10 +15,28 @@ Bullet :: struct {
 }
 
 update_bullet :: proc(b : ^Bullet, dt : f32){
-    b.vel = b.dir * b.speed //Not 100% sure, but can probaly be called one
+    b.vel = b.dir * b.speed //Not 100% sure, but can probaly be called once
     b.pos += b.vel * dt
+    b.collider.pos = b.pos
 }
 
 draw_bullet :: proc(b : Bullet){
     rl.DrawCircleV(b.pos, b.radius, rl.RED)
+}
+
+create_bullet :: proc(pos : rl.Vector2, c : rl.Camera2D) -> Bullet{
+    mouse_pos := rl.GetMousePosition()
+    world_pos := rl.GetScreenToWorld2D(mouse_pos, c)
+    b := Bullet{
+        damage = 10,
+        radius = 8,
+        speed = 500,
+        pos = pos,
+        dir = rl.Vector2Normalize(world_pos - pos),
+    }
+    b.collider = {
+        pos = pos,
+        radius = b.radius/2,
+    }
+    return b
 }

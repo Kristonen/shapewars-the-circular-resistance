@@ -1,15 +1,24 @@
 package player
 
+import "core:fmt"
 import rl "vendor:raylib"
 import ab "../ability"
 import cl "../collider"
 import m "../map"
 import h "../health"
 import b "../bullet"
+import "../ui"
 
 Weapon :: struct {
     fire_rate : f32,
     cooldown : f32,
+}
+
+Loot_Bag :: struct{
+    value : f32,
+    max_value : f32,
+    level : i32,
+    level_increase : f32,
 }
 
 Player :: struct {
@@ -19,9 +28,11 @@ Player :: struct {
     speed : f32,
     weapon : Weapon,
     ability : ab.Ability,
-    health_bar : h.Health_Bar,
     health : h.Health,
-    bar : h.Health_Bar,
+    h_bar : ui.UI_Progress_Bar,
+    v_bar : ui.UI_Progress_Bar,
+
+    loot_bag : Loot_Bag,
 
     collider : cl.Collider_Circle,
 }
@@ -41,6 +52,7 @@ update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map, check_col : bool
     next_pos := p.pos + p.vel * dt
     if !cl.check_player_wall(next_pos, p.radius, level, check_col){
         p.pos += p.vel * dt
+        p.collider.pos = p.pos
     }
 }
 
@@ -53,16 +65,7 @@ update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (b.Bulle
         p.weapon.cooldown = p.weapon.fire_rate
         mouse_pos := rl.GetMousePosition()
         world_mouse := rl.GetScreenToWorld2D(mouse_pos, camera)
-        bullet := b.Bullet{
-            damage = 10,
-            pos = p.pos,
-            speed = 500,
-            radius = 8,
-            dir = rl.Vector2Normalize(world_mouse - p.pos),
-            collider = {
-                radius = 2,
-            }
-        }
+        bullet := b.create_bullet(p.pos, camera)
         return bullet, true
     }
     return {}, false
@@ -85,6 +88,20 @@ create_player :: proc(level : m.Tiled_Map) -> Player{
         },
         collider = {
             radius = 28,
+        },
+        loot_bag = {
+            max_value = 50,
+            level = 1,
+            level_increase = 20,
         }
+    }
+}
+
+increase_value :: proc(bag : ^Loot_Bag, value : f32){
+    bag.value += value
+    if bag.value >= bag.max_value{
+        bag.level += 1
+        bag.value -= bag.max_value
+        bag.max_value += bag.level_increase
     }
 }

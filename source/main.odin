@@ -15,6 +15,7 @@ import pacl "particle"
 import ab "ability"
 import "ui"
 import "handler"
+import d "drop"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -63,18 +64,7 @@ main :: proc(){
     }
     append(&game.ui_elements, cooldown)
 
-    p_bar := ui.UI_Progress_Bar{
-        rect = {
-            x = 50,
-            y = f32(rl.GetScreenHeight() - 100),
-            width = f32(rl.GetScreenWidth()) * 0.25,
-            height = 50,
-        },
-        outline_color = rl.BLACK,
-        background_color = rl.GRAY,
-        fill_color = rl.RED,
-    }
-    append(&game.ui_elements, p_bar)
+    // append(&game.ui_elements, p_bar)
 
     defer{
         delete(game.player_bullets)
@@ -84,6 +74,7 @@ main :: proc(){
         delete(game.level.layers)
         delete(game.ui_elements)
         delete(game.menu.elements)
+        delete(game.loot)
         rl.CloseWindow()
     }
 
@@ -93,6 +84,26 @@ main :: proc(){
         game.player = pl.create_player(game.level)
         game.player.pos = m.get_player_spawn_pos(game.level)
         game.camera.target = game.player.pos
+        rect := rl.Rectangle {
+            x = 50,
+            y = f32(rl.GetScreenHeight() - 100),
+            width = f32(rl.GetScreenWidth()) * 0.25,
+            height = 50,
+        }
+        p_bar := ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
+        p_bar.show_text = true
+        p_bar.min = 0
+        p_bar.max = game.player.health.max
+        p_bar.value = game.player.health.current
+        p_bar.type = .Health
+
+        v_bar := p_bar
+        v_bar.rect.x += p_bar.rect.width + 100
+        v_bar.type = .Value
+        v_bar.fill_color = rl.BLUE
+        v_bar.value = game.player.loot_bag.value
+        v_bar.max = game.player.loot_bag.max_value
+
 
         ability_test := ab.Radial_Liberation{   
             count = 8,
@@ -101,6 +112,10 @@ main :: proc(){
             }
         }
         game.player.ability = ability_test
+        game.player.h_bar = p_bar
+        game.player.v_bar = v_bar
+        append(&game.ui_elements, game.player.h_bar)
+        append(&game.ui_elements, game.player.v_bar)
     } else{
         panic("Could not load the level!")
     }
@@ -158,6 +173,22 @@ update_game :: proc(game : ^Game_State, dt : f32) {
         cast_ability(game)
     }
 
+    for &e in game.ui_elements{
+        switch &element in e{
+            case ui.UI_Cooldown:
+            case ui.UI_Button:
+            case ui.UI_Menu:
+            case ui.UI_Progress_Bar:
+                if element.type == .Health{
+                    ui.update_progress_bar_player(&element, game.player.h_bar.value)
+                } else if element.type == .Value{
+                    ui.update_progress_bar_player(&element, game.player.loot_bag.value)
+                }
+            case ui.UI_Label:
+            case ui.UI_Slider:
+        }
+    }
+
     ab.update_ability(&game.player.ability, dt)
 
     for &b, idx in game.player_bullets{
@@ -165,6 +196,10 @@ update_game :: proc(game : ^Game_State, dt : f32) {
         if check_if_bullet_can_delete(game.camera, b){
             unordered_remove(&game.player_bullets, idx)
         }
+    }
+
+    for &l, idx_l in game.loot{
+        d.update_loot(&l, game.player.pos, dt)
     }
 
     enemy_inst, ok_enemy := update_spawn(game)
@@ -175,7 +210,7 @@ update_game :: proc(game : ^Game_State, dt : f32) {
 
     for &e, idx in game.enemies{
         enemy.update_enemy(&e, game.player.pos, dt)
-        ui.update_progress_bar(&e.health_bar, e.pos)
+        ui.update_progress_bar_enemy(&e.health_bar, e.pos)
     }
 
     for &p, idx in game.particles{
@@ -193,6 +228,8 @@ check_collisions :: proc(game : ^Game_State){
                 pacl.create_hit_particles(&game.particles, particle_pos)
                 h.take_damage(b, &e.health)
                 if e.health.is_dead{
+                    shard := d.create_shape_shard(e.origin)
+                    append(&game.loot, shard)
                     unordered_remove(&game.enemies, idx_e)
                 }
                 if len(game.player_bullets) - 1 >= idx_b{
@@ -204,6 +241,18 @@ check_collisions :: proc(game : ^Game_State){
             particle_pos : rl.Vector2 = {b.pos.x + b.radius, b.pos.y + b.radius}
             pacl.create_destroy_bullet_particle(&game.particles, particle_pos)
             unordered_remove(&game.player_bullets, idx_b)
+        }
+    }
+
+    for &l, idx in game.loot{
+        if cl.check_circle_circle(game.player.collider, l.pickup){
+            pl.increase_value(&game.player.loot_bag, l.value)
+            ui.update_progress_bar_player(&game.player.v_bar, game.player.loot_bag.value)
+            unordered_remove(&game.loot, idx)
+        }
+
+        if cl.check_circle_circle(game.player.collider, l.detection){
+            l.is_following = true
         }
     }
 }
@@ -220,20 +269,28 @@ draw_game :: proc(game : ^Game_State){
     }
     pl.draw_player(game.player)
     if game.helper_activated{
-        cl.draw_collider_cirlce(game.player.pos, game.player.collider)
+        cl.draw_collider_cirlce(game.player.collider)
     }
     
     for bullet in game.player_bullets{
         bu.draw_bullet(bullet)
         if game.helper_activated{
-            cl.draw_collider_cirlce(bullet.pos, bullet.collider)
+            cl.draw_collider_cirlce(bullet.collider)
         }
     }
 
     for e in game.enemies{
         enemy.draw_enemy(e)
         if game.helper_activated{
-            cl.draw_collider_rect(e.pos, e.collidor)
+            cl.draw_collider_rect(e.collidor)
+        }
+    }
+
+    for s in game.loot{
+        d.draw_loot(s)
+        if game.helper_activated{
+            cl.draw_collider_cirlce(s.detection)
+            cl.draw_collider_cirlce(s.pickup)
         }
     }
 
@@ -243,7 +300,6 @@ draw_game :: proc(game : ^Game_State){
             unordered_remove(&game.particles, idx)
         }
     }
-
 }
 
 draw_ui :: proc(game : Game_State){
@@ -255,7 +311,7 @@ draw_ui :: proc(game : Game_State){
             case ui.UI_Button:
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:
-                ui.draw_progress_bar(specified_element, game.player.health.current, game.player.health.max)
+                ui.draw_progress_bar(specified_element)
             case ui.UI_Label:
             case ui.UI_Slider:
         }

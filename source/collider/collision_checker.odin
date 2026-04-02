@@ -48,3 +48,7 @@ check_bullet_wall :: proc(pos_bullet : rl.Vector2, radius : f32, level : m.Tiled
     }
     return false
 }
+
+check_circle_circle :: proc(col_o, col_t : Collider_Circle) -> bool{
+    return rl.CheckCollisionCircles(col_o.pos, col_o.radius, col_t.pos, col_t.radius)
+}
