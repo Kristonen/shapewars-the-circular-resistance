@@ -21,7 +21,7 @@ create_label :: proc(text : string, pos : rl.Vector2, size : rl.Vector2) -> UI_L
         height = size.y, 
         font_size = 50,
         text_color = rl.WHITE,
-        color = rl.BLACK,
+        color = rl.GRAY,
     }
 }
 
@@ -30,7 +30,15 @@ update_label :: proc(l : ^UI_Label){
 }
 
 draw_label :: proc(l : UI_Label){
+    rec := rl.Rectangle{
+        x = l.pos.x,
+        y = l.pos.y,
+        width = l.width,
+        height = l.height,
+    }
+    
     rl.DrawRectangleV(l.pos, {l.width, l.height}, l.color)
+    rl.DrawRectangleLinesEx(rec, 5, rl.BLACK)
     text := strings.clone_to_cstring(l.text)
     text_width := rl.MeasureText(text, l.font_size)
     text_height := l.font_size

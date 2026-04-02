@@ -27,7 +27,6 @@ UI_Button :: struct{
     height : f32,
     state : Button_State,
     type : Button_Type,
-    on_click : proc(),
 }
 
 create_button :: proc(text : string, pos : rl.Vector2, size : rl.Vector2) -> UI_Button{
@@ -80,7 +79,14 @@ update_button_color :: proc(btn : ^UI_Button){
 }
 
 draw_button :: proc(btn : UI_Button){
+    rect := rl.Rectangle{
+        x = btn.pos.x,
+        y = btn.pos.y,
+        width = btn.width,
+        height = btn.height,
+    }
     rl.DrawRectangleV(btn.pos, {btn.width, btn.height}, btn.color)
+    rl.DrawRectangleLinesEx(rect, 5, rl.BLACK)
     text := strings.clone_to_cstring(btn.text)
     text_width := rl.MeasureText(text, btn.font_size)
     text_height := btn.font_size
