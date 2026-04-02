@@ -14,35 +14,18 @@ UI_Menu :: struct{
     color : rl.Color,
 }
 
-create_menu :: proc(type : Menu_Type) -> UI_Menu{
-    menu : UI_Menu
+create_menu :: proc(m : ^UI_Menu){
+    m.width = f32(rl.GetScreenWidth())
+    m.height = f32(rl.GetScreenHeight())
+    m.color = {0, 0, 0, 100}
+}
+
+create_menu_elements :: proc(elements : ^[dynamic]UI_Element, type : Menu_Type){
+    clear(elements)
     switch type{
         case .Pause:
-            menu = create_pause_menu()
-            create_buttons_for_pause_menu(&menu)
-        case.Main:
         case .Options:
-            menu = create_options_menu()
-            create_option_stuff(&menu)
-    }
-    return menu
-}
-
-create_pause_menu :: proc() -> UI_Menu{
-    color := rl.Color{0, 0, 0, 100}
-    return {
-        width = f32(rl.GetScreenWidth()),
-        height = f32(rl.GetScreenHeight()),
-        color = color,
-    }
-}
-
-create_options_menu :: proc() -> UI_Menu{
-    color := rl.Color{0, 0, 0, 100}
-    return {
-        width = f32(rl.GetScreenWidth()),
-        height = f32(rl.GetScreenHeight()),
-        color = color,
+        case .Main:
     }
 }
 
@@ -54,6 +37,10 @@ update_menu :: proc(menu : ^UI_Menu){
             case UI_Cooldown:
             case UI_Menu:
             case UI_Progress_Bar:
+            case UI_Label:
+                update_label(&e)
+            case UI_Slider:
+                update_slider(&e)
         }
     }
 }
@@ -70,6 +57,10 @@ draw_menu :: proc(menu : UI_Menu){
                 //
             case UI_Progress_Bar:
                 //
+            case UI_Label:
+                draw_label(e)
+            case UI_Slider:
+                draw_slider(e)
         }
     }
 }

@@ -51,7 +51,9 @@ main :: proc(){
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
         helper_activated = false,
+        current_menu = .Pause,
     }
+    sync_menu(&game)
 
     cooldown := ui.UI_Cooldown{
         pos = {550, f32(rl.GetScreenHeight() - 100)},
@@ -82,7 +84,6 @@ main :: proc(){
         delete(game.level.layers)
         delete(game.ui_elements)
         delete(game.menu.elements)
-        delete(game.last_menu.elements)
         rl.CloseWindow()
     }
 
@@ -126,10 +127,10 @@ update_game :: proc(game : ^Game_State, dt : f32) {
     if handler.update_pausing(){
         game.is_paused = !game.is_paused
         if game.is_paused{
-            game.menu = ui.create_menu(.Pause)
+            game.current_menu = .Pause
+            sync_menu(game)
         } else{
             clear(&game.menu.elements)
-            clear(&game.last_menu.elements)
         }
     }
 
@@ -255,6 +256,8 @@ draw_ui :: proc(game : Game_State){
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:
                 ui.draw_progress_bar(specified_element, game.player.health.current, game.player.health.max)
+            case ui.UI_Label:
+            case ui.UI_Slider:
         }
     }
 
@@ -294,6 +297,8 @@ check_interaction_with_menu_ui :: proc(g : ^Game_State){
             case ui.UI_Menu:
             case ui.UI_Cooldown:
             case ui.UI_Progress_Bar:
+            case ui.UI_Label:   
+            case ui.UI_Slider:         
         }
     }
 }
@@ -309,5 +314,45 @@ check_which_btn_was_pressed :: proc(g : ^Game_State, b : ^ui.UI_Button){
             on_click_back(g)
         case .Exit:
             on_click_quit(g)
+    }
+}
+
+sync_menu :: proc(g : ^Game_State){
+    clear(&g.menu.elements)
+    ui.create_menu(&g.menu)
+    switch g.current_menu{
+        case .Pause:
+            width : f32 = 500
+            height : f32 = 100
+            pos_x := f32(rl.GetScreenWidth()) / 2 - width/2
+            pos_y := f32(rl.GetScreenHeight()) * 0.25
+            btn := ui.create_button("Continue", {pos_x, pos_y}, {width, height})
+            btn.type = .Continue
+            append(&g.menu.elements, btn)
+            pos_y += btn.height * 2 + 50 
+            btn = ui.create_button("Options", {pos_x, pos_y}, {width, height})
+            btn.type = .Options
+            append(&g.menu.elements, btn)
+            pos_y += btn.height * 2 + 50 
+            btn = ui.create_button("Exit", {pos_x, pos_y}, {width, height})
+            btn.type = .Exit
+            append(&g.menu.elements, btn)
+        case .Options:
+            width : f32 = 500
+            height : f32 = 100
+            pos_x := f32(rl.GetScreenWidth()) / 2 - width /2
+            pos_y := f32(rl.GetScreenHeight()) * 0.85
+            btn := ui.create_button("Back", {pos_x, pos_y}, {width, height})
+            btn.type = .Back
+            append(&g.menu.elements, btn)
+
+            label := ui.create_label("Test:", {100, 100}, {500, 100})
+            append(&g.menu.elements, label)
+
+            slider := ui.create_slider({700, 100}, {1000, 100})
+            append(&g.menu.elements, slider)
+
+            
+        case.Main:
     }
 }

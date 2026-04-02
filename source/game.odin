@@ -20,7 +20,8 @@ Game_State :: struct{
     particles : [dynamic]pacl.Particle,
     ui_elements : [dynamic]ui.UI_Element,
     menu : ui.UI_Menu,
-    last_menu : ui.UI_Menu,
+    current_menu : ui.Menu_Type,
+    last_menu : ui.Menu_Type,
     level : m.Tiled_Map,
 
     helper_activated : bool,

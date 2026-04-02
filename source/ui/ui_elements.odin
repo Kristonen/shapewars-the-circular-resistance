@@ -5,4 +5,6 @@ UI_Element :: union{
     UI_Button,
     UI_Menu,
     UI_Progress_Bar,
+    UI_Label,
+    UI_Slider,
 }

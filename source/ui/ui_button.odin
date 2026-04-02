@@ -30,51 +30,20 @@ UI_Button :: struct{
     on_click : proc(),
 }
 
-create_buttons_for_pause_menu :: proc(m : ^UI_Menu){
-    play_btn := get_standard_button()
-    play_btn.text = "Continue"
-    play_btn.type = .Continue
-
-    opt_btn := play_btn
-    opt_btn.text = "Options"
-    opt_btn.pos.y += opt_btn.height * 2 + 50
-    opt_btn.type = .Options
-    
-    esc_btn := opt_btn
-    esc_btn.text = "Exit"
-    esc_btn.pos.y += esc_btn.height * 2 + 50
-    esc_btn.type = .Exit
-
-    append(&m.elements, play_btn)
-    append(&m.elements, opt_btn)
-    append(&m.elements, esc_btn)
-}
-
-create_option_stuff :: proc(m : ^UI_Menu){
-    back_btn := get_standard_button()
-    back_btn.pos.y = f32(rl.GetScreenHeight()) * 0.85
-    back_btn.text = "Back"
-    back_btn.type = .Back
-
-    append(&m.elements, back_btn)
-}
-
-get_standard_button :: proc() -> UI_Button{
-    btn : UI_Button
-    btn.text = "Continue"
-    btn.width = 500
-    btn.height = 100
-    btn.text_color = rl.WHITE
-    btn.font_size = 50
-    btn.n_color = rl.BROWN
-    btn.f_color = rl.BEIGE
-    btn.p_color = rl.VIOLET
-    btn.color = btn.n_color
-    pos_x := f32(rl.GetScreenWidth()) / 2 - btn.width / 2
-    pos_y := f32(rl.GetScreenHeight()) / 2 - btn.width / 2
-    btn.pos = {pos_x, pos_y}
-    btn.state = .None
-    return btn
+create_button :: proc(text : string, pos : rl.Vector2, size : rl.Vector2) -> UI_Button{
+    return {
+        text = text,
+        pos = {pos.x, pos.y},
+        width = size.x,
+        height = size.y,
+        font_size = 50,
+        text_color = rl.WHITE,
+        n_color = rl.BROWN,
+        color = rl.BROWN,
+        f_color = rl.BEIGE,
+        p_color = rl.VIOLET,
+        state = .None
+    }
 }
 
 update_button :: proc(btn : ^UI_Button){
@@ -85,7 +54,6 @@ update_button :: proc(btn : ^UI_Button){
         width = btn.width,
         height = btn.height,
     }
-
     if rl.CheckCollisionPointRec(mouse_pos, rect){
         btn.state = .Focus
 
