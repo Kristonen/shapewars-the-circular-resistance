@@ -1,0 +1,79 @@
+package game
+
+import "core:fmt"
+import rl "vendor:raylib"
+import "ui"
+import "bullet"
+import "particle"
+
+check_bullet :: proc(g : ^Game_State){
+    for &b, idx in g.player_bullets{
+        check_bullet_enemy(g, &b)
+        check_bullet_wall(g, &b)
+    }
+}
+
+check_bullet_enemy :: proc(g : ^Game_State, b : ^bullet.Bullet){
+    for &e in g.enemies{
+        e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
+        if rl.CheckCollisionCircleRec(b.pos, b.radius, e_rect){
+            particle_pos : rl.Vector2 = {e.pos.x + e.width/2, e.pos.y + e.height/2}
+            particle.create_hit_particles(&g.particles, particle_pos)
+            e.health.take_dmg(&e.health, b.damage)
+            b.is_active = false    
+        }
+    }
+}
+
+check_bullet_wall :: proc(g : ^Game_State, b : ^bullet.Bullet){
+    for layer in g.level.layers{
+        if layer.name != "Walls" do continue
+        for obj in layer.objects{
+            rect := rl.Rectangle{
+                x = obj.x, y = obj.y,
+                width = obj.width, height = obj.height,
+            }
+
+            if rl.CheckCollisionCircleRec(b.pos, b.radius, rect){
+                b.is_active = false
+                particle.create_destroy_bullet_particle(&g.particles, b.pos)
+            }
+        }
+    }
+}
+
+check_collision_menu :: proc(g : ^Game_State){
+    for &element in g.menu.elements{
+        switch &e in element{
+            case ui.UI_Cooldown:
+            case ui.UI_Button:
+                check_collision_button(&e)
+            case ui.UI_Menu:
+            case ui.UI_Progress_Bar:
+            case ui.UI_Label:
+            case ui.UI_Slider:
+        }
+    }
+}
+
+check_collision_button :: proc(b : ^ui.UI_Button){
+    mouse_pos := rl.GetMousePosition()
+    rect := rl.Rectangle{
+        x = b.pos.x,
+        y = b.pos.y,
+        width = b.width,
+        height = b.height,
+    }
+
+    if rl.CheckCollisionPointRec(mouse_pos, rect){
+        b.state = .Focus
+        if rl.IsMouseButtonDown(.LEFT){
+            b.state = .Pressing
+        }
+        if rl.IsMouseButtonReleased(.LEFT){
+            b.state = .Pressed
+        }
+    } else{
+        b.state = .None
+    }
+}

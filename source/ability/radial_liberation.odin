@@ -7,7 +7,6 @@ import "core:math"
 
 Radial_Liberation :: struct{
     count : int,
-    cooldown : Ability_Cooldown,
 }
 
 cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]bullet.Bullet, pos : rl.Vector2){
@@ -26,7 +25,8 @@ cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]bullet
             radius = 8,
             collider = {
                 radius = 8,
-            }
+            },
+            is_active = true
         }
         append(bullets, b)
     }

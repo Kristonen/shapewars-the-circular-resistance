@@ -28,6 +28,7 @@ Player :: struct {
     speed : f32,
     weapon : Weapon,
     ability : ab.Ability,
+    ability_cd : ab.Ability_Cooldown,
     health : h.Health,
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
@@ -63,8 +64,6 @@ update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (b.Bulle
 
     if rl.IsMouseButtonDown(.LEFT) && p.weapon.cooldown <= 0{
         p.weapon.cooldown = p.weapon.fire_rate
-        mouse_pos := rl.GetMousePosition()
-        world_mouse := rl.GetScreenToWorld2D(mouse_pos, camera)
         bullet := b.create_bullet(p.pos, camera)
         return bullet, true
     }

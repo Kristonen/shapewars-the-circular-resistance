@@ -1,6 +1,5 @@
 package enemy
 
-import "core:slice/heap"
 import rl "vendor:raylib"
 import cl "../collider"
 import h "../health"
@@ -39,6 +38,7 @@ create_enemy :: proc(pos : rl.Vector2) -> Dummy_Enemy{
     health := h.Health{
         current = 20,
         max = 20,
+        take_dmg = h.take_damage,
     }
 
     rect := rl.Rectangle{
@@ -55,18 +55,6 @@ create_enemy :: proc(pos : rl.Vector2) -> Dummy_Enemy{
     enemy.origin = {enemy.pos.x + enemy.width/2, enemy.pos.y + enemy.height/2}
 
     return enemy
-}
-
-update_enemy :: proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32){
-    e.update_behavior(e, player_pos, dt)
-    e.origin = {e.pos.x + e.width/2, e.pos.y + e.height/2}
-    e.collidor.pos = e.pos
-    e.health_bar.value = e.health.current
-}
-
-draw_enemy :: proc(e : Dummy_Enemy){
-    rl.DrawRectangleV(e.pos, {e.width, e.height}, e.color)
-    ui.draw_progress_bar(e.health_bar)
 }
 
 melee_enemy_behavior :: proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32){

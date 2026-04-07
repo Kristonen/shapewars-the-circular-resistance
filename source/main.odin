@@ -107,11 +107,12 @@ main :: proc(){
 
         ability_test := ab.Radial_Liberation{   
             count = 8,
-            cooldown = {
-                cooldown = 5,
-            }
+        }
+        ability_cd := ab.Ability_Cooldown{
+            cast_rate = 5,
         }
         game.player.ability = ability_test
+        game.player.ability_cd = ability_cd
         game.player.h_bar = p_bar
         game.player.v_bar = v_bar
         append(&game.ui_elements, game.player.h_bar)
@@ -121,242 +122,83 @@ main :: proc(){
     }
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
-        activate_helper(&game)
+        
         update_game(&game, dt)
         check_collisions(&game)
         game.camera.target += handler.get_camera_follow_pos(game.player.pos, game.camera, dt)
+        draw_game(game)
 
-        rl.BeginDrawing()
-        rl.BeginMode2D(game.camera)
-        draw_game(&game)
-        rl.EndMode2D()
-        draw_ui(game)
-
-        rl.EndDrawing()
         if game.should_close{
             break
         }
     }
 }
 
-update_game :: proc(game : ^Game_State, dt : f32) {
-    if handler.update_pausing(){
-        game.is_paused = !game.is_paused
-        if game.is_paused{
-            game.current_menu = .Pause
-            sync_menu(game)
-        } else{
-            clear(&game.menu.elements)
-        }
-    }
-
-    if handler.update_map_drawing(){
-        game.map_drawing = !game.map_drawing
-    }
-
-    if game.is_paused{
-        ui.update_menu(&game.menu)
-        check_interaction_with_menu_ui(game)
-        return  
-    }
-
-    game.play_time += dt
-
-    pl.update_player(&game.player, dt, game.level, game.map_drawing)
-    bullet, ok_bullet := pl.update_shooting(&game.player, game.camera, dt)
-    casting := ab.update_casting(&game.player.ability)
-
-    if ok_bullet{
-        append(&game.player_bullets, bullet)
-    }
-
-    if casting{
-        cast_ability(game)
-    }
-
-    for &e in game.ui_elements{
-        switch &element in e{
-            case ui.UI_Cooldown:
-            case ui.UI_Button:
-            case ui.UI_Menu:
-            case ui.UI_Progress_Bar:
-                if element.type == .Health{
-                    ui.update_progress_bar_player(&element, game.player.h_bar.value, game.player.h_bar.max)
-                } else if element.type == .Value{
-                    ui.update_progress_bar_player(&element, game.player.loot_bag.value, game.player.loot_bag.max_value)
-                }
-            case ui.UI_Label:
-            case ui.UI_Slider:
-        }
-    }
-
-    ab.update_ability(&game.player.ability, dt)
-
-    for &b, idx in game.player_bullets{
-        bu.update_bullet(&b, dt)
-        if check_if_bullet_can_delete(game.camera, b){
-            unordered_remove(&game.player_bullets, idx)
-        }
-    }
-
-    for &l, idx_l in game.loot{
-        d.update_loot(&l, game.player.pos, dt)
-    }
-
-    enemy_inst, ok_enemy := update_spawn(game)
-
-    if ok_enemy{
-        append(&game.enemies, enemy_inst)
-    }
-
-    for &e, idx in game.enemies{
-        enemy.update_enemy(&e, game.player.pos, dt)
-        ui.update_progress_bar_enemy(&e.health_bar, e.pos)
-    }
-
-    for &p, idx in game.particles{
-        pacl.update_particle(&p, dt)
+update_game :: proc(g : ^Game_State, dt : f32) {
+    update_helper(g)
+    update_handler(g, dt)
+    if !g.is_paused{
+        g.play_time += dt
+        update_player(g, dt)
+        update_player_shooting(g, dt)
+        update_player_bullets(g, dt)
+        update_player_casting(g, dt)
+        update_manual_spawn(g)
+        update_enemies(g, dt)
+        update_loot(g, dt)
+        update_particle(g, dt)
+        update_in_game_ui(g, dt)
+    } else{
+        update_menu(g)
     }
 }
 
-check_collisions :: proc(game : ^Game_State){
-
-    for b, idx_b in game.player_bullets{
-        for &e, idx_e in game.enemies{
-            e_rec := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
-            if cl.check_bullet_enemy(b.pos, b.radius, e_rec){
-                particle_pos : rl.Vector2 = {e.pos.x + (e.width/2), e.pos.y + (e.height/2)}
-                pacl.create_hit_particles(&game.particles, particle_pos)
-                h.take_damage(b, &e.health)
-                if e.health.is_dead{
-                    d.spawn_shards(&game.loot, 5, e.pos)
-                    unordered_remove(&game.enemies, idx_e)
-                }
-                if len(game.player_bullets) - 1 >= idx_b{
-                    unordered_remove(&game.player_bullets, idx_b)
-                }
-            }
-        }
-        if cl.check_bullet_wall(b.pos, b.radius, game.level){
-            particle_pos : rl.Vector2 = {b.pos.x + b.radius, b.pos.y + b.radius}
-            pacl.create_destroy_bullet_particle(&game.particles, particle_pos)
-            unordered_remove(&game.player_bullets, idx_b)
-        }
-    }
-
-    for &l, idx in game.loot{
-        if !l.is_active do continue
-        if cl.check_circle_circle(game.player.collider, l.pickup){
-            pl.increase_value(&game.player.loot_bag, l.value)
-            ui.update_progress_bar_player(&game.player.v_bar, game.player.loot_bag.value, game.player.loot_bag.max_value)
-            unordered_remove(&game.loot, idx)
-        }
-
-        if cl.check_circle_circle(game.player.collider, l.detection){
-            l.is_following = true
-        }
+check_collisions :: proc(g : ^Game_State){
+    if !g.is_paused{
+        check_bullet(g)
+    } else{
+        check_collision_menu(g)
     }
 }
 
-check_if_bullet_can_delete :: proc(c : rl.Camera2D, b : bu.Bullet) -> bool{
-    c_world := handler.get_camera_world_position(c)
-    return b.pos.x < c_world.left || b.pos.x > c_world.right || b.pos.y < c_world.top || b.pos.y > c_world.bottom 
-}
+//     for &l, idx in game.loot{
+//         if !l.is_active do continue
+//         if cl.check_circle_circle(game.player.collider, l.pickup){
+//             pl.increase_value(&game.player.loot_bag, l.value)
+//             ui.update_progress_bar_player(&game.player.v_bar, game.player.loot_bag.value, game.player.loot_bag.max_value)
+//             unordered_remove(&game.loot, idx)
+//         }
 
-draw_game :: proc(game : ^Game_State){
+//         if cl.check_circle_circle(game.player.collider, l.detection){
+//             l.is_following = true
+//         }
+//     }
+// }
+
+draw_game :: proc(g : Game_State){
+    rl.BeginDrawing()
     rl.ClearBackground(rl.BLUE)
-    if game.map_drawing{
-        m.draw_map(game.level, game.helper_activated)
+    rl.BeginMode2D(g.camera)
+    if g.map_drawing{
+        draw_map(g, g.helper_activated)
     }
-    pl.draw_player(game.player)
-    if game.helper_activated{
-        cl.draw_collider_cirlce(game.player.collider)
+    draw_player(g)
+    draw_bullet(g)
+    draw_enemies(g)
+    draw_loot(g)
+    draw_particles(g)
+    rl.EndMode2D()
+    draw_in_game_ui(g)
+    if g.is_paused{
+        draw_menu(g)
     }
-    
-    for bullet in game.player_bullets{
-        bu.draw_bullet(bullet)
-        if game.helper_activated{
-            cl.draw_collider_cirlce(bullet.collider)
-        }
-    }
-
-    for e in game.enemies{
-        enemy.draw_enemy(e)
-        if game.helper_activated{
-            cl.draw_collider_rect(e.collidor)
-        }
-    }
-
-    for &s in game.loot{
-        d.draw_loot(s)
-        if game.helper_activated{
-            cl.draw_collider_cirlce(s.detection)
-            cl.draw_collider_cirlce(s.pickup)
-        }
-    }
-
-    for p, idx in game.particles{
-        pacl.draw_particles(p)
-        if(!p.alive){
-            unordered_remove(&game.particles, idx)
-        }
-    }
-}
-
-draw_ui :: proc(game : Game_State){
-    for element in game.ui_elements{
-        switch specified_element in element{
-            //TODO FIX
-            case ui.UI_Cooldown:
-                ui.draw_cooldown(specified_element, ab.get_cooldown(game.player.ability))
-            case ui.UI_Button:
-            case ui.UI_Menu:
-            case ui.UI_Progress_Bar:
-                ui.draw_progress_bar(specified_element)
-            case ui.UI_Label:
-            case ui.UI_Slider:
-        }
-    }
-
-    if game.is_paused{
-        ui.draw_menu(game.menu)
-    }
-    
+    rl.EndDrawing()
 }
 
 cast_ability :: proc(g : ^Game_State){
     switch &a in g.player.ability{
         case ab.Radial_Liberation:
             ab.cast_radial_liberation(a, &g.player_bullets, g.player.pos)
-    }
-}
-
-draw_help_stuff :: proc(game : Game_State){
-    ability := ab.get_cooldown(game.player.ability)
-    rl.DrawFPS(20, 50)
-    str := fmt.tprintf("%.2f, %.2f | %.2f | %.2f", game.player.pos.x, game.player.pos.y, game.player.vel, ability.timer)
-    cstr := strings.clone_to_cstring(str)
-    delete_cstring(cstr)
-    rl.DrawText(cstr, 150, 50, 20, rl.LIGHTGRAY)
-    str = fmt.tprintf("%.0f", game.play_time)
-    cstr = strings.clone_to_cstring(str)
-    rl.DrawText(cstr, 150, 100, 20, rl.LIGHTGRAY)
-    delete_cstring(cstr)
-}
-
-check_interaction_with_menu_ui :: proc(g : ^Game_State){
-    for &element in g.menu.elements{
-        switch &e in element{
-            case ui.UI_Button:
-                if e.state == .Pressed{
-                    check_which_btn_was_pressed(g, &e)
-                }
-            case ui.UI_Menu:
-            case ui.UI_Cooldown:
-            case ui.UI_Progress_Bar:
-            case ui.UI_Label:   
-            case ui.UI_Slider:         
-        }
     }
 }
 
@@ -376,7 +218,6 @@ check_which_btn_was_pressed :: proc(g : ^Game_State, b : ^ui.UI_Button){
 
 sync_menu :: proc(g : ^Game_State){
     clear(&g.menu.elements)
-    ui.create_menu(&g.menu)
     switch g.current_menu{
         case .Pause:
             width : f32 = 500

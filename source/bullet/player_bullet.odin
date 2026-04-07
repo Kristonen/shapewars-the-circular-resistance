@@ -12,6 +12,7 @@ Bullet :: struct {
     speed : f32,
     radius : f32,
     collider : cl.Collider_Circle,
+    is_active : bool
 }
 
 update_bullet :: proc(b : ^Bullet, dt : f32){
@@ -33,6 +34,7 @@ create_bullet :: proc(pos : rl.Vector2, c : rl.Camera2D) -> Bullet{
         speed = 500,
         pos = pos,
         dir = rl.Vector2Normalize(world_pos - pos),
+        is_active = true,
     }
     b.collider = {
         pos = pos,

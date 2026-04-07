@@ -1,0 +1,211 @@
+package game
+
+import "core:fmt"
+import rl "vendor:raylib"
+import "handler"
+import "ui"
+import "collider"
+import "bullet"
+import "enemy"
+
+update_handler :: proc(g : ^Game_State, dt : f32){
+    if rl.IsKeyPressed(.F1){
+        g.is_paused = !g.is_paused
+
+        if g.is_paused{
+            g.current_menu = .Pause
+            sync_menu(g)
+        } else{
+            clear(&g.menu.elements)
+        }
+    }
+
+    if rl.IsKeyPressed(.Q){
+        g.map_drawing = !g.map_drawing
+    }
+}
+
+update_manual_spawn :: proc(g : ^Game_State){
+    if rl.IsKeyPressed(.T){
+        new_pos := handler.get_random_spawn_pos(g.camera)
+        e := enemy.create_enemy(new_pos)
+        append(&g.enemies, e)
+    }
+}
+
+update_helper :: proc(g : ^Game_State){
+    if rl.IsKeyPressed(.F2){
+        g.helper_activated = !g.helper_activated
+    }
+
+}
+
+update_player :: proc(g : ^Game_State, dt : f32){
+    g.player.vel = {}
+    if rl.IsKeyDown(.W){
+        g.player.vel.y = -check_direction_col(g^, g.player.pos, {0, -1}, g.player.speed, dt)
+    }
+    if rl.IsKeyDown(.D){
+        g.player.vel.x = check_direction_col(g^, g.player.pos, {1, 0}, g.player.speed, dt)
+    }
+    if rl.IsKeyDown(.S){
+        g.player.vel.y = check_direction_col(g^, g.player.pos, {0, 1}, g.player.speed, dt)
+    }
+    if rl.IsKeyDown(.A){
+        g.player.vel.x = -check_direction_col(g^, g.player.pos, {-1, 0}, g.player.speed, dt)
+    }
+
+    g.player.pos += g.player.vel * g.player.speed * dt
+    g.player.collider.pos = g.player.pos
+}
+
+update_player_bullets :: proc(g : ^Game_State, dt :f32){
+    for &b, idx in g.player_bullets{
+        b.vel = b.dir * b.speed
+        b.pos += b.vel * dt
+        b.collider.pos = b.pos
+        if check_bullet_out_of_view(g.camera, b.pos){
+            b.is_active = false
+        }
+        if !b.is_active{
+            unordered_remove(&g.player_bullets, idx)
+        }
+    }
+}
+
+update_player_shooting :: proc(g : ^Game_State, dt : f32){
+    if g.player.weapon.cooldown > 0{
+        g.player.weapon.cooldown -= dt
+    }
+
+    if rl.IsMouseButtonDown(.LEFT) && g.player.weapon.cooldown <= 0{
+        g.player.weapon.cooldown = g.player.weapon.fire_rate
+        b := bullet.create_bullet(g.player.pos, g.camera)
+        append(&g.player_bullets, b)
+    }
+}
+
+update_player_casting :: proc(g : ^Game_State, dt : f32){
+    if g.player.ability_cd.cooldown > 0{
+        g.player.ability_cd.cooldown -= dt
+    }
+
+    if rl.IsKeyPressed(.SPACE) && g.player.ability_cd.cooldown <= 0{
+        g.player.ability_cd.cooldown = g.player.ability_cd.cast_rate
+        cast_player_ability(g)
+    }
+}
+
+update_enemies :: proc(g : ^Game_State, dt : f32){
+    for &e, idx in g.enemies{
+        if e.health.is_dead{
+            unordered_remove(&g.enemies, idx)
+            continue
+        }
+        e.update_behavior(&e, g.player.pos, dt)
+        e.origin = {e.pos.x - e.width/2, e.pos.y - e.height/2}
+        e.collidor.pos = e.origin
+        e.health_bar.value = e.health.current
+        e.health_bar.rect.x = e.pos.x - 10
+        e.health_bar.rect.y = e.pos.y - 20
+    }
+}
+
+update_particle :: proc(g : ^Game_State, dt : f32){
+    for &p, idx in g.particles{
+        if !p.alive{
+            unordered_remove(&g.particles, idx)
+        }
+        p.life += dt
+        p.pos += p.vel * dt
+        if p.life >= p.max_life{
+            p.alive = false
+        }
+    }
+}
+
+update_loot :: proc(g : ^Game_State, dt : f32){
+    for &l in g.loot{
+        if !l.is_following do continue
+        dir := g.player.pos - l.pos
+        dir = rl.Vector2Normalize(dir)
+
+        if l.current_speed <= l.max_speed{
+            l.current_speed += l.acceleration
+        }
+
+        l.pos += dir * l.current_speed * dt
+        l.detection.pos = l.pos
+        l.pickup.pos = l.pos
+    }
+}
+
+update_in_game_ui :: proc(g : ^Game_State, dt : f32){
+    for &element in g.ui_elements{
+        switch &e in element{
+            case ui.UI_Progress_Bar:
+                if e.type == .Health{
+                    update_progress_bar(&e, g.player.health.current, g.player.health.max)
+                } else if e.type == .Value{
+                    update_progress_bar(&e, g.player.loot_bag.value, g.player.loot_bag.max_value)
+                }
+            case ui.UI_Cooldown:
+                update_cooldown(&e, g.player.ability_cd.cooldown, g.player.ability_cd.cast_rate)
+            case ui.UI_Button:
+            case ui.UI_Menu:
+            case ui.UI_Label:
+            case ui.UI_Slider:
+        }
+    }
+}
+
+update_menu :: proc(g : ^Game_State){
+    for &element in g.menu.elements{
+        switch &e in element{
+            case ui.UI_Cooldown:
+                update_cooldown(&e, g.player.ability_cd.cooldown, g.player.ability_cd.cast_rate)
+            case ui.UI_Button:
+                update_button(&e)
+                if e.state == .Pressed{
+                    check_which_btn_was_pressed(g, &e)
+                }
+            case ui.UI_Menu:
+            case ui.UI_Progress_Bar:
+            case ui.UI_Label:
+            case ui.UI_Slider:
+        } 
+    }
+}
+
+update_progress_bar :: proc(bar : ^ui.UI_Progress_Bar, value : f32, max : f32){
+    bar.value = value
+    bar.max = max
+}
+
+update_button :: proc(b : ^ui.UI_Button){
+    switch b.state{
+        case .None: b.color = b.n_color
+        case .Focus: b.color = b.f_color
+        case .Pressing: b.color = b.p_color
+        case .Pressed: b.color = b.p_color
+    }
+}
+
+update_cooldown :: proc(cd : ^ui.UI_Cooldown, value : f32, max : f32){
+    cd.value = value
+    cd.max = max
+}
+
+check_direction_col :: proc(g : Game_State, pos : rl.Vector2, vel : rl.Vector2, speed : f32, dt : f32) -> f32{
+    n_vel := rl.Vector2Normalize(vel)
+    next_pos := pos + vel * speed * dt
+    if collider.check_player_wall(next_pos, g.player.radius, g.level, g.map_drawing){
+        return 0
+    }
+    return 1
+}
+
+check_bullet_out_of_view :: proc(c : rl.Camera2D, pos : rl.Vector2) -> bool{
+    c_world := handler.get_camera_world_position(c)
+    return pos.x < c_world.left || pos.x > c_world.right || pos.y < c_world.top || pos.y > c_world.bottom 
+}
