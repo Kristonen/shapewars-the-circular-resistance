@@ -90,9 +90,9 @@ create_player :: proc(level : m.Tiled_Map) -> Player{
             radius = 28,
         },
         loot_bag = {
-            max_value = 50,
+            max_value = 500,
             level = 1,
-            level_increase = 20,
+            level_increase = 250,
         }
     }
 }

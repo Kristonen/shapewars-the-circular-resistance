@@ -77,13 +77,13 @@ main :: proc(){
         delete(game.loot)
         rl.CloseWindow()
     }
-
     level, ok := m.load_map("assets/test_map.json", map_allocator)
     if ok{
         game.level = level
         game.player = pl.create_player(game.level)
         game.player.pos = m.get_player_spawn_pos(game.level)
         game.camera.target = game.player.pos
+        
         rect := rl.Rectangle {
             x = 50,
             y = f32(rl.GetScreenHeight() - 100),
@@ -131,6 +131,7 @@ main :: proc(){
         draw_game(&game)
         rl.EndMode2D()
         draw_ui(game)
+
         rl.EndDrawing()
         if game.should_close{
             break
@@ -180,9 +181,9 @@ update_game :: proc(game : ^Game_State, dt : f32) {
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:
                 if element.type == .Health{
-                    ui.update_progress_bar_player(&element, game.player.h_bar.value)
+                    ui.update_progress_bar_player(&element, game.player.h_bar.value, game.player.h_bar.max)
                 } else if element.type == .Value{
-                    ui.update_progress_bar_player(&element, game.player.loot_bag.value)
+                    ui.update_progress_bar_player(&element, game.player.loot_bag.value, game.player.loot_bag.max_value)
                 }
             case ui.UI_Label:
             case ui.UI_Slider:
@@ -228,8 +229,7 @@ check_collisions :: proc(game : ^Game_State){
                 pacl.create_hit_particles(&game.particles, particle_pos)
                 h.take_damage(b, &e.health)
                 if e.health.is_dead{
-                    shard := d.create_shape_shard(e.origin)
-                    append(&game.loot, shard)
+                    d.spawn_shards(&game.loot, 5, e.pos)
                     unordered_remove(&game.enemies, idx_e)
                 }
                 if len(game.player_bullets) - 1 >= idx_b{
@@ -245,9 +245,10 @@ check_collisions :: proc(game : ^Game_State){
     }
 
     for &l, idx in game.loot{
+        if !l.is_active do continue
         if cl.check_circle_circle(game.player.collider, l.pickup){
             pl.increase_value(&game.player.loot_bag, l.value)
-            ui.update_progress_bar_player(&game.player.v_bar, game.player.loot_bag.value)
+            ui.update_progress_bar_player(&game.player.v_bar, game.player.loot_bag.value, game.player.loot_bag.max_value)
             unordered_remove(&game.loot, idx)
         }
 
@@ -286,7 +287,7 @@ draw_game :: proc(game : ^Game_State){
         }
     }
 
-    for s in game.loot{
+    for &s in game.loot{
         d.draw_loot(s)
         if game.helper_activated{
             cl.draw_collider_cirlce(s.detection)

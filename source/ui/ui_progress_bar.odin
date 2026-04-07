@@ -22,8 +22,9 @@ UI_Progress_Bar :: struct{
     type : Bar_Type,
 }
 
-update_progress_bar_player :: proc(p : ^UI_Progress_Bar, value : f32){
+update_progress_bar_player :: proc(p : ^UI_Progress_Bar, value : f32, max_value : f32){
     p.value = value
+    p.max = max_value
 }
 
 update_progress_bar_enemy :: proc(p : ^UI_Progress_Bar, pos : rl.Vector2){
