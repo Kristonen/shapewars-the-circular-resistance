@@ -13,23 +13,6 @@ Particle :: struct{
     alive : bool
 }
 
-update_particle :: proc(p : ^Particle, dt : f32){
-    p.life += dt
-    p.pos += p.vel * dt
-
-    if p.life >= p.max_life{
-        p.alive = false
-    }
-}
-
-draw_particles :: proc(p : Particle){
-    alpha := 1.0 - (p.life / p.max_life)
-    color := p.color
-    color.a = u8(alpha*255)
-
-    rl.DrawCircleV(p.pos, p.size/2, color)
-}
-
 create_hit_particles :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
     amount := rl.GetRandomValue(25, 40)
     for _ in 0..<amount{

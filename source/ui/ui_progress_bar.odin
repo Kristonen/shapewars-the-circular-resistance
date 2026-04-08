@@ -31,7 +31,7 @@ create_progress_bar :: proc(rect : rl.Rectangle, o_color, b_color, f_color : rl.
 
     return bar
 }
-
+//TODO instead of creating 3 different rectangles use the black one for DrawRectangleLinesEX
 get_health_bars :: proc(p : UI_Progress_Bar, margin : f32) -> (rl.Rectangle, rl.Rectangle){
     inner_health_bar := p.rect
     inner_health_bar.x += margin

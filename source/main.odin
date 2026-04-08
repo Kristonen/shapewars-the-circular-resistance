@@ -180,7 +180,7 @@ draw_game :: proc(g : Game_State){
     rl.ClearBackground(rl.BLUE)
     rl.BeginMode2D(g.camera)
     if g.map_drawing{
-        draw_map(g, g.helper_activated)
+        draw_map(g)
     }
     draw_player(g)
     draw_bullet(g)

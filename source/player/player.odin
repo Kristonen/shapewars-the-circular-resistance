@@ -38,42 +38,6 @@ Player :: struct {
     collider : cl.Collider_Circle,
 }
 
-update_player :: proc(p: ^Player, dt: f32, level : m.Tiled_Map, check_col : bool){
-    p.vel = {0, 0}
-    if rl.IsKeyDown(.W) {p.vel.y = -1}
-    if rl.IsKeyDown(.S) {p.vel.y = 1}
-    if rl.IsKeyDown(.A) {p.vel.x = -1}
-    if rl.IsKeyDown(.D) {p.vel.x = 1}
-
-    if rl.Vector2Length(p.vel)> 0.01{
-        p.vel = rl.Vector2Normalize(p.vel)
-        p.vel *= p.speed
-    }
-
-    next_pos := p.pos + p.vel * dt
-    if !cl.check_player_wall(next_pos, p.radius, level, check_col){
-        p.pos += p.vel * dt
-        p.collider.pos = p.pos
-    }
-}
-
-update_shooting :: proc(p : ^Player, camera : rl.Camera2D, dt : f32) -> (b.Bullet, bool){
-    if p.weapon.cooldown > 0{
-        p.weapon.cooldown -= dt
-    }
-
-    if rl.IsMouseButtonDown(.LEFT) && p.weapon.cooldown <= 0{
-        p.weapon.cooldown = p.weapon.fire_rate
-        bullet := b.create_bullet(p.pos, camera)
-        return bullet, true
-    }
-    return {}, false
-}
-
-draw_player :: proc(p : Player){
-    rl.DrawCircleV(p.pos, p.radius, rl.PURPLE)
-}
-
 create_player :: proc(level : m.Tiled_Map) -> Player{
     return {
         speed = 400,

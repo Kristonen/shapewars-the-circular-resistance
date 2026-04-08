@@ -9,11 +9,11 @@ import "ui"
 draw_player :: proc(g : Game_State){
     rl.DrawCircleV(g.player.pos, g.player.radius, rl.VIOLET)
     if g.helper_activated{
-        draw_collider_cirlce(g.player.collider)
+        draw_collider_circle(g.player.collider)
     }
 }
 
-draw_map :: proc(g : Game_State, helper_activated : bool){
+draw_map :: proc(g : Game_State){
     tileset_name := g.level.tilesets[0].image
     tileset_path := fmt.tprintf("assets/%s", tileset_name)
     // texture := rl.LoadTexture(rl.TextFormat("%s", tileset_path))
@@ -46,7 +46,7 @@ draw_map :: proc(g : Game_State, helper_activated : bool){
             }
         }
 
-        if layer.type == "objectgroup" && layer.name == "Walls" && helper_activated {
+        if layer.type == "objectgroup" && layer.name == "Walls" && g.helper_activated {
             for obj in layer.objects{
                 rect : rl.Rectangle = {
                     x = obj.x,
@@ -64,7 +64,7 @@ draw_bullet :: proc(g : Game_State){
     for b in g.player_bullets{
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if g.helper_activated{
-            draw_collider_cirlce(b.collider)
+            draw_collider_circle(b.collider)
         }
     }
 }
@@ -83,8 +83,8 @@ draw_loot :: proc(g : Game_State){
     for l in g.loot{
         rl.DrawRectangleV(l.pos, l.size, l.color)
         if g.helper_activated{
-            draw_collider_cirlce(l.detection)
-            draw_collider_cirlce(l.pickup)
+            draw_collider_circle(l.detection)
+            draw_collider_circle(l.pickup)
         }
     }
 }
@@ -136,7 +136,7 @@ draw_cooldown :: proc(cd : ui.UI_Cooldown){
     rl.DrawRectangleV({cd.pos.x, cd.pos.y}, {cd.width, height}, color)
 }
 
-draw_collider_cirlce :: proc(c : collider.Collider_Circle){
+draw_collider_circle :: proc(c : collider.Collider_Circle){
     color := rl.GREEN
     color.a = 100
     rl.DrawCircleV(c.pos, c.radius, color)
@@ -160,8 +160,7 @@ draw_text :: proc(text : string, r : rl.Rectangle){
 }
 
 draw_menu :: proc(g : Game_State){
-    color := rl.Color{0, 0, 0, 100}
-    rl.DrawRectangleV({0, 0}, {g.menu.width, g.menu.height}, color)
+    rl.DrawRectangleV({0, 0}, {g.menu.width, g.menu.height}, g.menu.color)
     for element in g.menu.elements{
         switch e in element{
             case ui.UI_Cooldown:
@@ -170,7 +169,9 @@ draw_menu :: proc(g : Game_State){
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:
             case ui.UI_Label:
+                draw_label(e)
             case ui.UI_Slider:
+                draw_slider(e)
         } 
     }
 }
@@ -185,4 +186,18 @@ draw_button :: proc(b : ui.UI_Button){
     rl.DrawRectangleV(b.pos, {b.width, b.height}, b.color)
     rl.DrawRectangleLinesEx(rect, 5, rl.BLACK)
     draw_text(b.text, rect)
+}
+
+draw_label :: proc(l : ui.UI_Label){
+    rl.DrawRectangleV(l.pos, {l.width, l.height}, l.color)
+    rl.DrawRectangleLinesEx({l.pos.x, l.pos.y, l.width, l.height}, 5, rl.BLACK)
+    draw_text(l.text, {l.pos.x, l.pos.y, l.width, l.height})
+}
+
+draw_slider :: proc(s : ui.UI_Slider){
+    end_pos := rl.Vector2{
+        s.pos.x + s.width, s.pos.y
+    }
+    rl.DrawLineV(s.pos, end_pos, rl.BLACK)
+    rl.DrawRectangleV({s.slider.x, s.slider.y}, {s.slider.width, s.slider.height}, s.color)
 }

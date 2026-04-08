@@ -6,6 +6,28 @@ import "ui"
 import "bullet"
 import "particle"
 
+check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, g : Game_State) -> bool{
+    if !g.map_drawing{
+        return false
+    }
+    for layer in g.level.layers{
+        if layer.name == "Walls"{
+            for obj in layer.objects{
+                wall_rect := rl.Rectangle{
+                    x = obj.x,
+                    y = obj.y,
+                    width = obj.width,
+                    height = obj.height,
+                }
+                if rl.CheckCollisionCircleRec(pos_player, radius, wall_rect){
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}
+
 check_bullet :: proc(g : ^Game_State){
     for &b, idx in g.player_bullets{
         check_bullet_enemy(g, &b)
@@ -52,6 +74,7 @@ check_collision_menu :: proc(g : ^Game_State){
             case ui.UI_Progress_Bar:
             case ui.UI_Label:
             case ui.UI_Slider:
+                check_collision_slider(&e)
         }
     }
 }
@@ -76,4 +99,15 @@ check_collision_button :: proc(b : ^ui.UI_Button){
     } else{
         b.state = .None
     }
+}
+
+check_collision_slider :: proc(s : ^ui.UI_Slider){
+    mouse_pos := rl.GetMousePosition()
+    if rl.CheckCollisionPointRec(mouse_pos, s.slider) && rl.IsMouseButtonDown(.LEFT){
+        s.state = .Active
+    }
+    if s.state == .Active && rl.IsMouseButtonReleased(.LEFT){
+        s.state = .None
+    }
+    //TODO mouse click on the line
 }

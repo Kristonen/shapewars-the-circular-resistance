@@ -1,6 +1,5 @@
 package ability
 
-import "core:fmt"
 import rl "vendor:raylib"
 import bullet "../bullet"
 import "core:math"

@@ -11,7 +11,8 @@ import "enemy"
 update_handler :: proc(g : ^Game_State, dt : f32){
     if rl.IsKeyPressed(.F1){
         g.is_paused = !g.is_paused
-
+        clear(&g.menu.elements)
+        ui.create_menu(&g.menu)
         if g.is_paused{
             g.current_menu = .Pause
             sync_menu(g)
@@ -173,6 +174,7 @@ update_menu :: proc(g : ^Game_State){
             case ui.UI_Progress_Bar:
             case ui.UI_Label:
             case ui.UI_Slider:
+                update_slider(&e)
         } 
     }
 }
@@ -196,10 +198,21 @@ update_cooldown :: proc(cd : ^ui.UI_Cooldown, value : f32, max : f32){
     cd.max = max
 }
 
+update_slider :: proc(s : ^ui.UI_Slider){
+    switch s.state{
+        case .None:
+            s.color = s.n_color
+        case .Active:
+            s.color = s.a_color
+            s.slider.x = rl.GetMousePosition().x
+    }
+
+}
+
 check_direction_col :: proc(g : Game_State, pos : rl.Vector2, vel : rl.Vector2, speed : f32, dt : f32) -> f32{
     n_vel := rl.Vector2Normalize(vel)
     next_pos := pos + vel * speed * dt
-    if collider.check_player_wall(next_pos, g.player.radius, g.level, g.map_drawing){
+    if check_player_wall(next_pos, g.player.radius, g){
         return 0
     }
     return 1
