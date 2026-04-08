@@ -1,5 +1,6 @@
 package game
 
+import "core:math/rand"
 import "core:fmt"
 import rl "vendor:raylib"
 import "handler"
@@ -101,7 +102,9 @@ update_player_casting :: proc(g : ^Game_State, dt : f32){
 update_enemies :: proc(g : ^Game_State, dt : f32){
     for &e, idx in g.enemies{
         if e.health.is_dead{
-            loot.create_simple_shard(&g.loot, e.pos)
+            // loot.create_simple_shard(&g.loot, e.pos)
+            count := rand.int32_range(3, 7)
+            loot.spawn_shards(&g.loot, count, e.pos)
             unordered_remove(&g.enemies, idx)
             continue
         }
@@ -129,6 +132,14 @@ update_particle :: proc(g : ^Game_State, dt : f32){
 
 update_loot :: proc(g : ^Game_State, dt : f32){
     for &l in g.loot{
+        if !l.is_active{
+            l.time -= dt
+            if l.time <= 0{
+                l.is_active = true
+                continue
+            }
+            l.pos += l.dir * l.speed * dt
+        }
         if !l.is_following do continue
         dir := g.player.pos - l.pos
         dir = rl.Vector2Normalize(dir)
