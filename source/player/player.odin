@@ -34,6 +34,7 @@ Player :: struct {
     v_bar : ui.UI_Progress_Bar,
 
     loot_bag : Loot_Bag,
+    increase_value : proc(b : ^Loot_Bag, value : f32),
 
     collider : cl.Collider_Circle,
 }
@@ -53,10 +54,11 @@ create_player :: proc(level : m.Tiled_Map) -> Player{
             radius = 28,
         },
         loot_bag = {
-            max_value = 500,
+            max_value = 50,
             level = 1,
-            level_increase = 250,
-        }
+            level_increase = 50,
+        },
+        increase_value = increase_value,
     }
 }
 

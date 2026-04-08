@@ -6,7 +6,7 @@ import e "enemy"
 import pl "player"
 import m "map"
 import pacl "particle"
-import "drop"
+import "loot"
 import "ui"
 
 Game_State :: struct{
@@ -20,7 +20,7 @@ Game_State :: struct{
     enemies : [dynamic]e.Dummy_Enemy,
     particles : [dynamic]pacl.Particle,
     ui_elements : [dynamic]ui.UI_Element,
-    loot : [dynamic]drop.Shape_Shard,
+    loot : [dynamic]loot.Shape_Shard,
 
     menu : ui.UI_Menu,
     current_menu : ui.Menu_Type,

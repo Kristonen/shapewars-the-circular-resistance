@@ -1,4 +1,4 @@
-package drop
+package loot
 
 import "core:math"
 import "core:math/rand"
@@ -30,6 +30,13 @@ Shape_Shard :: struct{
     is_active : bool,
 }
 
+create_simple_shard :: proc(drops : ^[dynamic]Shape_Shard, pos : rl.Vector2){
+    shard : Shape_Shard
+    give_shard_everything(&shard, pos)
+    shard.is_active = true
+    append(drops, shard)
+}
+
 spawn_shards :: proc(drops : ^[dynamic]Shape_Shard, count : i32, pos : rl.Vector2){
     for _ in 0..<count{
         new_shard : Shape_Shard
@@ -52,10 +59,10 @@ give_shard_everything :: proc(shard : ^Shape_Shard, pos : rl.Vector2){
     shard.pos = pos
     shard.value = 10
     shard.size = {20, 20}
-    shard.detection.pos = pos
-    shard.detection.radius = shard.size.x * 4
-    shard.pickup.pos = pos
-    shard.pickup.radius = shard.size.x / 2
+    shard.detection.pos = {shard.pos.x + shard.size.x/2, shard.pos.y + shard.size.y/2}
+    shard.detection.radius = shard.size.x * 6
+    shard.pickup.pos = {shard.pos.x + shard.size.x/2, shard.pos.y + shard.size.y/2}
+    shard.pickup.radius = shard.size.x / 4
 
     roll := rand.float32()
     if roll < 0.05{

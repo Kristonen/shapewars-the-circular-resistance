@@ -15,7 +15,7 @@ import pacl "particle"
 import ab "ability"
 import "ui"
 import "handler"
-import d "drop"
+import "loot"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -156,6 +156,8 @@ update_game :: proc(g : ^Game_State, dt : f32) {
 check_collisions :: proc(g : ^Game_State){
     if !g.is_paused{
         check_bullet(g)
+        check_collisions_detection_loot(g)
+        check_collisions_pickup_loot(g)
     } else{
         check_collision_menu(g)
     }

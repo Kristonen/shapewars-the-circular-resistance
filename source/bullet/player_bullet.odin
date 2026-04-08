@@ -38,7 +38,7 @@ create_bullet :: proc(pos : rl.Vector2, c : rl.Camera2D) -> Bullet{
     }
     b.collider = {
         pos = pos,
-        radius = b.radius/2,
+        radius = b.radius,
     }
     return b
 }

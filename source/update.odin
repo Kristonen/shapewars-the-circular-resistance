@@ -7,6 +7,7 @@ import "ui"
 import "collider"
 import "bullet"
 import "enemy"
+import "loot"
 
 update_handler :: proc(g : ^Game_State, dt : f32){
     if rl.IsKeyPressed(.F1){
@@ -100,12 +101,13 @@ update_player_casting :: proc(g : ^Game_State, dt : f32){
 update_enemies :: proc(g : ^Game_State, dt : f32){
     for &e, idx in g.enemies{
         if e.health.is_dead{
+            loot.create_simple_shard(&g.loot, e.pos)
             unordered_remove(&g.enemies, idx)
             continue
         }
         e.update_behavior(&e, g.player.pos, dt)
-        e.origin = {e.pos.x - e.width/2, e.pos.y - e.height/2}
-        e.collidor.pos = e.origin
+        e.origin = {e.pos.x + e.width/2, e.pos.y + e.height/2}
+        e.collidor.pos = e.pos
         e.health_bar.value = e.health.current
         e.health_bar.rect.x = e.pos.x - 10
         e.health_bar.rect.y = e.pos.y - 20
@@ -136,8 +138,8 @@ update_loot :: proc(g : ^Game_State, dt : f32){
         }
 
         l.pos += dir * l.current_speed * dt
-        l.detection.pos = l.pos
-        l.pickup.pos = l.pos
+        l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
+        l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
     }
 }
 

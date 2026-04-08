@@ -64,6 +64,27 @@ check_bullet_wall :: proc(g : ^Game_State, b : ^bullet.Bullet){
     }
 }
 
+check_collisions_detection_loot :: proc(g : ^Game_State){
+    for &l in g.loot{
+        if l.is_following || !l.is_active do continue
+
+        if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, g.player.collider.pos, g.player.radius){
+            l.is_following = true
+        }
+    }
+}
+
+check_collisions_pickup_loot :: proc(g : ^Game_State){
+    for &l, idx in g.loot{
+        if !l.is_active do continue
+
+        if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, g.player.collider.pos, g.player.collider.radius){
+            g.player.increase_value(&g.player.loot_bag, l.value)
+            unordered_remove(&g.loot, idx)
+        }
+    }
+}
+
 check_collision_menu :: proc(g : ^Game_State){
     for &element in g.menu.elements{
         switch &e in element{

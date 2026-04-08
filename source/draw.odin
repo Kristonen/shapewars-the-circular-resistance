@@ -198,6 +198,7 @@ draw_slider :: proc(s : ui.UI_Slider){
     end_pos := rl.Vector2{
         s.pos.x + s.width, s.pos.y
     }
-    rl.DrawLineV(s.pos, end_pos, rl.BLACK)
+    // rl.DrawLineV(s.pos, end_pos, rl.BLACK)
+    rl.DrawLineEx(s.pos, end_pos, 5, rl.BLACK)
     rl.DrawRectangleV({s.slider.x, s.slider.y}, {s.slider.width, s.slider.height}, s.color)
 }
