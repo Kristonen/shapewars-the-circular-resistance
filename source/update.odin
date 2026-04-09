@@ -152,8 +152,6 @@ update_particle :: proc(g : ^Game_State, dt : f32){
 
 update_loot :: proc(g : ^Game_State, dt : f32){
     for &l in g.loot{
-        l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
-        l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
         if !l.is_active{
             l.time -= dt
             if l.time <= 0{
@@ -161,6 +159,8 @@ update_loot :: proc(g : ^Game_State, dt : f32){
                 continue
             }
             l.pos += l.dir * l.speed * dt
+            l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
+            l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
         }
         if !l.is_following do continue
         dir := g.player.pos - l.pos
@@ -171,10 +171,21 @@ update_loot :: proc(g : ^Game_State, dt : f32){
         }
 
         l.pos += dir * l.current_speed * dt
+        l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
+        l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
     }
 }
 
 update_upgrade :: proc(g : ^Game_State, dt : f32){
+    g.upgrade_menu.width = f32(rl.GetScreenWidth())
+    g.upgrade_menu.height = f32(rl.GetScreenHeight())
+    for i in 0..<3{
+        slot := g.upgrade_menu.upgrades[i]
+        slot.rect.x = g.upgrade_menu.width * 0.1 + slot.rect.width * f32(i) + 50 * f32(i)
+        slot.rect.width = g.upgrade_menu.width * 0.25
+        slot.rect.height = g.upgrade_menu.height * 0.75
+        g.upgrade_menu.upgrades[i] = slot
+    }
     test := g.upgrade_menu.shader.test
     g.upgrade_menu.shader.timer -= dt
     if g.upgrade_menu.shader.timer <= 0{
