@@ -15,7 +15,7 @@ create_health_upgrade :: proc(name : string, desc : string,
         desc = desc,
         value = value,
         type = type,
-        rarity = .Common,
+        rarity = rarity,
         stat = .Health,
         target = .Player,
     }

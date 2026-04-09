@@ -3,7 +3,7 @@ package ability
 import rl "vendor:raylib"
 
 Ability :: union{
-    Radial_Liberation,
+    Radial_Liberation, Dash
 }
 
 Ability_Cooldown :: struct{

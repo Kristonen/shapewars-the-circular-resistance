@@ -102,14 +102,13 @@ draw_particles :: proc(g : Game_State){
 draw_upgrade :: proc(g : Game_State){
     rl.DrawRectangleV({}, {g.upgrade_menu.width, g.upgrade_menu.height}, {0, 0, 0, 200})
     for slot in g.upgrade_menu.upgrades{
-        color := get_upgrade_color(slot.upgrade.rarity)
         gray := rl.GRAY
         gray.a = 150
         if slot.state == .Focused{
             gray = {180, 180, 180, 150}
         }
         rl.DrawRectangleV({slot.rect.x, slot.rect.y}, {slot.rect.width, slot.rect.height}, gray)
-        rl.DrawRectangleLinesEx(slot.rect, 5, color)
+        rl.DrawRectangleLinesEx(slot.rect, 5, slot.color)
 
         rect := rl.Rectangle {slot.rect.x + 25, slot.rect.y + 100, slot.rect.width - 50, 50}
         rl.DrawRectangleV({rect.x, rect.y}, {rect.width, rect.height}, rl.BLACK)
@@ -127,19 +126,8 @@ draw_upgrade :: proc(g : Game_State){
         rect.y = slot.rect.y + slot.rect.height - 100
         rl.DrawRectangleV({rect.x, rect.y}, {rect.width, rect.height}, rl.BLACK)
         r_string := fmt.tprintf("%v", slot.upgrade.rarity)
-        draw_text(r_string, rect, 20, color)
+        draw_text(r_string, rect, 20, slot.color)
     }
-}
-
-get_upgrade_color :: proc(r : upgrade.Rarity) -> rl.Color{
-    switch r{
-        case .Common: return rl.SKYBLUE
-        case .Uncommon: return rl.DARKBLUE
-        case .Rare: return rl.GREEN
-        case .Epic: return rl.PURPLE
-        case .Legendary: return rl.ORANGE
-    }
-    return rl.WHITE
 }
 
 draw_in_game_ui :: proc(g : Game_State){

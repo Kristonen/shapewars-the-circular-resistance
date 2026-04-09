@@ -82,5 +82,7 @@ get_upgrade_target :: proc(p : ^Player) {
     switch a in p.ability{
         case ab.Radial_Liberation:
             p.target_ability = .Radial_Liberation
+        case ab.Dash:
+            p.target_ability = .Dash
     }
 }

@@ -113,6 +113,9 @@ main :: proc(){
             count = 8,
             damage = 5,
         }
+        // ability_test := ab.Dash{
+
+        // }
         ability_cd := ab.Ability_Cooldown{
             cast_rate = 5,
         }
@@ -200,6 +203,8 @@ cast_ability :: proc(g : ^Game_State){
     switch &a in g.player.ability{
         case ab.Radial_Liberation:
             ab.cast_radial_liberation(a, &g.player_bullets, g.player.pos)
+        case ab.Dash:
+
     }
 }
 

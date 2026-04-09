@@ -47,13 +47,14 @@ on_upgrade :: proc(g : ^Game_State, u : upgrade.Upgrade){
             switch u.stat{
                 case .Damage:
                     apply_upgrade(u.type, &a.damage, u.value)
-                    fmt.println(a.damage)
                 case .Attack_Speed:
+                    apply_upgrade(u.type, &g.player.ability_cd.cast_rate, u.value)
                 case .Move_Speed:
                 case .Health:
                 case .Amount:
                     apply_upgrade(u.type, &a.count, u.value)
             }
+        case ability.Dash:
     }
 }
 

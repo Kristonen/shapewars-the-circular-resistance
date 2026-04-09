@@ -2,13 +2,11 @@ package ability
 
 import rl "vendor:raylib"
 import bullet "../bullet"
-import "../upgrade"
 import "core:math"
 
 Radial_Liberation :: struct{
     damage : f32,
     count : f32,
-    //target : upgrade.Upgrade_Target,
 }
 
 cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]bullet.Bullet, pos : rl.Vector2){
