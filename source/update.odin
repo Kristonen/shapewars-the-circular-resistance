@@ -30,7 +30,7 @@ update_handler :: proc(g : ^Game_State, dt : f32){
 
     if rl.IsKeyPressed(.U){
         g.level_up = true
-        upgrade.create_upgrade_menu(&g.upgrade_menu, g.upgrade_pool)
+        upgrade.create_upgrade_menu(&g.upgrade_menu, g.available_upgrades, g.player.target_ability)
     }
 }
 

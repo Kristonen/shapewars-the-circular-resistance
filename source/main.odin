@@ -23,7 +23,7 @@ import "upgrade"
 //////////////////////////////////////////////////////
 
 main :: proc(){
-
+    
     rl.InitWindow(1920, 1080, "Shapewars: The Circular Resistance")
     rl.SetWindowState({.WINDOW_RESIZABLE})
     rl.SetTargetFPS(500)
@@ -77,6 +77,7 @@ main :: proc(){
         delete(game.menu.elements)
         delete(game.loot)
         delete(game.upgrade_pool)
+        delete(game.available_upgrades)
         rl.CloseWindow()
     }
     level, ok := m.load_map("assets/test_map.json", map_allocator)
@@ -117,6 +118,8 @@ main :: proc(){
         }
         game.player.ability = ability_test
         game.player.ability_cd = ability_cd
+        pl.get_upgrade_target(&game.player)
+        fill_available_upgrades(&game)
         game.player.h_bar = p_bar
         game.player.v_bar = v_bar
         append(&game.ui_elements, game.player.h_bar)
@@ -170,20 +173,6 @@ check_collisions :: proc(g : ^Game_State){
         check_collision_menu(g)
     }
 }
-
-//     for &l, idx in game.loot{
-//         if !l.is_active do continue
-//         if cl.check_circle_circle(game.player.collider, l.pickup){
-//             pl.increase_value(&game.player.loot_bag, l.value)
-//             ui.update_progress_bar_player(&game.player.v_bar, game.player.loot_bag.value, game.player.loot_bag.max_value)
-//             unordered_remove(&game.loot, idx)
-//         }
-
-//         if cl.check_circle_circle(game.player.collider, l.detection){
-//             l.is_following = true
-//         }
-//     }
-// }
 
 draw_game :: proc(g : Game_State){
     rl.BeginDrawing()
@@ -264,5 +253,15 @@ sync_menu :: proc(g : ^Game_State){
 
             
         case.Main:
+    }
+}
+
+fill_available_upgrades :: proc(g : ^Game_State){
+    for u in g.upgrade_pool{
+        if u.target == .Player{
+            append(&g.available_upgrades, u)
+        } else if g.player.target_ability == u.target{
+            append(&g.available_upgrades, u)
+        }
     }
 }

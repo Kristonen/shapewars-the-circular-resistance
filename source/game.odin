@@ -9,6 +9,7 @@ import pacl "particle"
 import "loot"
 import "ui"
 import "upgrade"
+import "ability"
 
 Game_State :: struct{
     player : pl.Player,
@@ -31,6 +32,7 @@ Game_State :: struct{
     level_up : bool,
     upgrade_menu : upgrade.UI_Upgrade_Menu,
     upgrade_pool : [dynamic]upgrade.Upgrade,
+    available_upgrades : [dynamic]upgrade.Upgrade,
 
 
     helper_activated : bool,

@@ -3,7 +3,7 @@ package upgrade
 import "core:math/rand"
 import rl "vendor:raylib"
 
-Upgrade_Target :: enum { Player, Radial_Liberation }
+Upgrade_Target :: enum { Player, Radial_Liberation, Dash }
 Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, Health, Amount }
 Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }
@@ -45,13 +45,18 @@ Upgrade_Shader :: struct{
     timer : f32,
 }
 
-create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade){
+create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade, a_target : Upgrade_Target){
     m.width = f32(rl.GetScreenWidth())
     m.height = f32(rl.GetScreenHeight())
     // m.upgrades = create_test_upgrades()
     for i in 0..<3{
         rand := rand.int32_range(0, i32(len(u)))
-        m.upgrades[i] = create_upgrade_slot(u[rand], f32(i))
+        upgrade := u[rand]
+        if upgrade.target == .Player{
+            m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
+        } else if a_target == upgrade.target{
+            m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
+        }
     }
     shader := rl.LoadShader(nil, "assets/test.frag")
     u_time_loc := rl.GetShaderLocation(shader, "u_time")
@@ -69,6 +74,7 @@ create_upgrades :: proc(a : ^[dynamic]Upgrade){
     create_as_upgrades(a)
     create_health_upgrades(a)
     create_rl_upgrades(a)
+    create_dash_upgrades(a)
 }
 
 create_upgrade_slot :: proc(u : Upgrade, mul : f32) -> UI_Upgrade_Slot{

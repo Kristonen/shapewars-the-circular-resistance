@@ -8,6 +8,7 @@ import m "../map"
 import h "../health"
 import b "../bullet"
 import "../ui"
+import "../upgrade"
 
 Weapon :: struct {
     fire_rate : f32,
@@ -29,6 +30,7 @@ Player :: struct {
     weapon : Weapon,
     ability : ab.Ability,
     ability_cd : ab.Ability_Cooldown,
+    target_ability : upgrade.Upgrade_Target,
     health : h.Health,
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
@@ -74,4 +76,11 @@ increase_value :: proc(bag : ^Loot_Bag, value : f32) -> bool{
         return true
     }
     return false
+}
+
+get_upgrade_target :: proc(p : ^Player) {
+    switch a in p.ability{
+        case ab.Radial_Liberation:
+            p.target_ability = .Radial_Liberation
+    }
 }
