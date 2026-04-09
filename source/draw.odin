@@ -5,6 +5,7 @@ import rl "vendor:raylib"
 import "core:fmt"
 import "collider"
 import "ui"
+import "upgrade"
 
 draw_player :: proc(g : Game_State){
     rl.DrawCircleV(g.player.pos, g.player.radius, rl.VIOLET)
@@ -98,6 +99,49 @@ draw_particles :: proc(g : Game_State){
     }
 }
 
+draw_upgrade :: proc(g : Game_State){
+    rl.DrawRectangleV({}, {g.upgrade_menu.width, g.upgrade_menu.height}, {0, 0, 0, 200})
+    for slot in g.upgrade_menu.upgrades{
+        color := get_upgrade_color(slot.upgrade.rarity)
+        gray := rl.GRAY
+        gray.a = 150
+        if slot.state == .Focused{
+            gray = {180, 180, 180, 150}
+        }
+        rl.DrawRectangleV({slot.rect.x, slot.rect.y}, {slot.rect.width, slot.rect.height}, gray)
+        rl.DrawRectangleLinesEx(slot.rect, 5, color)
+
+        rect := rl.Rectangle {slot.rect.x + 25, slot.rect.y + 100, slot.rect.width - 50, 50}
+        rl.DrawRectangleV({rect.x, rect.y}, {rect.width, rect.height}, rl.BLACK)
+        draw_text(slot.upgrade.name, rect)
+
+        texture_rect := rect
+        texture_rect.x = slot.rect.x + slot.rect.width/2 - 32
+        texture_rect.y += rect.height + 50
+        rl.BeginShaderMode(g.upgrade_menu.shader.bloom)
+        rl.DrawRectangleV({texture_rect.x, texture_rect.y}, {64, 64}, slot.upgrade.texture)
+        rl.EndShaderMode()
+        rect.y += 64 + 150
+        rl.DrawRectangleV({rect.x, rect.y}, {rect.width, 200}, rl.BLACK)
+        draw_text(slot.upgrade.desc, rect, 20)
+        rect.y = slot.rect.y + slot.rect.height - 100
+        rl.DrawRectangleV({rect.x, rect.y}, {rect.width, rect.height}, rl.BLACK)
+        r_string := fmt.tprintf("%v", slot.upgrade.rarity)
+        draw_text(r_string, rect, 20, color)
+    }
+}
+
+get_upgrade_color :: proc(r : upgrade.Rarity) -> rl.Color{
+    switch r{
+        case .Common: return rl.SKYBLUE
+        case .Uncommon: return rl.DARKBLUE
+        case .Rare: return rl.GREEN
+        case .Epic: return rl.PURPLE
+        case .Legendary: return rl.ORANGE
+    }
+    return rl.WHITE
+}
+
 draw_in_game_ui :: proc(g : Game_State){
     for element in g.ui_elements{
         switch e in element{
@@ -148,14 +192,13 @@ draw_collider_rect :: proc(c : collider.Collider_Rectangle){
     rl.DrawRectangleV(c.pos, {c.width, c.height}, color)
 }
 
-draw_text :: proc(text : string, r : rl.Rectangle){
-    font_size : i32 = 30
+draw_text :: proc(text : string, r : rl.Rectangle, font_size : i32 = 30, color : rl.Color = rl.WHITE){
     ctext := strings.clone_to_cstring(text)
     text_width := rl.MeasureText(ctext, font_size)
     text_height : i32 = font_size
     text_x := i32(r.x) + (i32(r.width) - text_width) / 2
     text_y := i32(r.y) + (i32(r.height) - text_height) / 2
-    rl.DrawText(ctext, i32(text_x), i32(text_y), font_size, rl.WHITE)
+    rl.DrawText(ctext, i32(text_x), i32(text_y), font_size, color)
     delete(ctext)
 }
 

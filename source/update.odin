@@ -9,6 +9,7 @@ import "collider"
 import "bullet"
 import "enemy"
 import "loot"
+import "upgrade"
 
 update_handler :: proc(g : ^Game_State, dt : f32){
     if rl.IsKeyPressed(.F1){
@@ -25,6 +26,11 @@ update_handler :: proc(g : ^Game_State, dt : f32){
 
     if rl.IsKeyPressed(.Q){
         g.map_drawing = !g.map_drawing
+    }
+
+    if rl.IsKeyPressed(.U){
+        g.level_up = true
+        upgrade.create_upgrade_menu(&g.upgrade_menu, g.upgrade_pool)
     }
 }
 
@@ -83,7 +89,11 @@ update_player_shooting :: proc(g : ^Game_State, dt : f32){
 
     if rl.IsMouseButtonDown(.LEFT) && g.player.weapon.cooldown <= 0{
         g.player.weapon.cooldown = g.player.weapon.fire_rate
-        b := bullet.create_bullet(g.player.pos, g.camera)
+        b := g.player.bullet
+        b.pos = g.player.pos
+        mouse_pos := rl.GetMousePosition()
+        dir := rl.GetScreenToWorld2D(mouse_pos, g.camera)
+        b.dir = rl.Vector2Normalize(dir - g.player.pos)
         append(&g.player_bullets, b)
     }
 }
@@ -151,6 +161,24 @@ update_loot :: proc(g : ^Game_State, dt : f32){
         l.pos += dir * l.current_speed * dt
         l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
         l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
+    }
+}
+
+update_upgrade :: proc(g : ^Game_State, dt : f32){
+    test := g.upgrade_menu.shader.test
+    g.upgrade_menu.shader.timer -= dt
+    if g.upgrade_menu.shader.timer <= 0{
+        test += 0.1
+        g.upgrade_menu.shader.timer = 0.5
+    }
+    color_test := rl.Vector4 {0.4, 0, 1, 0.5}
+    rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.u_time_loc, &test, .FLOAT)
+    rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.color_loc, &color_test, .VEC4)
+    for &slot in g.upgrade_menu.upgrades{
+        if slot.state == .Selected{
+            on_upgrade(g, slot.upgrade)
+            g.level_up = false
+        }
     }
 }
 

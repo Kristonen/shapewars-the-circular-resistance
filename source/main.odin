@@ -16,6 +16,7 @@ import ab "ability"
 import "ui"
 import "handler"
 import "loot"
+import "upgrade"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -75,6 +76,7 @@ main :: proc(){
         delete(game.ui_elements)
         delete(game.menu.elements)
         delete(game.loot)
+        delete(game.upgrade_pool)
         rl.CloseWindow()
     }
     level, ok := m.load_map("assets/test_map.json", map_allocator)
@@ -83,6 +85,7 @@ main :: proc(){
         game.player = pl.create_player(game.level)
         game.player.pos = m.get_player_spawn_pos(game.level)
         game.camera.target = game.player.pos
+        upgrade.create_upgrades(&game.upgrade_pool)
         
         rect := rl.Rectangle {
             x = 50,
@@ -107,6 +110,7 @@ main :: proc(){
 
         ability_test := ab.Radial_Liberation{   
             count = 8,
+            damage = 5,
         }
         ability_cd := ab.Ability_Cooldown{
             cast_rate = 5,
@@ -137,7 +141,7 @@ main :: proc(){
 update_game :: proc(g : ^Game_State, dt : f32) {
     update_helper(g)
     update_handler(g, dt)
-    if !g.is_paused{
+    if !g.is_paused && !g.level_up{
         g.play_time += dt
         update_player(g, dt)
         update_player_shooting(g, dt)
@@ -148,16 +152,20 @@ update_game :: proc(g : ^Game_State, dt : f32) {
         update_loot(g, dt)
         update_particle(g, dt)
         update_in_game_ui(g, dt)
+    } else if g.level_up{
+        update_upgrade(g, dt)
     } else{
         update_menu(g)
     }
 }
 
 check_collisions :: proc(g : ^Game_State){
-    if !g.is_paused{
+    if !g.is_paused && !g.level_up{
         check_bullet(g)
         check_collisions_detection_loot(g)
         check_collisions_pickup_loot(g)
+    } else if g.level_up{
+        check_collision_upgrade_slot(g)
     } else{
         check_collision_menu(g)
     }
@@ -193,6 +201,8 @@ draw_game :: proc(g : Game_State){
     draw_in_game_ui(g)
     if g.is_paused{
         draw_menu(g)
+    } else if g.level_up{
+        draw_upgrade(g)
     }
     rl.EndDrawing()
 }

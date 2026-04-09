@@ -25,19 +25,14 @@ draw_bullet :: proc(b : Bullet){
     rl.DrawCircleV(b.pos, b.radius, rl.RED)
 }
 
-create_bullet :: proc(pos : rl.Vector2, c : rl.Camera2D) -> Bullet{
-    mouse_pos := rl.GetMousePosition()
-    world_pos := rl.GetScreenToWorld2D(mouse_pos, c)
+create_bullet :: proc() -> Bullet{
     b := Bullet{
         damage = 10,
         radius = 8,
         speed = 500,
-        pos = pos,
-        dir = rl.Vector2Normalize(world_pos - pos),
         is_active = true,
     }
     b.collider = {
-        pos = pos,
         radius = b.radius,
     }
     return b

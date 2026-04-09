@@ -5,6 +5,7 @@ import rl "vendor:raylib"
 import "ui"
 import "bullet"
 import "particle"
+import "upgrade"
 
 check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, g : Game_State) -> bool{
     if !g.map_drawing{
@@ -79,8 +80,25 @@ check_collisions_pickup_loot :: proc(g : ^Game_State){
         if !l.is_active do continue
 
         if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, g.player.collider.pos, g.player.collider.radius){
-            g.player.increase_value(&g.player.loot_bag, l.value)
+            g.level_up = g.player.increase_value(&g.player.loot_bag, l.value)
+            if g.level_up{
+                upgrade.create_upgrade_menu(&g.upgrade_menu, g.upgrade_pool)
+            }
             unordered_remove(&g.loot, idx)
+        }
+    }
+}
+
+check_collision_upgrade_slot :: proc(g : ^Game_State){
+    mouse_pos := rl.GetMousePosition()
+    for &slot in g.upgrade_menu.upgrades{
+        if rl.CheckCollisionPointRec(mouse_pos, slot.rect){
+            slot.state = .Focused
+            if rl.IsMouseButtonReleased(.LEFT){
+                slot.state = .Selected
+            }
+        } else{
+            slot.state = .None
         }
     }
 }

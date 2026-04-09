@@ -33,8 +33,10 @@ Player :: struct {
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
 
+    bullet : b.Bullet,
+
     loot_bag : Loot_Bag,
-    increase_value : proc(b : ^Loot_Bag, value : f32),
+    increase_value : proc(b : ^Loot_Bag, value : f32) -> bool,
 
     collider : cl.Collider_Circle,
 }
@@ -59,14 +61,17 @@ create_player :: proc(level : m.Tiled_Map) -> Player{
             level_increase = 50,
         },
         increase_value = increase_value,
+        bullet = b.create_bullet(),
     }
 }
 
-increase_value :: proc(bag : ^Loot_Bag, value : f32){
+increase_value :: proc(bag : ^Loot_Bag, value : f32) -> bool{
     bag.value += value
     if bag.value >= bag.max_value{
         bag.level += 1
         bag.value -= bag.max_value
         bag.max_value += bag.level_increase
+        return true
     }
+    return false
 }

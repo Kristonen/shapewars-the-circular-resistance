@@ -8,6 +8,7 @@ import m "map"
 import pacl "particle"
 import "loot"
 import "ui"
+import "upgrade"
 
 Game_State :: struct{
     player : pl.Player,
@@ -26,6 +27,11 @@ Game_State :: struct{
     current_menu : ui.Menu_Type,
     last_menu : ui.Menu_Type,
     level : m.Tiled_Map,
+
+    level_up : bool,
+    upgrade_menu : upgrade.UI_Upgrade_Menu,
+    upgrade_pool : [dynamic]upgrade.Upgrade,
+
 
     helper_activated : bool,
     map_drawing : bool,
