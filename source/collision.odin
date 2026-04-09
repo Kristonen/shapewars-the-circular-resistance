@@ -42,6 +42,7 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^bullet.Bullet){
         if rl.CheckCollisionCircleRec(b.pos, b.radius, e_rect){
             particle_pos : rl.Vector2 = {e.pos.x + e.width/2, e.pos.y + e.height/2}
             particle.create_hit_particles(&g.particles, particle_pos)
+            e.knocback->apply(g.player.pos, &e.pos)
             e.health.take_dmg(&e.health, b.damage)
             b.is_active = false    
         }
@@ -91,10 +92,14 @@ check_collisions_pickup_loot :: proc(g : ^Game_State){
 
 check_collision_upgrade_slot :: proc(g : ^Game_State){
     mouse_pos := rl.GetMousePosition()
+    if !g.upgrade_menu.is_active && rl.IsMouseButtonReleased(.LEFT){
+        g.upgrade_menu.is_active = true
+        return
+    }
     for &slot in g.upgrade_menu.upgrades{
         if rl.CheckCollisionPointRec(mouse_pos, slot.rect){
             slot.state = .Focused
-            if rl.IsMouseButtonReleased(.LEFT){
+            if rl.IsMouseButtonReleased(.LEFT) && g.upgrade_menu.is_active{
                 slot.state = .Selected
             }
         } else{

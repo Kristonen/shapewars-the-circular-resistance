@@ -1,5 +1,6 @@
 package enemy
 
+import "vendor:stb/rect_pack"
 import rl "vendor:raylib"
 import cl "../collider"
 import h "../health"
@@ -13,12 +14,28 @@ Dummy_Enemy :: struct {
     speed : f32,
     width : f32,
     height : f32,
+    visual_scale : rl.Vector2,
     color : rl.Color,
     collidor : cl.Collider_Rectangle,
     update_behavior : Enemy_Behavior,
 
     health : h.Health,
     health_bar : ui.UI_Progress_Bar,
+    knocback : Knockback,
+}
+
+Knockback :: struct{
+    strength : f32,
+    vel : rl.Vector2,
+    threshold : f32,
+    friction : f32,
+    apply : proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2),
+}
+
+apply_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2){
+    dir := v_pos^ - a_pos
+    dir = rl.Vector2Normalize(dir)
+    k.vel += dir * k.strength
 }
 
 create_enemy :: proc(pos : rl.Vector2) -> Dummy_Enemy{
@@ -33,6 +50,13 @@ create_enemy :: proc(pos : rl.Vector2) -> Dummy_Enemy{
             width = 48,
         },
         update_behavior = melee_enemy_behavior,
+        knocback = {
+            strength = 400,
+            friction = 0.9,
+            threshold = 10,
+            apply = apply_knockback,
+        },
+        visual_scale = {1, 1},
     }
 
     health := h.Health{

@@ -72,7 +72,14 @@ draw_bullet :: proc(g : Game_State){
 
 draw_enemies :: proc(g : Game_State){
     for e in g.enemies{
-        rl.DrawRectangleV(e.pos, {e.width, e.height}, rl.RED)
+        width := e.width * e.visual_scale.x
+        height := e.height * e.visual_scale.y
+        pos := e.pos
+        if width != e.width{
+            pos.x -= (width - e.width) / 2
+            pos.y += (height - e.height) / 2 
+        }
+        rl.DrawRectangleV(pos, {width, height}, rl.RED)
         draw_progress_bar(e.health_bar)
         if g.helper_activated{
             draw_collider_rect(e.collidor)

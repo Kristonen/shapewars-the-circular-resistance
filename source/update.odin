@@ -1,5 +1,6 @@
 package game
 
+import "core:fmt"
 import "core:math/rand"
 import rl "vendor:raylib"
 import "handler"
@@ -117,7 +118,17 @@ update_enemies :: proc(g : ^Game_State, dt : f32){
             unordered_remove(&g.enemies, idx)
             continue
         }
-        e.update_behavior(&e, g.player.pos, dt)
+        kb_speed := rl.Vector2Length(e.knocback.vel)
+        if kb_speed > e.knocback.threshold{
+            e.pos += e.knocback.vel * dt
+            e.knocback.vel *= e.knocback.friction
+            e.visual_scale.x = 1.0 + (kb_speed * 0.005)
+            e.visual_scale.y = 1.0 - (kb_speed * 0.005)
+        } else{
+            e.visual_scale = {1, 1}
+            e.update_behavior(&e, g.player.pos, dt)
+        }
+        
         e.origin = {e.pos.x + e.width/2, e.pos.y + e.height/2}
         e.collidor.pos = e.pos
         e.health_bar.value = e.health.current
@@ -141,6 +152,8 @@ update_particle :: proc(g : ^Game_State, dt : f32){
 
 update_loot :: proc(g : ^Game_State, dt : f32){
     for &l in g.loot{
+        l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
+        l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
         if !l.is_active{
             l.time -= dt
             if l.time <= 0{
@@ -158,8 +171,6 @@ update_loot :: proc(g : ^Game_State, dt : f32){
         }
 
         l.pos += dir * l.current_speed * dt
-        l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
-        l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
     }
 }
 

@@ -35,6 +35,7 @@ UI_Upgrade_Menu :: struct{
     height : f32,
     upgrades : [3]UI_Upgrade_Slot,
     shader : Upgrade_Shader,
+    is_active : bool,
 }
 
 Upgrade_Shader :: struct{
@@ -48,6 +49,7 @@ Upgrade_Shader :: struct{
 create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade, a_target : Upgrade_Target){
     m.width = f32(rl.GetScreenWidth())
     m.height = f32(rl.GetScreenHeight())
+    m.is_active = !rl.IsMouseButtonDown(.LEFT)
     used_idx : [3]i32
     used_idx[0] = -1
     used_idx[1] = -1
