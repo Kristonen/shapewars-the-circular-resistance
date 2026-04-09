@@ -1,7 +1,6 @@
 package game
 
 import "core:math/rand"
-import "core:fmt"
 import rl "vendor:raylib"
 import "handler"
 import "ui"

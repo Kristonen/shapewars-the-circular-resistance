@@ -48,16 +48,17 @@ Upgrade_Shader :: struct{
 create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade, a_target : Upgrade_Target){
     m.width = f32(rl.GetScreenWidth())
     m.height = f32(rl.GetScreenHeight())
+    used_idx : [3]i32
+    used_idx[0] = -1
+    used_idx[1] = -1
+    used_idx[2] = -1
     // m.upgrades = create_test_upgrades()
     for i in 0..<3{
-        rand := rand.int32_range(0, i32(len(u)))
-        upgrade := u[rand]
-        if upgrade.target == .Player{
-            m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
-        } else if a_target == upgrade.target{
-            m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
-        }
+        upgrade, idx := get_random_upgrade_by_rarity(u, used_idx)
+        used_idx[i] = idx
+        m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
     }
+
     shader := rl.LoadShader(nil, "assets/test.frag")
     u_time_loc := rl.GetShaderLocation(shader, "u_time")
     color_loc := rl.GetShaderLocation(shader, "color")
@@ -66,6 +67,43 @@ create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade, a_target
     m.shader.u_time_loc = u_time_loc
     m.shader.color_loc = color_loc
     m.shader.timer = 0.5
+}
+
+is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
+    for idx in idx_array{
+        if n == idx{
+            return true
+        }
+    }
+    return false
+}
+
+get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) -> (Upgrade, i32){
+    upgrade : Upgrade
+    rand_idx : i32
+    for true{
+        rarity := get_random_rarity()
+        rand_idx = rand.int32_range(0, i32(len(u)))
+        upgrade = u[rand_idx]
+        if rarity != upgrade.rarity || is_upgrade_already_used(rand_idx, used_idx) do continue
+        break
+    }
+    return upgrade, rand_idx
+}
+
+get_random_rarity :: proc() -> Rarity{
+    rand := rand.float32()
+    if rand <= 0.02{
+        return .Legendary
+    } else if rand <= 0.10{
+        return .Epic
+    } else if rand <= 0.25{
+        return .Rare
+    } else if rand <= 0.50{
+        return .Uncommon
+    } else {
+        return .Common
+    }
 }
 
 create_upgrades :: proc(a : ^[dynamic]Upgrade){
