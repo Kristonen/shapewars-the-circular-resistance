@@ -91,6 +91,7 @@ check_collisions_pickup_loot :: proc(g : ^Game_State){
         if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, g.player.collider.pos, g.player.collider.radius){
             g.level_up = g.player.increase_value(&g.player.loot_bag, l.value)
             if g.level_up{
+                level_up_spawner_update(g)
                 upgrade.create_upgrade_menu(&g.upgrade_menu, g.available_upgrades, g.player.target_ability)
             }
             unordered_remove(&g.loot, idx)

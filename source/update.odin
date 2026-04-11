@@ -125,6 +125,22 @@ update_player_casting :: proc(g : ^Game_State, dt : f32){
     }
 }
 
+update_spawner :: proc(g : ^Game_State, dt : f32){
+    for &s in g.spawner{
+        if s.count >= s.max_count do continue
+        if s.spawn_timer > 0{
+            s.spawn_timer -= dt
+            continue
+        }
+        new_enemy : Dummy_Enemy = s.enemy
+        new_enemy.pos = handler.get_random_spawn_pos(g.camera)
+        new_enemy.spawner = &s
+        s.count += 1
+        s.spawn_timer = s.spawn_time
+        append(&g.enemies, new_enemy)
+    }
+}
+
 update_enemy :: proc(g : ^Game_State, dt : f32){
     for &e, idx in g.enemies{
         if e.health.is_dead{

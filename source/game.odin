@@ -7,7 +7,6 @@ import pacl "particle"
 import "loot"
 import "ui"
 import "upgrade"
-import "ability"
 
 Create_Hit_Particle :: #type proc(p : ^[dynamic]pacl.Particle, pos : rl.Vector2)
 
@@ -23,6 +22,7 @@ Game_State :: struct{
 
     enemies : [dynamic]Dummy_Enemy,
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
+    spawner : [dynamic]Spawner,
 
     create_hit_particle : Create_Hit_Particle,
     particles : [dynamic]pacl.Particle,

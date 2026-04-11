@@ -76,6 +76,8 @@ main :: proc(){
         delete(game.loot)
         delete(game.upgrade_pool)
         delete(game.available_upgrades)
+        delete(game.enemy_fragments)
+        delete(game.spawner)
         rl.CloseWindow()
     }
     level, ok := m.load_map("assets/test_map.json", map_allocator)
@@ -85,6 +87,8 @@ main :: proc(){
         game.player.pos = m.get_player_spawn_pos(game.level)
         game.camera.target = game.player.pos
         upgrade.create_upgrades(&game.upgrade_pool)
+        spawner := create_spawner(5, 2, 1)
+        append(&game.spawner, spawner)
         
         rect := rl.Rectangle {
             x = 50,
@@ -151,6 +155,7 @@ update_game :: proc(g : ^Game_State, dt : f32) {
         update_player_shooting(g, dt)
         update_player_bullets(g, dt)
         update_player_casting(g, dt)
+        update_spawner(g, dt)
         update_manual_spawn(g)
         update_enemy(g, dt)
         update_fragement(g, dt)

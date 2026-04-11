@@ -135,7 +135,7 @@ get_upgrade_color :: proc(r : Rarity) -> rl.Color{
         case .Common: return rl.SKYBLUE
         case .Uncommon: return rl.DARKBLUE
         case .Rare: return rl.GREEN
-        case .Epic: return rl.PURPLE
+        case .Epic: return rl.VIOLET
         case .Legendary: return rl.ORANGE
     }
     return rl.WHITE

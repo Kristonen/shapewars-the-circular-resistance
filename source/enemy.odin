@@ -23,6 +23,9 @@ Dummy_Enemy :: struct {
     health : Health,
     health_bar : ui.UI_Progress_Bar,
     knocback : Knockback,
+
+    spawner : rawptr,
+
     on_hit : On_Hit,
     on_death : On_Death,
 }
@@ -108,6 +111,8 @@ on_death :: proc(g : ^Game_State, e : Dummy_Enemy, idx : i32){
     g.shake = 100
     count := rand.int32_range(3, 7)
     loot.spawn_shards(&g.loot, count, e.origin)
+    spawner : ^Spawner = (^Spawner)(e.spawner)
+    spawner.count -= 1
     create_fragments_death(&g.enemy_fragments ,e)
     unordered_remove(&g.enemies, idx)
 }
