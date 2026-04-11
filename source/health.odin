@@ -1,4 +1,4 @@
-package health
+package game
 
 import rl "vendor:raylib"
 
@@ -22,6 +22,7 @@ Health :: struct{
 take_damage :: proc(h : ^Health, dmg : f32){
     h.current -= dmg
     if h.current <= h.min{
+        h.current = h.min
         h.is_dead = true
     }
 }

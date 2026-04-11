@@ -79,11 +79,17 @@ draw_enemies :: proc(g : Game_State){
             pos.x -= (width - e.width) / 2
             pos.y += (height - e.height) / 2 
         }
-        rl.DrawRectangleV(pos, {width, height}, rl.RED)
+        rl.DrawRectangleV(pos, {width, height}, e.color)
         draw_progress_bar(e.health_bar)
         if g.helper_activated{
             draw_collider_rect(e.collidor)
         }
+    }
+}
+
+draw_fragments :: proc(g : Game_State){
+    for f in g.enemy_fragments{
+        rl.DrawRectangleV({f.pos.x, f.pos.y}, {f.width, f.height}, f.color)
     }
 }
 

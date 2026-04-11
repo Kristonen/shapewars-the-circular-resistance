@@ -7,7 +7,6 @@ import "handler"
 import "ui"
 import "collider"
 import "bullet"
-import "enemy"
 import "loot"
 import "upgrade"
 
@@ -37,7 +36,7 @@ update_handler :: proc(g : ^Game_State, dt : f32){
 update_manual_spawn :: proc(g : ^Game_State){
     if rl.IsKeyPressed(.T){
         new_pos := handler.get_random_spawn_pos(g.camera)
-        e := enemy.create_enemy(new_pos)
+        e := create_enemy(new_pos)
         append(&g.enemies, e)
     }
 }
@@ -47,6 +46,17 @@ update_helper :: proc(g : ^Game_State){
         g.helper_activated = !g.helper_activated
     }
 
+}
+
+update_camera :: proc(g : ^Game_State, dt : f32){
+    g.camera.target += handler.get_camera_follow_pos(g.player.pos, g.camera, dt)
+    g.camera.offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2}
+    if g.shake > 5{
+        shake_x := g.camera.offset.x + rand.float32_range(-g.shake, g.shake)
+        shake_y := g.camera.offset.y + rand.float32_range(-g.shake, g.shake)
+        g.camera.offset = {shake_x, shake_y}
+        g.shake *= 0.95
+    }
 }
 
 update_player :: proc(g : ^Game_State, dt : f32){
@@ -109,13 +119,10 @@ update_player_casting :: proc(g : ^Game_State, dt : f32){
     }
 }
 
-update_enemies :: proc(g : ^Game_State, dt : f32){
+update_enemy :: proc(g : ^Game_State, dt : f32){
     for &e, idx in g.enemies{
         if e.health.is_dead{
-            // loot.create_simple_shard(&g.loot, e.pos)
-            count := rand.int32_range(3, 7)
-            loot.spawn_shards(&g.loot, count, e.pos)
-            unordered_remove(&g.enemies, idx)
+            e.on_death(g, e, i32(idx))
             continue
         }
         kb_speed := rl.Vector2Length(e.knocback.vel)
@@ -134,6 +141,19 @@ update_enemies :: proc(g : ^Game_State, dt : f32){
         e.health_bar.value = e.health.current
         e.health_bar.rect.x = e.pos.x - 10
         e.health_bar.rect.y = e.pos.y - 20
+    }
+}
+
+update_fragement :: proc(g : ^Game_State, dt : f32){
+    for &f, idx in g.enemy_fragments{
+        f.life_time -= dt
+        if f.move_time > 0{
+            f.pos += f.vel * f.speed * dt
+            f.move_time -= dt
+        }
+        if f.life_time <= 0{
+            unordered_remove(&g.enemy_fragments, idx)
+        }
     }
 }
 

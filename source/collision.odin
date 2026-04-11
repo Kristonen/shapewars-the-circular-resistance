@@ -40,11 +40,9 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^bullet.Bullet){
     for &e in g.enemies{
         e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
         if rl.CheckCollisionCircleRec(b.pos, b.radius, e_rect){
-            particle_pos : rl.Vector2 = {e.pos.x + e.width/2, e.pos.y + e.height/2}
-            particle.create_hit_particles(&g.particles, particle_pos)
-            e.knocback->apply(g.player.pos, &e.pos)
-            e.health.take_dmg(&e.health, b.damage)
-            b.is_active = false    
+            e.on_hit(g, &e, b.damage)
+            b.is_active = false
+            b.pos = {-10000, -10000}
         }
     }
 }

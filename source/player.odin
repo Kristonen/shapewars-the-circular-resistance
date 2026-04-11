@@ -1,14 +1,12 @@
-package player
+package game
 
 import "core:fmt"
 import rl "vendor:raylib"
-import ab "../ability"
-import cl "../collider"
-import m "../map"
-import h "../health"
-import b "../bullet"
-import "../ui"
-import "../upgrade"
+import ab "ability"
+import cl "collider"
+import b "bullet"
+import "ui"
+import "upgrade"
 
 Weapon :: struct {
     fire_rate : f32,
@@ -31,7 +29,7 @@ Player :: struct {
     ability : ab.Ability,
     ability_cd : ab.Ability_Cooldown,
     target_ability : upgrade.Upgrade_Target,
-    health : h.Health,
+    health : Health,
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
 
@@ -43,7 +41,7 @@ Player :: struct {
     collider : cl.Collider_Circle,
 }
 
-create_player :: proc(level : m.Tiled_Map) -> Player{
+create_player :: proc() -> Player{
     return {
         speed = 400,
         radius = 32,

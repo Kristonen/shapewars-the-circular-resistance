@@ -7,10 +7,7 @@ import "core:fmt"
 import "core:mem"
 import bu "bullet"
 import cl "collider"
-import pl "player"
-import enemy "enemy"
 import m "map"
-import h "health"
 import pacl "particle"
 import ab "ability"
 import "ui"
@@ -54,6 +51,7 @@ main :: proc(){
         },
         helper_activated = false,
         current_menu = .Pause,
+        create_hit_particle = pacl.create_hit_particles
     }
     sync_menu(&game)
 
@@ -83,7 +81,7 @@ main :: proc(){
     level, ok := m.load_map("assets/test_map.json", map_allocator)
     if ok{
         game.level = level
-        game.player = pl.create_player(game.level)
+        game.player = create_player()
         game.player.pos = m.get_player_spawn_pos(game.level)
         game.camera.target = game.player.pos
         upgrade.create_upgrades(&game.upgrade_pool)
@@ -121,7 +119,7 @@ main :: proc(){
         }
         game.player.ability = ability_test
         game.player.ability_cd = ability_cd
-        pl.get_upgrade_target(&game.player)
+        get_upgrade_target(&game.player)
         fill_available_upgrades(&game)
         game.player.h_bar = p_bar
         game.player.v_bar = v_bar
@@ -132,10 +130,11 @@ main :: proc(){
     }
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
-        
+        update_camera(&game, dt)
         update_game(&game, dt)
         check_collisions(&game)
-        game.camera.target += handler.get_camera_follow_pos(game.player.pos, game.camera, dt)
+        //game.camera.target += handler.get_camera_follow_pos(game.player.pos, game.camera, dt)
+        
         draw_game(game)
 
         if game.should_close{
@@ -154,7 +153,8 @@ update_game :: proc(g : ^Game_State, dt : f32) {
         update_player_bullets(g, dt)
         update_player_casting(g, dt)
         update_manual_spawn(g)
-        update_enemies(g, dt)
+        update_enemy(g, dt)
+        update_fragement(g, dt)
         update_loot(g, dt)
         update_particle(g, dt)
         update_in_game_ui(g, dt)
@@ -187,6 +187,7 @@ draw_game :: proc(g : Game_State){
     draw_player(g)
     draw_bullet(g)
     draw_enemies(g)
+    draw_fragments(g)
     draw_loot(g)
     draw_particles(g)
     rl.EndMode2D()

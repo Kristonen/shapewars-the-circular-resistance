@@ -2,8 +2,6 @@ package game
 
 import rl "vendor:raylib"
 import b "bullet"
-import e "enemy"
-import pl "player"
 import m "map"
 import pacl "particle"
 import "loot"
@@ -11,16 +9,25 @@ import "ui"
 import "upgrade"
 import "ability"
 
+Create_Hit_Particle :: #type proc(p : ^[dynamic]pacl.Particle, pos : rl.Vector2)
+
 Game_State :: struct{
-    player : pl.Player,
+    player : Player,
     spawn_player : rl.Vector2,
     camera : rl.Camera2D,
+    shake : f32,
     is_paused : bool,
     play_time : f32,
 
     player_bullets : [dynamic]b.Bullet,
-    enemies : [dynamic]e.Dummy_Enemy,
+
+    enemies : [dynamic]Dummy_Enemy,
+    enemy_fragments : [dynamic]Enemy_Death_Fragment,
+
+    create_hit_particle : Create_Hit_Particle,
     particles : [dynamic]pacl.Particle,
+
+
     ui_elements : [dynamic]ui.UI_Element,
     loot : [dynamic]loot.Shape_Shard,
 

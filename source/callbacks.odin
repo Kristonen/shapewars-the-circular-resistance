@@ -3,7 +3,6 @@ package game
 import "core:fmt"
 import rl "vendor:raylib"
 import "upgrade"
-import "player"
 import "ability"
 
 on_click_continue :: proc(g : ^Game_State){
