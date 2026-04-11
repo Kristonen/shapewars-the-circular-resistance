@@ -16,7 +16,6 @@ Health :: struct{
     max : f32,
     min : f32,
     is_dead : bool,
-    is_invincible : bool,
     invincible_timer : f32,
     take_dmg : proc(h : ^Health, dmg : f32)
 }
