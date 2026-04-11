@@ -2,21 +2,6 @@ package ui
 
 import rl "vendor:raylib"
 
-Slider_state :: enum{
-    None, Active
-}
-
-UI_Slider :: struct{
-    pos : rl.Vector2,
-    width : f32,
-    height : f32,
-    slider : rl.Rectangle,
-    state : Slider_state,
-    color : rl.Color,
-    n_color : rl.Color,
-    a_color : rl.Color,
-}
-
 create_slider :: proc(pos : rl.Vector2, size : rl.Vector2) -> UI_Slider{
     slider := UI_Slider{
         pos = pos,

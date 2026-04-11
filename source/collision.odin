@@ -47,6 +47,16 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^bullet.Bullet){
     }
 }
 
+check_enemy_player :: proc(g : ^Game_State){
+    for &e in g.enemies{
+        e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
+        if rl.CheckCollisionCircleRec(g.player.collider.pos, g.player.collider.radius, e_rect) && g.player.health.invincible_timer <= 0{
+            g.player.health.take_dmg(&g.player.health, 10)
+            g.player.health.invincible_timer = 2
+        }
+    }
+}
+
 check_bullet_wall :: proc(g : ^Game_State, b : ^bullet.Bullet){
     for layer in g.level.layers{
         if layer.name != "Walls" do continue

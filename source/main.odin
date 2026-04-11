@@ -106,7 +106,6 @@ main :: proc(){
         v_bar.value = game.player.loot_bag.value
         v_bar.max = game.player.loot_bag.max_value
 
-
         ability_test := ab.Radial_Liberation{   
             count = 8,
             damage = 5,
@@ -167,6 +166,7 @@ update_game :: proc(g : ^Game_State, dt : f32) {
 
 check_collisions :: proc(g : ^Game_State){
     if !g.is_paused && !g.level_up{
+        check_enemy_player(g)
         check_bullet(g)
         check_collisions_detection_loot(g)
         check_collisions_pickup_loot(g)

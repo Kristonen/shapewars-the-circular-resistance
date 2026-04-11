@@ -1,26 +1,6 @@
 package ui
 
-import "core:strings"
 import rl "vendor:raylib"
-import "core:fmt"
-
-Bar_Type :: enum{
-    Health, Value
-}
-
-UI_Progress_Bar :: struct{
-    show_text : bool,
-    min : f32,
-    max : f32,
-    value : f32,
-    rect : rl.Rectangle,
-    roundness : f32,
-    segments : i32,
-    outline_color : rl.Color,
-    background_color : rl.Color,
-    fill_color : rl.Color,
-    type : Bar_Type,
-}
 
 create_progress_bar :: proc(rect : rl.Rectangle, o_color, b_color, f_color : rl.Color) -> UI_Progress_Bar{
     bar : UI_Progress_Bar

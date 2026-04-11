@@ -60,6 +60,12 @@ update_camera :: proc(g : ^Game_State, dt : f32){
 }
 
 update_player :: proc(g : ^Game_State, dt : f32){
+    if g.player.health.is_dead{
+        g.should_close = true
+    }
+    if g.player.health.invincible_timer >= 0{
+        g.player.health.invincible_timer -= dt
+    }
     g.player.vel = {}
     if rl.IsKeyDown(.W){
         g.player.vel.y = -check_direction_col(g^, g.player.pos, {0, -1}, g.player.speed, dt)

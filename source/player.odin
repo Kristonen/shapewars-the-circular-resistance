@@ -50,7 +50,8 @@ create_player :: proc() -> Player{
         },
         health = {
           current = 50,
-          max = 100,  
+          max = 100, 
+          take_dmg = take_damage,
         },
         collider = {
             radius = 28,

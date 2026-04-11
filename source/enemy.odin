@@ -1,7 +1,6 @@
 package game
 
 import "core:math/rand"
-import "vendor:stb/rect_pack"
 import rl "vendor:raylib"
 import cl "collider"
 import "ui"
