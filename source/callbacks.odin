@@ -29,7 +29,7 @@ on_upgrade :: proc(g : ^Game_State, u : upgrade.Upgrade){
     if u.target == .Player{
         switch u.stat{
             case .Damage:
-                apply_upgrade(u.type, &g.player.bullet.damage, u.value)
+                apply_upgrade(u.type, &g.player.weapon.bullet.damage, u.value)
             case .Move_Speed:
                 apply_upgrade(u.type, &g.player.speed, u.value)
             case .Attack_Speed:

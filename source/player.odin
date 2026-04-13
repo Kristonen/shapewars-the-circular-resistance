@@ -11,6 +11,7 @@ import "upgrade"
 Weapon :: struct {
     fire_rate : f32,
     cooldown : f32,
+    bullet : b.Bullet,
 }
 
 Loot_Bag :: struct{
@@ -33,7 +34,7 @@ Player :: struct {
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
 
-    bullet : b.Bullet,
+    // bullet : b.Bullet,
 
     loot_bag : Loot_Bag,
     increase_value : proc(b : ^Loot_Bag, value : f32) -> bool,
@@ -47,6 +48,7 @@ create_player :: proc() -> Player{
         radius = 32,
         weapon = {
             fire_rate = 0.5,
+            bullet = b.create_bullet(),
         },
         health = {
           current = 50,
@@ -62,7 +64,6 @@ create_player :: proc() -> Player{
             level_increase = 50,
         },
         increase_value = increase_value,
-        bullet = b.create_bullet(),
     }
 }
 

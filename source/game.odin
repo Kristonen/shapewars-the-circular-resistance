@@ -18,31 +18,42 @@ Game_State :: struct{
     is_paused : bool,
     play_time : f32,
 
-    player_bullets : [dynamic]b.Bullet,
-
-    enemies : [dynamic]Dummy_Enemy,
-    enemy_fragments : [dynamic]Enemy_Death_Fragment,
-    spawner : [dynamic]Spawner,
-
     create_hit_particle : Create_Hit_Particle,
-    particles : [dynamic]pacl.Particle,
-
-
-    ui_elements : [dynamic]ui.UI_Element,
-    loot : [dynamic]loot.Shape_Shard,
 
     menu : ui.UI_Menu,
     current_menu : ui.Menu_Type,
     last_menu : ui.Menu_Type,
-    level : m.Tiled_Map,
 
-    level_up : bool,
-    upgrade_menu : upgrade.UI_Upgrade_Menu,
-    upgrade_pool : [dynamic]upgrade.Upgrade,
-    available_upgrades : [dynamic]upgrade.Upgrade,
-
+    level_data : [dynamic]Level_Data,
+    current_level : Level_Data,
 
     helper_activated : bool,
     map_drawing : bool,
     should_close : bool,
+}
+
+Level_Data :: struct{
+    spawner : [dynamic]Spawner,
+    enemies : [dynamic]Enemy,
+    enemy_fragments : [dynamic]Enemy_Death_Fragment,
+    enemy_bullets : [dynamic]b.Bullet,
+
+    particles : [dynamic]pacl.Particle,
+
+    player_bullets : [dynamic]b.Bullet,
+
+    loot : [dynamic]loot.Shape_Shard,
+
+    power_level_up : bool,
+    upgrade_menu : upgrade.UI_Upgrade_Menu,
+    upgrade_pool : [dynamic]upgrade.Upgrade,
+    available_upgrades : [dynamic]upgrade.Upgrade,
+
+    ui_elements : [dynamic]ui.UI_Element,
+    level_visual : m.Tiled_Map,
+}
+
+create_start_level :: proc() -> Level_Data{
+    level : Level_Data
+    return level
 }

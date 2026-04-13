@@ -1,15 +1,32 @@
 package game
 
+import "core:text/regex/virtual_machine"
 import "core:math/rand"
 import rl "vendor:raylib"
 import cl "collider"
 import "ui"
 import "loot"
+import "bullet"
 
-Enemy_Behavior :: #type proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32)
-On_Hit :: #type proc(g : ^Game_State, e : ^Dummy_Enemy, dmg : f32)
-On_Death :: #type proc(g : ^Game_State, e : Dummy_Enemy, idx : i32)
-Dummy_Enemy :: struct {
+Update_Behavior :: #type proc(e : ^Enemy, data : Behavior_Data, player_pos : rl.Vector2, dt : f32)
+On_Hit :: #type proc(g : ^Game_State, e : ^Enemy, dmg : f32)
+On_Death :: #type proc(g : ^Game_State, e : Enemy, idx : i32)
+
+Melee_Data :: struct{
+
+}
+
+Distance_Data :: struct{
+    max_distance : f32,
+    bullet : bullet.Bullet,
+    weapon : Weapon,
+}
+
+Behavior_Data :: union{
+    Melee_Data, Distance_Data,
+}
+
+Enemy :: struct {
     pos : rl.Vector2,
     origin : rl.Vector2,
     speed : f32,
@@ -18,7 +35,7 @@ Dummy_Enemy :: struct {
     visual_scale : rl.Vector2,
     color : rl.Color,
     collidor : cl.Collider_Rectangle,
-    update_behavior : Enemy_Behavior,
+    behavior : Behavior_Data,
 
     health : Health,
     health_bar : ui.UI_Progress_Bar,
@@ -55,69 +72,79 @@ apply_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
     k.vel += dir * k.strength
 }
 
-create_enemy :: proc(pos : rl.Vector2) -> Dummy_Enemy{
-    enemy := Dummy_Enemy{
-        height = 32,
-        width = 48,
-        pos = pos,
-        speed = 200,
-        color = rl.RED,
-        collidor = {
-            height = 32,
-            width = 48,
-        },
-        update_behavior = melee_enemy_behavior,
-        knocback = {
-            strength = 400,
-            friction = 0.9,
-            threshold = 10,
-            apply = apply_knockback,
-        },
-        visual_scale = {1, 1},
-    }
-
-    health := Health{
+create_start_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
+    e := create_enemy(rect, speed, color)
+    e.health = {
         current = 25,
         max = 25,
         take_dmg = take_damage,
     }
-
-    rect := rl.Rectangle{
-        x = pos.x + 20,
-        y = pos.y - 20,
-        width = enemy.width + 20,
-        height = 10,
+    e.knocback = {
+        strength = 400,
+        friction = 0.9,
+        threshold = 10,
+        apply = apply_knockback,
     }
-
-    enemy.health = health
-    enemy.health_bar = ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
-    enemy.health_bar.value = enemy.health.current
-    enemy.health_bar.max = enemy.health.max
-    enemy.origin = {enemy.pos.x + enemy.width/2, enemy.pos.y + enemy.height/2}
-    enemy.on_hit = on_hit
-    enemy.on_death = on_death
-
-    return enemy
+    e.behavior = Melee_Data{}
+    return e
 }
 
-on_hit :: proc(g : ^Game_State, e : ^Dummy_Enemy, dmg : f32){
+create_second_enemy :: proc() -> Enemy{
+    rect := rl.Rectangle{width = 40, height = 24}
+    e := create_enemy(rect, 100, rl.GOLD)
+    e.health = {
+        current = 10,
+        max = 10,
+        take_dmg = take_damage,
+    }
+    e.knocback = {
+        strength = 400,
+        friction = 0.9,
+        threshold = 10,
+        apply = apply_knockback,
+    }
+    e.behavior = Distance_Data{
+        max_distance = 350,
+        weapon = {
+            fire_rate = 1,
+            bullet = bullet.create_bullet()
+        }
+    }
+    return e
+}
+
+create_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
+    e := Enemy{
+        width = rect.width,
+        height = rect.height,
+        speed = speed,
+        color = color,
+        visual_scale = {1, 1},
+        on_hit = on_hit,
+        on_death = on_death,
+    }
+    e.collidor = { width = e.width, height = e.height}
+    return e
+}
+
+on_hit :: proc(g : ^Game_State, e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.pos.x + e.width/2, e.pos.y + e.height/2}
-    g.create_hit_particle(&g.particles, e.origin)
+    g.create_hit_particle(&g.current_level.particles, e.origin)
     e.knocback->apply(g.player.pos, &e.pos)
     e.health->take_dmg(dmg)
 }
 
-on_death :: proc(g : ^Game_State, e : Dummy_Enemy, idx : i32){
+on_death :: proc(g : ^Game_State, e : Enemy, idx : i32){
     g.shake = 100
     count := rand.int32_range(3, 7)
-    loot.spawn_shards(&g.loot, count, e.origin)
+    loot.spawn_shards(&g.current_level.loot, count, e.origin)
     spawner : ^Spawner = (^Spawner)(e.spawner)
     spawner.count -= 1
-    create_fragments_death(&g.enemy_fragments ,e)
-    unordered_remove(&g.enemies, idx)
+    create_fragments_death(&g.current_level.enemy_fragments ,e)
+    unordered_remove(&g.current_level.enemies, idx)
 }
 
-create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Dummy_Enemy){
+create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){
     f : Enemy_Death_Fragment
     f.pos.x = e.pos.x
     f.pos.y = e.pos.y
@@ -146,8 +173,29 @@ create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Dummy_Ene
     append(a, f)
 }
 
-melee_enemy_behavior :: proc(e : ^Dummy_Enemy, player_pos : rl.Vector2, dt : f32){
+melee_enemy_behavior :: proc(e : ^Enemy, data : Melee_Data, player_pos : rl.Vector2, dt : f32){
     dir := player_pos - e.pos
     vel := rl.Vector2Normalize(dir) * e.speed
     e.pos += vel * dt
+}
+
+distance_enemy_behavior :: proc(e : ^Enemy, data : ^Distance_Data, g : ^Game_State, dt : f32){
+    dist := rl.Vector2Distance(e.pos, g.player.pos)
+    if data.max_distance <= dist{
+        dir := g.player.pos - e.pos
+        vel := rl.Vector2Normalize(dir) * e.speed
+        e.pos += vel * dt
+    } else if data.weapon.cooldown >= 0{
+        data.weapon.cooldown -= dt
+    } else{
+        data.weapon.cooldown = data.weapon.fire_rate
+        b := data.weapon.bullet
+        pos := rl.Vector2{
+            e.pos.x + e.width/2, e.pos.y + e.height/2
+        }
+        b.pos = pos
+        dir := g.player.pos - e.pos
+        b.dir = rl.Vector2Normalize(dir)
+        append(&g.current_level.enemy_bullets, b)
+    }
 }

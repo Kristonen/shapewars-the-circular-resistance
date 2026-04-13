@@ -15,32 +15,32 @@ draw_player :: proc(g : Game_State){
 }
 
 draw_map :: proc(g : Game_State){
-    tileset_name := g.level.tilesets[0].image
+    tileset_name := g.current_level.level_visual.tilesets[0].image
     tileset_path := fmt.tprintf("assets/%s", tileset_name)
     // texture := rl.LoadTexture(rl.TextFormat("%s", tileset_path))
-    texture := g.level.texture//rl.LoadTexture("assets/simple_tilemap_test.png")
-    tiles_per_row := texture.width / i32(g.level.tilewidth)
+    texture := g.current_level.level_visual.texture//rl.LoadTexture("assets/simple_tilemap_test.png")
+    tiles_per_row := texture.width / i32(g.current_level.level_visual.tilewidth)
 
-    for layer in g.level.layers{
+    for layer in g.current_level.level_visual.layers{
         if !layer.visible do continue
 
         if layer.type == "tilelayer"{
-            for pos_y in 0..<g.level.height{
-                for pos_x in 0..<g.level.width{
-                    gid := layer.data[pos_y * g.level.width + pos_x]
+            for pos_y in 0..<g.current_level.level_visual.height{
+                for pos_x in 0..<g.current_level.level_visual.width{
+                    gid := layer.data[pos_y * g.current_level.level_visual.width + pos_x]
                     if gid == 0 do continue
                     id := i32(gid - 1)
                     
                     source := rl.Rectangle{
-                        x = f32((id % tiles_per_row) * i32(g.level.tilewidth)),
-                        y = f32((id / tiles_per_row) * i32(g.level.tileheight)),
-                        width = f32(g.level.tilewidth),
-                        height = f32(g.level.tileheight),
+                        x = f32((id % tiles_per_row) * i32(g.current_level.level_visual.tilewidth)),
+                        y = f32((id / tiles_per_row) * i32(g.current_level.level_visual.tileheight)),
+                        width = f32(g.current_level.level_visual.tilewidth),
+                        height = f32(g.current_level.level_visual.tileheight),
                     }
 
                     dest : rl.Vector2
-                    dest.x = f32(pos_x * g.level.tilewidth)
-                    dest.y = f32(pos_y * g.level.tileheight)
+                    dest.x = f32(pos_x * g.current_level.level_visual.tilewidth)
+                    dest.y = f32(pos_y * g.current_level.level_visual.tileheight)
 
                     rl.DrawTextureRec(texture, source, dest, rl.WHITE)
                 }
@@ -62,7 +62,14 @@ draw_map :: proc(g : Game_State){
 }
 
 draw_bullet :: proc(g : Game_State){
-    for b in g.player_bullets{
+    for b in g.current_level.player_bullets{
+        rl.DrawCircleV(b.pos, b.radius, rl.RED)
+        if g.helper_activated{
+            draw_collider_circle(b.collider)
+        }
+    }
+
+    for b in g.current_level.enemy_bullets{
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if g.helper_activated{
             draw_collider_circle(b.collider)
@@ -71,7 +78,7 @@ draw_bullet :: proc(g : Game_State){
 }
 
 draw_enemies :: proc(g : Game_State){
-    for e in g.enemies{
+    for e in g.current_level.enemies{
         width := e.width * e.visual_scale.x
         height := e.height * e.visual_scale.y
         pos := e.pos
@@ -88,13 +95,13 @@ draw_enemies :: proc(g : Game_State){
 }
 
 draw_fragments :: proc(g : Game_State){
-    for f in g.enemy_fragments{
+    for f in g.current_level.enemy_fragments{
         rl.DrawRectangleV({f.pos.x, f.pos.y}, {f.width, f.height}, f.color)
     }
 }
 
 draw_loot :: proc(g : Game_State){
-    for l in g.loot{
+    for l in g.current_level.loot{
         rl.DrawRectangleV(l.pos, l.size, l.color)
         if g.helper_activated{
             draw_collider_circle(l.detection)
@@ -104,7 +111,7 @@ draw_loot :: proc(g : Game_State){
 }
 
 draw_particles :: proc(g : Game_State){
-    for p in g.particles{
+    for p in g.current_level.particles{
         alpha := 1.0 - (p.life/p.max_life)
         color := p.color
         color.a = u8(alpha*255)
@@ -113,8 +120,8 @@ draw_particles :: proc(g : Game_State){
 }
 
 draw_upgrade :: proc(g : Game_State){
-    rl.DrawRectangleV({}, {g.upgrade_menu.width, g.upgrade_menu.height}, {0, 0, 0, 200})
-    for slot in g.upgrade_menu.upgrades{
+    rl.DrawRectangleV({}, {g.current_level.upgrade_menu.width, g.current_level.upgrade_menu.height}, {0, 0, 0, 200})
+    for slot in g.current_level.upgrade_menu.upgrades{
         gray := rl.GRAY
         gray.a = 150
         if slot.state == .Focused{
@@ -130,7 +137,7 @@ draw_upgrade :: proc(g : Game_State){
         texture_rect := rect
         texture_rect.x = slot.rect.x + slot.rect.width/2 - 32
         texture_rect.y += rect.height + 50
-        rl.BeginShaderMode(g.upgrade_menu.shader.bloom)
+        rl.BeginShaderMode(g.current_level.upgrade_menu.shader.bloom)
         rl.DrawRectangleV({texture_rect.x, texture_rect.y}, {64, 64}, slot.upgrade.texture)
         rl.EndShaderMode()
         rect.y += 64 + 150
@@ -144,7 +151,7 @@ draw_upgrade :: proc(g : Game_State){
 }
 
 draw_in_game_ui :: proc(g : Game_State){
-    for element in g.ui_elements{
+    for element in g.current_level.ui_elements{
         switch e in element{
             case ui.UI_Progress_Bar:
                 if e.type == .Health{

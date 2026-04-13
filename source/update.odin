@@ -28,16 +28,8 @@ update_handler :: proc(g : ^Game_State, dt : f32){
     }
 
     if rl.IsKeyPressed(.U){
-        g.level_up = true
-        upgrade.create_upgrade_menu(&g.upgrade_menu, g.available_upgrades, g.player.target_ability)
-    }
-}
-
-update_manual_spawn :: proc(g : ^Game_State){
-    if rl.IsKeyPressed(.T){
-        new_pos := handler.get_random_spawn_pos(g.camera)
-        e := create_enemy(new_pos)
-        append(&g.enemies, e)
+        g.current_level.power_level_up = true
+        upgrade.create_upgrade_menu(&g.current_level.upgrade_menu, g.current_level.available_upgrades, g.player.target_ability)
     }
 }
 
@@ -85,7 +77,7 @@ update_player :: proc(g : ^Game_State, dt : f32){
 }
 
 update_player_bullets :: proc(g : ^Game_State, dt :f32){
-    for &b, idx in g.player_bullets{
+    for &b, idx in g.current_level.player_bullets{
         b.vel = b.dir * b.speed
         b.pos += b.vel * dt
         b.collider.pos = b.pos
@@ -93,8 +85,16 @@ update_player_bullets :: proc(g : ^Game_State, dt :f32){
             b.is_active = false
         }
         if !b.is_active{
-            unordered_remove(&g.player_bullets, idx)
+            unordered_remove(&g.current_level.player_bullets, idx)
         }
+    }
+}
+
+update_enemy_bullets :: proc(g : ^Game_State, dt : f32){
+    for &b in g.current_level.enemy_bullets{
+        b.vel = b.dir * b.speed
+        b.pos += b.vel * dt
+        b.collider.pos = b.pos
     }
 }
 
@@ -105,12 +105,12 @@ update_player_shooting :: proc(g : ^Game_State, dt : f32){
 
     if rl.IsMouseButtonDown(.LEFT) && g.player.weapon.cooldown <= 0{
         g.player.weapon.cooldown = g.player.weapon.fire_rate
-        b := g.player.bullet
+        b := g.player.weapon.bullet
         b.pos = g.player.pos
         mouse_pos := rl.GetMousePosition()
         dir := rl.GetScreenToWorld2D(mouse_pos, g.camera)
         b.dir = rl.Vector2Normalize(dir - g.player.pos)
-        append(&g.player_bullets, b)
+        append(&g.current_level.player_bullets, b)
     }
 }
 
@@ -126,23 +126,33 @@ update_player_casting :: proc(g : ^Game_State, dt : f32){
 }
 
 update_spawner :: proc(g : ^Game_State, dt : f32){
-    for &s in g.spawner{
+    for &s in g.current_level.spawner{
+        if !s.is_active do continue
         if s.count >= s.max_count do continue
         if s.spawn_timer > 0{
             s.spawn_timer -= dt
             continue
         }
-        new_enemy : Dummy_Enemy = s.enemy
+        new_enemy := s.enemy
         new_enemy.pos = handler.get_random_spawn_pos(g.camera)
+        rect := rl.Rectangle{
+            width = new_enemy.width + 20,
+            height = 10,
+            x = new_enemy.pos.x + 10,
+            y = new_enemy.pos.y + 20,
+        }
+        new_enemy.health_bar = ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
+        new_enemy.health_bar.value = new_enemy.health.current
+        new_enemy.health_bar.max = new_enemy.health.max
         new_enemy.spawner = &s
         s.count += 1
         s.spawn_timer = s.spawn_time
-        append(&g.enemies, new_enemy)
+        append(&g.current_level.enemies, new_enemy)
     }
 }
 
 update_enemy :: proc(g : ^Game_State, dt : f32){
-    for &e, idx in g.enemies{
+    for &e, idx in g.current_level.enemies{
         if e.health.is_dead{
             e.on_death(g, e, i32(idx))
             continue
@@ -155,7 +165,13 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
             e.visual_scale.y = 1.0 - (kb_speed * 0.005)
         } else{
             e.visual_scale = {1, 1}
-            e.update_behavior(&e, g.player.pos, dt)
+            switch &d in e.behavior {
+                case Melee_Data:
+                    melee_enemy_behavior(&e, d, g.player.pos, dt)
+                case Distance_Data:
+                    distance_enemy_behavior(&e, &d, g, dt)
+            }
+            // e.update_behavior(&e, g.player.pos, dt)
         }
         
         e.origin = {e.pos.x + e.width/2, e.pos.y + e.height/2}
@@ -167,22 +183,22 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
 }
 
 update_fragement :: proc(g : ^Game_State, dt : f32){
-    for &f, idx in g.enemy_fragments{
+    for &f, idx in g.current_level.enemy_fragments{
         f.life_time -= dt
         if f.move_time > 0{
             f.pos += f.vel * f.speed * dt
             f.move_time -= dt
         }
         if f.life_time <= 0{
-            unordered_remove(&g.enemy_fragments, idx)
+            unordered_remove(&g.current_level.enemy_fragments, idx)
         }
     }
 }
 
 update_particle :: proc(g : ^Game_State, dt : f32){
-    for &p, idx in g.particles{
+    for &p, idx in g.current_level.particles{
         if !p.alive{
-            unordered_remove(&g.particles, idx)
+            unordered_remove(&g.current_level.particles, idx)
         }
         p.life += dt
         p.pos += p.vel * dt
@@ -193,7 +209,7 @@ update_particle :: proc(g : ^Game_State, dt : f32){
 }
 
 update_loot :: proc(g : ^Game_State, dt : f32){
-    for &l in g.loot{
+    for &l in g.current_level.loot{
         if !l.is_active{
             l.time -= dt
             if l.time <= 0{
@@ -219,34 +235,34 @@ update_loot :: proc(g : ^Game_State, dt : f32){
 }
 
 update_upgrade :: proc(g : ^Game_State, dt : f32){
-    g.upgrade_menu.width = f32(rl.GetScreenWidth())
-    g.upgrade_menu.height = f32(rl.GetScreenHeight())
+    g.current_level.upgrade_menu.width = f32(rl.GetScreenWidth())
+    g.current_level.upgrade_menu.height = f32(rl.GetScreenHeight())
     for i in 0..<3{
-        slot := g.upgrade_menu.upgrades[i]
-        slot.rect.x = g.upgrade_menu.width * 0.1 + slot.rect.width * f32(i) + 50 * f32(i)
-        slot.rect.width = g.upgrade_menu.width * 0.25
-        slot.rect.height = g.upgrade_menu.height * 0.75
-        g.upgrade_menu.upgrades[i] = slot
+        slot := g.current_level.upgrade_menu.upgrades[i]
+        slot.rect.x = g.current_level.upgrade_menu.width * 0.1 + slot.rect.width * f32(i) + 50 * f32(i)
+        slot.rect.width = g.current_level.upgrade_menu.width * 0.25
+        slot.rect.height = g.current_level.upgrade_menu.height * 0.75
+        g.current_level.upgrade_menu.upgrades[i] = slot
     }
-    test := g.upgrade_menu.shader.test
-    g.upgrade_menu.shader.timer -= dt
-    if g.upgrade_menu.shader.timer <= 0{
-        test += 0.1
-        g.upgrade_menu.shader.timer = 0.5
-    }
-    color_test := rl.Vector4 {0.4, 0, 1, 0.5}
-    rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.u_time_loc, &test, .FLOAT)
-    rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.color_loc, &color_test, .VEC4)
-    for &slot in g.upgrade_menu.upgrades{
+    // test := g.upgrade_menu.shader.test
+    // g.upgrade_menu.shader.timer -= dt
+    // if g.upgrade_menu.shader.timer <= 0{
+    //     test += 0.1
+    //     g.upgrade_menu.shader.timer = 0.5
+    // }
+    // color_test := rl.Vector4 {0.4, 0, 1, 0.5}
+    // rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.u_time_loc, &test, .FLOAT)
+    // rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.color_loc, &color_test, .VEC4)
+    for &slot in g.current_level.upgrade_menu.upgrades{
         if slot.state == .Selected{
             on_upgrade(g, slot.upgrade)
-            g.level_up = false
+            g.current_level.power_level_up = false
         }
     }
 }
 
 update_in_game_ui :: proc(g : ^Game_State, dt : f32){
-    for &element in g.ui_elements{
+    for &element in g.current_level.ui_elements{
         switch &e in element{
             case ui.UI_Progress_Bar:
                 if e.type == .Health{

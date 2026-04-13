@@ -61,34 +61,47 @@ main :: proc(){
         height = 64,
         icon = rl.LoadTexture("assets/igel.png")
     }
-    append(&game.ui_elements, cooldown)
+    
 
     // append(&game.ui_elements, p_bar)
 
     defer{
-        delete(game.player_bullets)
-        delete(game.particles)
-        delete(game.enemies)
-        delete(game.level.tilesets)
-        delete(game.level.layers)
-        delete(game.ui_elements)
+        delete(game.current_level.enemies)
+        delete(game.current_level.spawner)
+        delete(game.current_level.player_bullets)
+        delete(game.current_level.enemy_bullets)
+        delete(game.current_level.enemy_fragments)
+        delete(game.current_level.loot)
+        delete(game.current_level.upgrade_pool)
+        delete(game.current_level.available_upgrades)
+        delete(game.current_level.particles)
+        delete(game.current_level.level_visual.tilesets)
+        delete(game.current_level.level_visual.layers)
+        delete(game.current_level.ui_elements)
+
+        delete(game.level_data)
         delete(game.menu.elements)
-        delete(game.loot)
-        delete(game.upgrade_pool)
-        delete(game.available_upgrades)
-        delete(game.enemy_fragments)
-        delete(game.spawner)
         rl.CloseWindow()
     }
     level, ok := m.load_map("assets/test_map.json", map_allocator)
     if ok{
-        game.level = level
+        game.current_level.level_visual = level
         game.player = create_player()
-        game.player.pos = m.get_player_spawn_pos(game.level)
+        game.player.pos = m.get_player_spawn_pos(game.current_level.level_visual)
         game.camera.target = game.player.pos
-        upgrade.create_upgrades(&game.upgrade_pool)
-        spawner := create_spawner(5, 2, 1)
-        append(&game.spawner, spawner)
+        level := create_start_level()
+
+        spawner := create_spawner(5, 1, 2)
+        spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
+        append(&level.spawner, spawner)
+
+        spawner = create_spawner(2, 2, 1, 2)
+        spawner.enemy = create_second_enemy()
+        append(&level.spawner, spawner)
+        append(&game.level_data, level)
+
+        game.current_level = level
+        level_up_spawner_update(&game)
         
         rect := rl.Rectangle {
             x = 50,
@@ -123,11 +136,13 @@ main :: proc(){
         game.player.ability = ability_test
         game.player.ability_cd = ability_cd
         get_upgrade_target(&game.player)
+        upgrade.create_upgrades(&game.current_level.upgrade_pool)
         fill_available_upgrades(&game)
         game.player.h_bar = p_bar
         game.player.v_bar = v_bar
-        append(&game.ui_elements, game.player.h_bar)
-        append(&game.ui_elements, game.player.v_bar)
+        append(&game.current_level.ui_elements, cooldown)
+        append(&game.current_level.ui_elements, game.player.h_bar)
+        append(&game.current_level.ui_elements, game.player.v_bar)
     } else{
         panic("Could not load the level!")
     }
@@ -149,20 +164,20 @@ main :: proc(){
 update_game :: proc(g : ^Game_State, dt : f32) {
     update_helper(g)
     update_handler(g, dt)
-    if !g.is_paused && !g.level_up{
+    if !g.is_paused && !g.current_level.power_level_up{
         g.play_time += dt
         update_player(g, dt)
         update_player_shooting(g, dt)
         update_player_bullets(g, dt)
+        update_enemy_bullets(g, dt)
         update_player_casting(g, dt)
         update_spawner(g, dt)
-        update_manual_spawn(g)
         update_enemy(g, dt)
         update_fragement(g, dt)
         update_loot(g, dt)
         update_particle(g, dt)
         update_in_game_ui(g, dt)
-    } else if g.level_up{
+    } else if g.current_level.power_level_up{
         update_upgrade(g, dt)
     } else{
         update_menu(g)
@@ -170,12 +185,12 @@ update_game :: proc(g : ^Game_State, dt : f32) {
 }
 
 check_collisions :: proc(g : ^Game_State){
-    if !g.is_paused && !g.level_up{
+    if !g.is_paused && !g.current_level.power_level_up{
         check_enemy_player(g)
         check_bullet(g)
         check_collisions_detection_loot(g)
         check_collisions_pickup_loot(g)
-    } else if g.level_up{
+    } else if g.current_level.power_level_up{
         check_collision_upgrade_slot(g)
     } else{
         check_collision_menu(g)
@@ -199,7 +214,7 @@ draw_game :: proc(g : Game_State){
     draw_in_game_ui(g)
     if g.is_paused{
         draw_menu(g)
-    } else if g.level_up{
+    } else if g.current_level.power_level_up{
         draw_upgrade(g)
     }
     rl.EndDrawing()
@@ -208,7 +223,7 @@ draw_game :: proc(g : Game_State){
 cast_ability :: proc(g : ^Game_State){
     switch &a in g.player.ability{
         case ab.Radial_Liberation:
-            ab.cast_radial_liberation(a, &g.player_bullets, g.player.pos)
+            ab.cast_radial_liberation(a, &g.current_level.player_bullets, g.player.pos)
         case ab.Dash:
 
     }
@@ -268,11 +283,11 @@ sync_menu :: proc(g : ^Game_State){
 }
 
 fill_available_upgrades :: proc(g : ^Game_State){
-    for u in g.upgrade_pool{
+    for u in g.current_level.upgrade_pool{
         if u.target == .Player{
-            append(&g.available_upgrades, u)
+            append(&g.current_level.available_upgrades, u)
         } else if g.player.target_ability == u.target{
-            append(&g.available_upgrades, u)
+            append(&g.current_level.available_upgrades, u)
         }
     }
 }
