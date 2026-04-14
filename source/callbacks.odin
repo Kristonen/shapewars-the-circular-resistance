@@ -1,7 +1,5 @@
 package game
 
-import "core:fmt"
-import rl "vendor:raylib"
 import "upgrade"
 import "ability"
 

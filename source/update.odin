@@ -91,10 +91,16 @@ update_player_bullets :: proc(g : ^Game_State, dt :f32){
 }
 
 update_enemy_bullets :: proc(g : ^Game_State, dt : f32){
-    for &b in g.current_level.enemy_bullets{
+    for &b, idx in g.current_level.enemy_bullets{
         b.vel = b.dir * b.speed
         b.pos += b.vel * dt
         b.collider.pos = b.pos
+        if check_bullet_out_of_view(g.camera, b.pos){
+            b.is_active = false
+        }
+        if !b.is_active{
+            unordered_remove(&g.current_level.enemy_bullets, idx)
+        }
     }
 }
 
@@ -171,7 +177,6 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
                 case Distance_Data:
                     distance_enemy_behavior(&e, &d, g, dt)
             }
-            // e.update_behavior(&e, g.player.pos, dt)
         }
         
         e.origin = {e.pos.x + e.width/2, e.pos.y + e.height/2}
@@ -244,15 +249,6 @@ update_upgrade :: proc(g : ^Game_State, dt : f32){
         slot.rect.height = g.current_level.upgrade_menu.height * 0.75
         g.current_level.upgrade_menu.upgrades[i] = slot
     }
-    // test := g.upgrade_menu.shader.test
-    // g.upgrade_menu.shader.timer -= dt
-    // if g.upgrade_menu.shader.timer <= 0{
-    //     test += 0.1
-    //     g.upgrade_menu.shader.timer = 0.5
-    // }
-    // color_test := rl.Vector4 {0.4, 0, 1, 0.5}
-    // rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.u_time_loc, &test, .FLOAT)
-    // rl.SetShaderValue(g.upgrade_menu.shader.bloom, g.upgrade_menu.shader.color_loc, &color_test, .VEC4)
     for &slot in g.current_level.upgrade_menu.upgrades{
         if slot.state == .Selected{
             on_upgrade(g, slot.upgrade)
@@ -282,6 +278,9 @@ update_in_game_ui :: proc(g : ^Game_State, dt : f32){
 
 update_menu :: proc(g : ^Game_State){
     for &element in g.menu.elements{
+        if test, ok := element.(ui.UI_Cooldown); ok{
+
+        }
         switch &e in element{
             case ui.UI_Cooldown:
                 update_cooldown(&e, g.player.ability_cd.cooldown, g.player.ability_cd.cast_rate)

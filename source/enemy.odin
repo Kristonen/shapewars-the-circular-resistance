@@ -1,6 +1,5 @@
 package game
 
-import "core:text/regex/virtual_machine"
 import "core:math/rand"
 import rl "vendor:raylib"
 import cl "collider"
@@ -8,7 +7,7 @@ import "ui"
 import "loot"
 import "bullet"
 
-Update_Behavior :: #type proc(e : ^Enemy, data : Behavior_Data, player_pos : rl.Vector2, dt : f32)
+Behavior :: #type proc(g : ^Game_State, e : ^Enemy, $T : typeid)
 On_Hit :: #type proc(g : ^Game_State, e : ^Enemy, dmg : f32)
 On_Death :: #type proc(g : ^Game_State, e : Enemy, idx : i32)
 
@@ -98,8 +97,8 @@ create_second_enemy :: proc() -> Enemy{
         take_dmg = take_damage,
     }
     e.knocback = {
-        strength = 400,
-        friction = 0.9,
+        strength = 500,
+        friction = 1.5,
         threshold = 10,
         apply = apply_knockback,
     }
@@ -138,8 +137,11 @@ on_death :: proc(g : ^Game_State, e : Enemy, idx : i32){
     g.shake = 100
     count := rand.int32_range(3, 7)
     loot.spawn_shards(&g.current_level.loot, count, e.origin)
-    spawner : ^Spawner = (^Spawner)(e.spawner)
-    spawner.count -= 1
+    if spawner := (^Spawner)(e.spawner); spawner != nil{
+        spawner.count -= 1
+    }
+    // spawner : ^Spawner = (^Spawner)(e.spawner)
+    // spawner.count -= 1
     create_fragments_death(&g.current_level.enemy_fragments ,e)
     unordered_remove(&g.current_level.enemies, idx)
 }

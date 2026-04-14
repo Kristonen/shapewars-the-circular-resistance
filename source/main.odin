@@ -188,6 +188,7 @@ check_collisions :: proc(g : ^Game_State){
     if !g.is_paused && !g.current_level.power_level_up{
         check_enemy_player(g)
         check_bullet(g)
+        check_bullet_player(g)
         check_collisions_detection_loot(g)
         check_collisions_pickup_loot(g)
     } else if g.current_level.power_level_up{

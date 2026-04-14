@@ -47,6 +47,19 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^bullet.Bullet){
     }
 }
 
+check_bullet_player :: proc(g : ^Game_State){
+    for &b in g.current_level.enemy_bullets{
+        c_player := g.player.collider
+        c_bullet := b.collider
+        if rl.CheckCollisionCircles(c_player.pos, c_player.radius, c_bullet.pos, c_bullet.radius){
+            g.player.health->take_dmg(5)
+            g.player.health.invincible_timer = 2
+            b.pos = {-10000, -10000}
+            b.is_active = false
+        }
+    }
+}
+
 check_enemy_player :: proc(g : ^Game_State){
     for &e in g.current_level.enemies{
         e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
