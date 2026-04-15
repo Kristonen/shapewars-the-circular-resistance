@@ -10,6 +10,7 @@ import "bullet"
 Behavior :: #type proc(g : ^Game_State, e : ^Enemy, $T : typeid)
 On_Hit :: #type proc(g : ^Game_State, e : ^Enemy, dmg : f32)
 On_Death :: #type proc(g : ^Game_State, e : Enemy, idx : i32)
+// Apply_Knockback :: #type proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
 
 Melee_Data :: struct{
 
@@ -80,6 +81,8 @@ apply_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
     k.vel += dir * k.strength
 }
 
+apply_no_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2){}
+
 create_start_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
     e := create_enemy(rect, speed, color)
     e.health = {
@@ -129,10 +132,7 @@ create_third_enemy :: proc() -> Enemy{
         take_dmg = take_damage,
     }
     e.knocback = {
-        strength = 100,
-        friction = 0.95,
-        threshold = 10,
-        apply = apply_knockback,
+        apply = apply_no_knockback,
     }
     e.behavior = Charge_Data{
         max_distance = 500,

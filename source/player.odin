@@ -12,6 +12,7 @@ Weapon :: struct {
     fire_rate : f32,
     cooldown : f32,
     bullet : b.Bullet,
+    lifesteal : f32,
 }
 
 Loot_Bag :: struct{
@@ -76,6 +77,13 @@ increase_value :: proc(bag : ^Loot_Bag, value : f32) -> bool{
         return true
     }
     return false
+}
+
+apply_lifesteal :: proc(p : ^Player, dmg : f32){
+    if p.weapon.lifesteal == 0 do return
+
+    add_h := p.weapon.lifesteal * dmg
+    p.health.current += add_h
 }
 
 get_upgrade_target :: proc(p : ^Player) {

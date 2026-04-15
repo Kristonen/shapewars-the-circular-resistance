@@ -35,6 +35,8 @@ on_upgrade :: proc(g : ^Game_State, u : upgrade.Upgrade){
             case .Health:
                 apply_upgrade(u.type, &g.player.health.max, u.value)
             case .Amount:
+            case .Lifesteal:
+                apply_upgrade(u.type, &g.player.weapon.lifesteal, u.value)
         }
         return
     }
@@ -50,6 +52,8 @@ on_upgrade :: proc(g : ^Game_State, u : upgrade.Upgrade){
                 case .Health:
                 case .Amount:
                     apply_upgrade(u.type, &a.count, u.value)
+                case .Lifesteal:
+                    apply_upgrade(u.type, &g.player.weapon.lifesteal, u.value)
             }
         case ability.Dash:
     }

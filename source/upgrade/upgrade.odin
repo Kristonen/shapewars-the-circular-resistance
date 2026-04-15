@@ -4,7 +4,7 @@ import "core:math/rand"
 import rl "vendor:raylib"
 
 Upgrade_Target :: enum { Player, Radial_Liberation, Dash }
-Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, Health, Amount }
+Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, Health, Amount, Lifesteal }
 Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }
 
