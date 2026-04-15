@@ -176,6 +176,8 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
                     melee_enemy_behavior(&e, d, g.player.pos, dt)
                 case Distance_Data:
                     distance_enemy_behavior(&e, &d, g, dt)
+                case Charge_Data:
+                    charge_enemy_behavior(&e, &d, g, dt)
             }
         }
         

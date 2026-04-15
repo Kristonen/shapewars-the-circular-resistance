@@ -21,8 +21,17 @@ Distance_Data :: struct{
     weapon : Weapon,
 }
 
+Charge_Data :: struct{
+    max_distance : f32,
+    charge_time : f32,
+    charge_timer : f32,
+    charge_speed : f32,
+    is_charging : bool,
+    charge_pos : rl.Vector2,
+}
+
 Behavior_Data :: union{
-    Melee_Data, Distance_Data,
+    Melee_Data, Distance_Data, Charge_Data
 }
 
 Enemy :: struct {
@@ -98,7 +107,7 @@ create_second_enemy :: proc() -> Enemy{
     }
     e.knocback = {
         strength = 500,
-        friction = 1.5,
+        friction = 0.8,
         threshold = 10,
         apply = apply_knockback,
     }
@@ -108,6 +117,27 @@ create_second_enemy :: proc() -> Enemy{
             fire_rate = 1,
             bullet = bullet.create_bullet()
         }
+    }
+    return e
+}
+
+create_third_enemy :: proc() -> Enemy{
+    e := create_enemy({width = 64, height = 54}, 300, rl.BROWN)
+    e.health = {
+        current = 100,
+        max = 100,
+        take_dmg = take_damage,
+    }
+    e.knocback = {
+        strength = 100,
+        friction = 0.95,
+        threshold = 10,
+        apply = apply_knockback,
+    }
+    e.behavior = Charge_Data{
+        max_distance = 500,
+        charge_time = 1,
+        charge_speed = 750,
     }
     return e
 }
@@ -199,5 +229,34 @@ distance_enemy_behavior :: proc(e : ^Enemy, data : ^Distance_Data, g : ^Game_Sta
         dir := g.player.pos - e.pos
         b.dir = rl.Vector2Normalize(dir)
         append(&g.current_level.enemy_bullets, b)
+    }
+}
+
+charge_enemy_behavior :: proc(e : ^Enemy, data : ^Charge_Data, g : ^Game_State, dt : f32){
+    dist := rl.Vector2Distance(g.player.pos, e.pos)
+    if data.max_distance <= dist && !data.is_charging{
+        dir := g.player.pos - e.pos
+        vel := rl.Vector2Normalize(dir) * e.speed
+        e.pos += vel * dt
+        return
+    } else if !data.is_charging {
+        data.is_charging = true
+        data.charge_pos = g.player.pos
+        data.charge_timer = data.charge_time
+    }
+
+    if data.is_charging && data.charge_timer > 0{
+        data.charge_timer -= dt
+        return
+    }
+
+    if data.is_charging{
+        dir := data.charge_pos - e.pos
+        vel := rl.Vector2Normalize(dir) * data.charge_speed
+        e.pos += vel * dt
+    }
+
+    if data.is_charging && rl.Vector2Distance(e.pos, data.charge_pos) < 10{
+        data.is_charging = false
     }
 }

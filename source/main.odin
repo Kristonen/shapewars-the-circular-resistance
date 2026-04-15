@@ -83,23 +83,27 @@ main :: proc(){
         delete(game.menu.elements)
         rl.CloseWindow()
     }
-    level, ok := m.load_map("assets/test_map.json", map_allocator)
+    level_visual, ok := m.load_map("assets/test_map.json", map_allocator)
     if ok{
-        game.current_level.level_visual = level
         game.player = create_player()
-        game.player.pos = m.get_player_spawn_pos(game.current_level.level_visual)
+        game.player.pos = m.get_player_spawn_pos(level_visual)
         game.camera.target = game.player.pos
         level := create_start_level()
+        level.level_visual = level_visual
 
-        spawner := create_spawner(5, 1, 2)
+        spawner := create_spawner(5, 1, 2, 5)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(2, 2, 1, 2)
+        spawner = create_spawner(2, 2, 1, 5)
         spawner.enemy = create_second_enemy()
         append(&level.spawner, spawner)
-        append(&game.level_data, level)
 
+        spawner = create_spawner(1, 1, 1)
+        spawner.enemy = create_third_enemy()
+        append(&level.spawner, spawner)
+
+        append(&game.level_data, level)
         game.current_level = level
         level_up_spawner_update(&game)
         
@@ -112,16 +116,12 @@ main :: proc(){
         p_bar := ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
         p_bar.show_text = true
         p_bar.min = 0
-        p_bar.max = game.player.health.max
-        p_bar.value = game.player.health.current
         p_bar.type = .Health
 
         v_bar := p_bar
         v_bar.rect.x += p_bar.rect.width + 100
-        v_bar.type = .Value
         v_bar.fill_color = rl.BLUE
-        v_bar.value = game.player.loot_bag.value
-        v_bar.max = game.player.loot_bag.max_value
+        v_bar.type = .Value
 
         ability_test := ab.Radial_Liberation{   
             count = 8,
@@ -205,11 +205,11 @@ draw_game :: proc(g : Game_State){
     if g.map_drawing{
         draw_map(g)
     }
+    draw_fragments(g)
     draw_player(g)
+    draw_loot(g)
     draw_bullet(g)
     draw_enemies(g)
-    draw_fragments(g)
-    draw_loot(g)
     draw_particles(g)
     rl.EndMode2D()
     draw_in_game_ui(g)

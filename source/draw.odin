@@ -137,9 +137,7 @@ draw_upgrade :: proc(g : Game_State){
         texture_rect := rect
         texture_rect.x = slot.rect.x + slot.rect.width/2 - 32
         texture_rect.y += rect.height + 50
-        rl.BeginShaderMode(g.current_level.upgrade_menu.shader.bloom)
-        rl.DrawRectangleV({texture_rect.x, texture_rect.y}, {64, 64}, slot.upgrade.texture)
-        rl.EndShaderMode()
+        rl.DrawRectangleV({texture_rect.x, texture_rect.y}, {64, 64}, slot.color)
         rect.y += 64 + 150
         rl.DrawRectangleV({rect.x, rect.y}, {rect.width, 200}, rl.BLACK)
         draw_text(slot.upgrade.desc, rect, 20)

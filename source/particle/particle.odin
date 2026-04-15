@@ -23,7 +23,7 @@ create_hit_particles :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
             vel = {math.cos(angle) * speed, math.sin(angle) * speed},
             color = rl.RED,
             max_life = f32(rl.GetRandomValue(5, 10)) / 10,
-            size = f32(rl.GetRandomValue(2, 5)),
+            size = f32(rl.GetRandomValue(5, 9)),
             alive = true
         }
         append(particles, p)

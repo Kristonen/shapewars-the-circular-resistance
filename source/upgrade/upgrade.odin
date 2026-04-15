@@ -8,7 +8,7 @@ Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, Health, Amount }
 Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }
 
-Upgrade_State :: enum{
+UpgradeSlot_State :: enum{
     None, Focused, Selected
 }
 
@@ -26,7 +26,7 @@ Upgrade :: struct{
 UI_Upgrade_Slot :: struct{
     rect : rl.Rectangle,
     upgrade : Upgrade,
-    state : Upgrade_State,
+    state : UpgradeSlot_State,
     color : rl.Color,
 }
 
@@ -139,60 +139,4 @@ get_upgrade_color :: proc(r : Rarity) -> rl.Color{
         case .Legendary: return rl.ORANGE
     }
     return rl.WHITE
-}
-
-create_test_upgrades :: proc() -> [3]UI_Upgrade_Slot{
-    attack := Upgrade{
-        name = "More Ouch",
-        desc = "Increase the damage by 5",
-        value = 5,
-        texture = rl.BLUE,
-        rarity = .Uncommon,
-        type = .Additive,
-        stat = .Damage,
-        target = .Player,
-    }
-    attack_speed := Upgrade{
-        name = "Faster pew",
-        desc = "Increase the attack speed by 5%",
-        value = 0.05,
-        texture = rl.ORANGE,
-        rarity = .Rare,
-        type = .Additive,
-        stat = .Attack_Speed,
-        target = .Player,
-    }
-    health := Upgrade{
-        name = "More life",
-        desc = "Increase the health by 10",
-        value = 10,
-        texture = rl.VIOLET,
-        rarity = .Common,
-        type = .Additive,
-        stat = .Health,
-        target = .Player,
-    }
-    rect : rl.Rectangle
-    rect.width = 500
-    rect.height = 800
-    rect.x = 170
-    rect.y = f32(rl.GetScreenHeight()) / 2 - rect.height / 2
-    ui_attack := UI_Upgrade_Slot{
-        rect = rect,
-        upgrade = attack,
-        color = {130, 130, 130, 150},
-    }
-    rect.x += rect.width + 50
-    ui_as := UI_Upgrade_Slot{
-        rect = rect,
-        upgrade = attack_speed,
-        color = {130, 130, 130, 150},
-    }
-    rect.x += rect.width + 50
-    ui_health := UI_Upgrade_Slot{
-        rect = rect,
-        upgrade = health,
-        color = {130, 130, 130, 150},
-    }
-    return {ui_attack, ui_as, ui_health}
 }
