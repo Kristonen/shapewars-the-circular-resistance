@@ -277,8 +277,6 @@ sync_menu :: proc(g : ^Game_State){
 
             slider := ui.create_slider({700, 100}, {1000, 100})
             append(&g.menu.elements, slider)
-
-            
         case.Main:
     }
 }
