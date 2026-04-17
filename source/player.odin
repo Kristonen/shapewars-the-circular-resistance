@@ -55,6 +55,7 @@ create_player :: proc() -> Player{
           current = 50,
           max = 100, 
           take_dmg = take_damage,
+          heal = heal,
         },
         collider = {
             radius = 28,
@@ -83,7 +84,7 @@ apply_lifesteal :: proc(p : ^Player, dmg : f32){
     if p.weapon.lifesteal == 0 do return
 
     add_h := p.weapon.lifesteal * dmg
-    p.health.current += add_h
+    p.health->heal(add_h)
 }
 
 get_upgrade_target :: proc(p : ^Player) {

@@ -17,7 +17,8 @@ Health :: struct{
     min : f32,
     is_dead : bool,
     invincible_timer : f32,
-    take_dmg : proc(h : ^Health, dmg : f32)
+    take_dmg : proc(h : ^Health, dmg : f32),
+    heal : proc(h : ^Health, heal : f32),
 }
 
 take_damage :: proc(h : ^Health, dmg : f32){
@@ -25,5 +26,12 @@ take_damage :: proc(h : ^Health, dmg : f32){
     if h.current <= h.min{
         h.current = h.min
         h.is_dead = true
+    }
+}
+
+heal :: proc(h : ^Health, heal : f32){
+    h.current += heal
+    if h.current > h.max{
+        h.current = h.max
     }
 }

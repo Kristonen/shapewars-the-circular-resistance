@@ -140,7 +140,14 @@ draw_upgrade :: proc(g : Game_State){
         rl.DrawRectangleV({texture_rect.x, texture_rect.y}, {64, 64}, slot.color)
         rect.y += 64 + 150
         rl.DrawRectangleV({rect.x, rect.y}, {rect.width, 200}, rl.BLACK)
-        draw_text(slot.upgrade.desc, rect, 20)
+        desc : string
+        if slot.upgrade.max_used > 0{
+            desc = fmt.tprintf("%v\n\n\tUsed: %i/%i", slot.upgrade.desc, slot.upgrade.count_used, slot.upgrade.max_used)
+        } else {
+            desc = fmt.tprintf("%v\n\n\tUsed: %i", slot.upgrade.desc, slot.upgrade.count_used)
+        }
+        
+        draw_text(desc, rect, 20)
         rect.y = slot.rect.y + slot.rect.height - 100
         rl.DrawRectangleV({rect.x, rect.y}, {rect.width, rect.height}, rl.BLACK)
         r_string := fmt.tprintf("%v", slot.upgrade.rarity)

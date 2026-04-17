@@ -12,7 +12,8 @@ Bullet :: struct {
     speed : f32,
     radius : f32,
     collider : cl.Collider_Circle,
-    is_active : bool
+    can_lifesteal : bool,
+    is_active : bool,
 }
 
 update_bullet :: proc(b : ^Bullet, dt : f32){
@@ -31,6 +32,7 @@ create_bullet :: proc() -> Bullet{
         radius = 8,
         speed = 500,
         is_active = true,
+        can_lifesteal = true,
     }
     b.collider = {
         radius = b.radius,

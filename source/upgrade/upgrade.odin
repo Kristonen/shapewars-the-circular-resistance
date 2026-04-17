@@ -5,27 +5,35 @@ import rl "vendor:raylib"
 
 Upgrade_Target :: enum { Player, Radial_Liberation, Dash }
 Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, Health, Amount, Lifesteal }
-Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division }
+Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division, Toogle }
+Upgrade_Toogle_Target :: enum{Pierce, LifeStealAbility }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }
 
 UpgradeSlot_State :: enum{
     None, Focused, Selected
 }
 
+Upgrade_Value :: union{
+    f32, bool
+}
+
 Upgrade :: struct{
     name : string,
     desc : string,
-    value : f32,
+    value : Upgrade_Value,
     texture : rl.Color,
     rarity : Rarity,
     target : Upgrade_Target,
     stat : Upgrade_Stat,
     type : Upgrade_Type,
+    toogle_target : Upgrade_Toogle_Target,
+    max_used : i32,
+    count_used : i32,
 }
 
 UI_Upgrade_Slot :: struct{
     rect : rl.Rectangle,
-    upgrade : Upgrade,
+    upgrade : ^Upgrade,
     state : UpgradeSlot_State,
     color : rl.Color,
 }
@@ -54,21 +62,11 @@ create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade, a_target
     used_idx[0] = -1
     used_idx[1] = -1
     used_idx[2] = -1
-    // m.upgrades = create_test_upgrades()
     for i in 0..<3{
         upgrade, idx := get_random_upgrade_by_rarity(u, used_idx)
         used_idx[i] = idx
         m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
     }
-
-    shader := rl.LoadShader(nil, "assets/test.frag")
-    u_time_loc := rl.GetShaderLocation(shader, "u_time")
-    color_loc := rl.GetShaderLocation(shader, "color")
-
-    m.shader.bloom = shader
-    m.shader.u_time_loc = u_time_loc
-    m.shader.color_loc = color_loc
-    m.shader.timer = 0.5
 }
 
 is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
@@ -80,13 +78,14 @@ is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
     return false
 }
 //TODO Improve that the rarity only roll once, instead of every single check
-get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) -> (Upgrade, i32){
-    upgrade : Upgrade
+get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) -> (^Upgrade, i32){
+    upgrade : ^Upgrade
     rand_idx : i32
     for true{
         rarity := get_random_rarity()
         rand_idx = rand.int32_range(0, i32(len(u)))
-        upgrade = u[rand_idx]
+        upgrade = &u[rand_idx]
+        if upgrade.max_used > 0 && upgrade.count_used >= upgrade.max_used do continue
         if rarity != upgrade.rarity || is_upgrade_already_used(rand_idx, used_idx) do continue
         break
     }
@@ -117,7 +116,7 @@ create_upgrades :: proc(a : ^[dynamic]Upgrade){
     create_dash_upgrades(a)
 }
 
-create_upgrade_slot :: proc(u : Upgrade, mul : f32) -> UI_Upgrade_Slot{
+create_upgrade_slot :: proc(u : ^Upgrade, mul : f32) -> UI_Upgrade_Slot{
     rect : rl.Rectangle
     rect.width = 500
     rect.height = 800

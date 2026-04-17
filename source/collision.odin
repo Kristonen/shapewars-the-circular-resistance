@@ -43,7 +43,9 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^bullet.Bullet){
             e.on_hit(g, &e, b.damage)
             b.is_active = false
             b.pos = {-10000, -10000}
-            apply_lifesteal(&g.player, b.damage)
+            if b.can_lifesteal{
+                apply_lifesteal(&g.player, b.damage)
+            }
         }
     }
 }

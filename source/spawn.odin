@@ -29,7 +29,7 @@ level_up_spawner_update :: proc(g : ^Game_State){
             continue
         }
 
-        if s.level_cond > g.player.loot_bag.level{
+        if s.level_cond < g.player.loot_bag.level{
             s.max_count += s.increase
         }
     }
