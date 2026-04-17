@@ -81,8 +81,8 @@ is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
 get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) -> (^Upgrade, i32){
     upgrade : ^Upgrade
     rand_idx : i32
+    rarity := get_random_rarity()
     for true{
-        rarity := get_random_rarity()
         rand_idx = rand.int32_range(0, i32(len(u)))
         upgrade = &u[rand_idx]
         if upgrade.max_used > 0 && upgrade.count_used >= upgrade.max_used do continue
