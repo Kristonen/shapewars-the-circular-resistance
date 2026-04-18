@@ -1,6 +1,4 @@
-package ability
-
-import rl "vendor:raylib"
+package game
 
 Ability :: union{
     Radial_Liberation, Dash

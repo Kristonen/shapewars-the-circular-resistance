@@ -19,6 +19,7 @@ Health :: struct{
     invincible_timer : f32,
     take_dmg : proc(h : ^Health, dmg : f32),
     heal : proc(h : ^Health, heal : f32),
+    heal_amount : f32,
 }
 
 take_damage :: proc(h : ^Health, dmg : f32){

@@ -1,10 +1,12 @@
 package upgrade
 
+import "core:fmt"
 import "core:math/rand"
 import rl "vendor:raylib"
 
 Upgrade_Target :: enum { Player, Radial_Liberation, Dash }
-Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, Health, Amount, Lifesteal }
+Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, CurrentHealth, MaxHealth,
+    Amount, Lifesteal }
 Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division, Toogle }
 Upgrade_Toogle_Target :: enum{Pierce, LifeStealAbility }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }

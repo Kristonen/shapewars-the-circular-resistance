@@ -5,7 +5,6 @@ import rl "vendor:raylib"
 import cl "collider"
 import "ui"
 import "loot"
-import "bullet"
 
 Behavior :: #type proc(g : ^Game_State, e : ^Enemy, $T : typeid)
 On_Hit :: #type proc(g : ^Game_State, e : ^Enemy, dmg : f32)
@@ -18,7 +17,7 @@ Melee_Data :: struct{
 
 Distance_Data :: struct{
     max_distance : f32,
-    bullet : bullet.Bullet,
+    bullet : Bullet,
     weapon : Weapon,
 }
 
@@ -118,7 +117,7 @@ create_second_enemy :: proc() -> Enemy{
         max_distance = 350,
         weapon = {
             fire_rate = 1,
-            bullet = bullet.create_bullet()
+            bullet = create_bullet()
         }
     }
     return e

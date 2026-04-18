@@ -2,7 +2,6 @@ package game
 
 import "core:fmt"
 import "upgrade"
-import "ability"
 
 on_click_continue :: proc(g : ^Game_State){
     g.is_paused = !g.is_paused
@@ -35,15 +34,17 @@ on_upgrade :: proc(g : ^Game_State, u : ^upgrade.Upgrade){
                 stat = (^upgrade.Upgrade_Value)(&g.player.speed)
             case .Attack_Speed:
                 stat = (^upgrade.Upgrade_Value)(&g.player.weapon.fire_rate)
-            case .Health:
+            case .MaxHealth:
                 stat = (^upgrade.Upgrade_Value)(&g.player.health.max)
+            case .CurrentHealth:
+                stat = (^upgrade.Upgrade_Value)(&g.player.health.heal_amount)
             case .Amount:
             case .Lifesteal:
                 stat = (^upgrade.Upgrade_Value)(&g.player.weapon.lifesteal)
         }
     } else{
         switch &a in g.player.ability{
-        case ability.Radial_Liberation:
+        case Radial_Liberation:
             if u.type == .Toogle{
                 switch u.toogle_target{
                     case .Pierce:
@@ -57,14 +58,15 @@ on_upgrade :: proc(g : ^Game_State, u : ^upgrade.Upgrade){
                 case .Attack_Speed:
                     stat = (^upgrade.Upgrade_Value)(&g.player.weapon.lifesteal)
                 case .Move_Speed:
-                case .Health:
+                case .MaxHealth:
+                case .CurrentHealth:
                 case .Amount:
                     stat = (^upgrade.Upgrade_Value)(&a.count)
                 case .Lifesteal:
                     stat = (^upgrade.Upgrade_Value)(&g.player.weapon.lifesteal)
                 }
             }
-            case ability.Dash:
+            case Dash:
         }
     }
 
@@ -86,7 +88,6 @@ apply_upgrade :: proc(type : upgrade.Upgrade_Type, stat : ^upgrade.Upgrade_Value
 }
 
 additive_upgrade :: proc(stat : ^f32, value : f32){
-    fmt.println(value)
     stat^ += value
 }
 

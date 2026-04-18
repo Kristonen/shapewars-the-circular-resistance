@@ -1,7 +1,6 @@
-package ability
+package game
 
 import rl "vendor:raylib"
-import bullet "../bullet"
 import "core:math"
 
 Radial_Liberation :: struct{
@@ -10,7 +9,7 @@ Radial_Liberation :: struct{
     can_lifesteal : bool,
 }
 
-cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]bullet.Bullet, pos : rl.Vector2){
+cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]Bullet, pos : rl.Vector2){
     for i in 0..<a.count{
         angle := f32(i) * (rl.PI * 2.0 / f32(a.count))
         dir := rl.Vector2{
@@ -18,7 +17,7 @@ cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]bullet
             math.sin(angle)
         }
 
-        b := bullet.Bullet{
+        b := Bullet{
             damage = a.damage,
             pos = pos,
             dir = dir,

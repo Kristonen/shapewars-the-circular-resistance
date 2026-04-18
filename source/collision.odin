@@ -3,7 +3,6 @@ package game
 import "core:fmt"
 import rl "vendor:raylib"
 import "ui"
-import "bullet"
 import "particle"
 import "upgrade"
 
@@ -36,7 +35,7 @@ check_bullet :: proc(g : ^Game_State){
     }
 }
 
-check_bullet_enemy :: proc(g : ^Game_State, b : ^bullet.Bullet){
+check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
     for &e in g.current_level.enemies{
         e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
         if rl.CheckCollisionCircleRec(b.pos, b.radius, e_rect){
@@ -73,7 +72,7 @@ check_enemy_player :: proc(g : ^Game_State){
     }
 }
 
-check_bullet_wall :: proc(g : ^Game_State, b : ^bullet.Bullet){
+check_bullet_wall :: proc(g : ^Game_State, b : ^Bullet){
     for layer in g.current_level.level_visual.layers{
         if layer.name != "Walls" do continue
         for obj in layer.objects{

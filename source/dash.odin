@@ -1,4 +1,4 @@
-package ability
+package game
 
 Dash :: struct{
     

@@ -5,11 +5,9 @@ import "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
 import "core:mem"
-import bu "bullet"
 import cl "collider"
 import m "map"
 import pacl "particle"
-import ab "ability"
 import "ui"
 import "handler"
 import "loot"
@@ -123,14 +121,14 @@ main :: proc(){
         v_bar.fill_color = rl.BLUE
         v_bar.type = .Value
 
-        ability_test := ab.Radial_Liberation{   
+        ability_test := Radial_Liberation{   
             count = 8,
             damage = 5,
         }
         // ability_test := ab.Dash{
 
         // }
-        ability_cd := ab.Ability_Cooldown{
+        ability_cd := Ability_Cooldown{
             cast_rate = 5,
         }
         game.player.ability = ability_test
@@ -223,9 +221,9 @@ draw_game :: proc(g : Game_State){
 
 cast_ability :: proc(g : ^Game_State){
     switch &a in g.player.ability{
-        case ab.Radial_Liberation:
-            ab.cast_radial_liberation(a, &g.current_level.player_bullets, g.player.pos)
-        case ab.Dash:
+        case Radial_Liberation:
+            cast_radial_liberation(a, &g.current_level.player_bullets, g.player.pos)
+        case Dash:
 
     }
 }
@@ -282,11 +280,28 @@ sync_menu :: proc(g : ^Game_State){
 }
 
 fill_available_upgrades :: proc(g : ^Game_State){
+    common : i32
+    uncommon : i32
+    rare : i32
+    epic : i32
+    legendary : i32
     for u in g.current_level.upgrade_pool{
         if u.target == .Player{
             append(&g.current_level.available_upgrades, u)
         } else if g.player.target_ability == u.target{
             append(&g.current_level.available_upgrades, u)
         }
+        switch u.rarity{
+            case .Common: common += 1
+            case .Uncommon: uncommon += 1
+            case .Rare: rare += 1
+            case .Epic: epic += 1
+            case .Legendary: legendary += 1
+        }
     }
+    fmt.printfln("Common: %i", common)
+    fmt.printfln("Uncommon: %i", uncommon)
+    fmt.printfln("Rare: %i", rare)
+    fmt.printfln("Epic: %i", epic)
+    fmt.printfln("Legendary: %i", legendary)
 }

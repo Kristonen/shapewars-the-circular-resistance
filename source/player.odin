@@ -2,16 +2,14 @@ package game
 
 import "core:fmt"
 import rl "vendor:raylib"
-import ab "ability"
 import cl "collider"
-import b "bullet"
 import "ui"
 import "upgrade"
 
 Weapon :: struct {
     fire_rate : f32,
     cooldown : f32,
-    bullet : b.Bullet,
+    bullet : Bullet,
     lifesteal : f32,
 }
 
@@ -28,8 +26,8 @@ Player :: struct {
     radius : f32,
     speed : f32,
     weapon : Weapon,
-    ability : ab.Ability,
-    ability_cd : ab.Ability_Cooldown,
+    ability : Ability,
+    ability_cd : Ability_Cooldown,
     target_ability : upgrade.Upgrade_Target,
     health : Health,
     h_bar : ui.UI_Progress_Bar,
@@ -49,7 +47,7 @@ create_player :: proc() -> Player{
         radius = 32,
         weapon = {
             fire_rate = 0.5,
-            bullet = b.create_bullet(),
+            bullet = create_bullet(),
         },
         health = {
           current = 50,
@@ -89,9 +87,9 @@ apply_lifesteal :: proc(p : ^Player, dmg : f32){
 
 get_upgrade_target :: proc(p : ^Player) {
     switch a in p.ability{
-        case ab.Radial_Liberation:
+        case Radial_Liberation:
             p.target_ability = .Radial_Liberation
-        case ab.Dash:
+        case Dash:
             p.target_ability = .Dash
     }
 }

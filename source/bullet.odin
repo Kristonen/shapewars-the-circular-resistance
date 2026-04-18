@@ -1,8 +1,8 @@
-package bullet
+package game
 
 import "core:fmt"
 import rl "vendor:raylib"
-import cl "../collider"
+import cl "collider"
 
 Bullet :: struct {
     damage : f32,
@@ -20,10 +20,6 @@ update_bullet :: proc(b : ^Bullet, dt : f32){
     b.vel = b.dir * b.speed //Not 100% sure, but can probaly be called once
     b.pos += b.vel * dt
     b.collider.pos = b.pos
-}
-
-draw_bullet :: proc(b : Bullet){
-    rl.DrawCircleV(b.pos, b.radius, rl.RED)
 }
 
 create_bullet :: proc() -> Bullet{

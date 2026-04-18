@@ -6,7 +6,6 @@ import rl "vendor:raylib"
 import "handler"
 import "ui"
 import "collider"
-import "bullet"
 import "loot"
 import "upgrade"
 
@@ -57,6 +56,10 @@ update_player :: proc(g : ^Game_State, dt : f32){
     }
     if g.player.health.invincible_timer >= 0{
         g.player.health.invincible_timer -= dt
+    }
+    if g.player.health.heal_amount > 0{
+        g.player.health->heal(g.player.health.heal_amount)
+        g.player.health.heal_amount = 0
     }
     g.player.vel = {}
     if rl.IsKeyDown(.W){

@@ -1,7 +1,6 @@
 package game
 
 import rl "vendor:raylib"
-import b "bullet"
 import m "map"
 import pacl "particle"
 import "loot"
@@ -36,11 +35,11 @@ Level_Data :: struct{
     spawner : [dynamic]Spawner,
     enemies : [dynamic]Enemy,
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
-    enemy_bullets : [dynamic]b.Bullet,
+    enemy_bullets : [dynamic]Bullet,
 
     particles : [dynamic]pacl.Particle,
 
-    player_bullets : [dynamic]b.Bullet,
+    player_bullets : [dynamic]Bullet,
 
     loot : [dynamic]loot.Shape_Shard,
 
