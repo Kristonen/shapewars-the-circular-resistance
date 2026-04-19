@@ -81,7 +81,7 @@ is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
     }
     return false
 }
-//TODO Improve that the rarity only roll once, instead of every single check
+
 get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) -> (^Upgrade, i32){
     upgrade : ^Upgrade
     rand_idx : i32
@@ -119,6 +119,7 @@ create_upgrades :: proc(a : ^[dynamic]Upgrade){
     create_rl_upgrades(a)
     create_dash_upgrades(a)
     create_bullet_upgrades(a)
+    create_shard_upgrades(a)
 }
 
 create_upgrade_slot :: proc(u : ^Upgrade, mul : f32) -> UI_Upgrade_Slot{

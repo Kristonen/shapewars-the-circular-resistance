@@ -7,6 +7,7 @@ create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
     legendary := create_bullet_upgrade("Pierce Bullet", "Bullets will not destroy on hit.", true, .Toogle, .Legendary)
     epic := create_bullet_upgrade("Multishot", "Add one bullet to your primary shotting.", 1, .Additive, .Epic)
     legendary.apply = apply_pierce_upgrade
+    legendary.max_used = 1
     epic.apply = apply_amount_upgrade
     append(a, epic)
     append(a, legendary)

@@ -18,6 +18,7 @@ Loot_Bag :: struct{
     max_value : f32,
     level : i32,
     level_increase : f32,
+    mul : f32,
 }
 
 Player :: struct {
@@ -61,13 +62,14 @@ create_player :: proc() -> Player{
             max_value = 50,
             level = 1,
             level_increase = 50,
+            mul = 1,
         },
         increase_value = increase_value,
     }
 }
 
 increase_value :: proc(bag : ^Loot_Bag, value : f32) -> bool{
-    bag.value += value
+    bag.value += value * bag.mul
     if bag.value >= bag.max_value{
         bag.level += 1
         bag.value -= bag.max_value
