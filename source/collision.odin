@@ -4,7 +4,6 @@ import "core:fmt"
 import rl "vendor:raylib"
 import "ui"
 import "particle"
-import "upgrade"
 
 check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, g : Game_State) -> bool{
     if !g.map_drawing{
@@ -107,7 +106,7 @@ check_collisions_pickup_loot :: proc(g : ^Game_State){
             g.current_level.power_level_up = g.player.increase_value(&g.player.loot_bag, l.value)
             if g.current_level.power_level_up{
                 level_up_spawner_update(g)
-                upgrade.create_upgrade_menu(&g.current_level.upgrade_menu, g.current_level.available_upgrades, g.player.target_ability)
+                create_upgrade_menu(&g.current_level.upgrade_menu, g.current_level.available_upgrades, g.player.target_ability)
             }
             unordered_remove(&g.current_level.loot, idx)
         }

@@ -7,7 +7,7 @@ import "handler"
 import "ui"
 import "collider"
 import "loot"
-import "upgrade"
+import "core:math"
 
 update_handler :: proc(g : ^Game_State, dt : f32){
     if rl.IsKeyPressed(.F1){
@@ -28,7 +28,7 @@ update_handler :: proc(g : ^Game_State, dt : f32){
 
     if rl.IsKeyPressed(.U){
         g.current_level.power_level_up = true
-        upgrade.create_upgrade_menu(&g.current_level.upgrade_menu, g.current_level.available_upgrades, g.player.target_ability)
+        create_upgrade_menu(&g.current_level.upgrade_menu, g.current_level.available_upgrades, g.player.target_ability)
     }
 }
 
@@ -114,12 +114,26 @@ update_player_shooting :: proc(g : ^Game_State, dt : f32){
 
     if rl.IsMouseButtonDown(.LEFT) && g.player.weapon.cooldown <= 0{
         g.player.weapon.cooldown = g.player.weapon.fire_rate
-        b := g.player.weapon.bullet
-        b.pos = g.player.pos
+
         mouse_pos := rl.GetMousePosition()
-        dir := rl.GetScreenToWorld2D(mouse_pos, g.camera)
-        b.dir = rl.Vector2Normalize(dir - g.player.pos)
-        append(&g.current_level.player_bullets, b)
+        mouse_local_pos := rl.GetScreenToWorld2D(mouse_pos, g.camera)
+        aim_dir := rl.Vector2Normalize(mouse_local_pos - g.player.pos)
+        base_angle := math.to_degrees(math.atan2(aim_dir.y, aim_dir.x))
+        
+        total_spread : f32 = 45.0
+        step := g.player.weapon.amount > 1 ? total_spread / (g.player.weapon.amount - 1) : 0
+        start_angle := g.player.weapon.amount > 1 ? base_angle - (total_spread/2.0) : base_angle
+
+        for i in 0..<g.player.weapon.amount{
+            angle := start_angle + f32(i) * step
+            dir : rl.Vector2
+            dir.x = math.cos(math.to_radians(angle))
+            dir.y = math.sin(math.to_radians(angle))
+            b := g.player.weapon.bullet
+            b.dir = dir
+            b.pos = g.player.pos
+            append(&g.current_level.player_bullets, b)
+        }
     }
 }
 

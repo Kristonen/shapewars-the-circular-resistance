@@ -11,7 +11,6 @@ import pacl "particle"
 import "ui"
 import "handler"
 import "loot"
-import "upgrade"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
@@ -89,15 +88,15 @@ main :: proc(){
         level := create_start_level()
         level.level_visual = level_visual
 
-        spawner := create_spawner(5, 1, 2, 5)
+        spawner := create_spawner(5, 1, 2)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(2, 2, 1, 5)
+        spawner = create_spawner(2, 2, 1, 10)
         spawner.enemy = create_second_enemy()
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(1, 1, 1)
+        spawner = create_spawner(1, 1, 1, 15)
         spawner.enemy = create_third_enemy()
         append(&level.spawner, spawner)
 
@@ -134,7 +133,7 @@ main :: proc(){
         game.player.ability = ability_test
         game.player.ability_cd = ability_cd
         get_upgrade_target(&game.player)
-        upgrade.create_upgrades(&game.current_level.upgrade_pool)
+        create_upgrades(&game.current_level.upgrade_pool)
         fill_available_upgrades(&game)
         game.player.h_bar = p_bar
         game.player.v_bar = v_bar

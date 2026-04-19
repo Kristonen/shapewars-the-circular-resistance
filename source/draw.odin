@@ -5,7 +5,6 @@ import rl "vendor:raylib"
 import "core:fmt"
 import "collider"
 import "ui"
-import "upgrade"
 
 draw_player :: proc(g : Game_State){
     rl.DrawCircleV(g.player.pos, g.player.radius, rl.VIOLET)

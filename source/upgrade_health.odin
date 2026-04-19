@@ -1,4 +1,4 @@
-package upgrade
+package game
 
 create_health_upgrades :: proc(a : ^[dynamic]Upgrade){
     common_m := create_max_health_upgrade("Better Nutrition", "Increase the life by 10.", 10.0, .Additive, .Common)
@@ -20,8 +20,8 @@ create_max_health_upgrade :: proc(name : string, desc : string,
         value = value,
         type = type,
         rarity = rarity,
-        stat = .MaxHealth,
         target = .Player,
+        apply = apply_max_health_upgrade,
     }
 }
 
@@ -34,7 +34,19 @@ create_current_health_upgrade :: proc(name : string, desc : string,
         value = value,
         type = type,
         rarity = rarity,
-        stat = .CurrentHealth,
         target = .Player,
+        apply = apply_current_health_upgrade,
     }
+}
+
+apply_current_health_upgrade :: proc(g : ^Game_State, u : Upgrade){
+    stat := &g.player.health.current
+    v := u.value.(f32)
+    apply_normal_upgrade(u.type, stat, v)
+}
+
+apply_max_health_upgrade :: proc(g : ^Game_State, u : Upgrade){
+    stat := &g.player.health.max
+    v := u.value.(f32)
+    apply_normal_upgrade(u.type, stat, v)
 }

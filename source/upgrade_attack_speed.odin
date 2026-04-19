@@ -1,6 +1,4 @@
-package upgrade
-
-import rl "vendor:raylib"
+package game
 
 create_as_upgrades :: proc(a : ^[dynamic]Upgrade){
     uncommon := create_as_upgrade("MORE", "Increase the attack speed by 5%", 0.95, .Multiplicative, .Uncommon)
@@ -17,6 +15,12 @@ create_as_upgrade :: proc(name : string, desc : string, value : f32, type : Upgr
         type = type,
         rarity = rarity,
         target = .Player,
-        stat = .Attack_Speed,
+        apply = apply_attack_speed_upgrade,
     }
+}
+
+apply_attack_speed_upgrade :: proc(g : ^Game_State, u : Upgrade){
+    stat := &g.player.weapon.fire_rate
+    v := u.value.(f32)
+    apply_normal_upgrade(u.type, stat, v)
 }

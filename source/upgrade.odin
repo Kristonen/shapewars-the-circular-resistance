@@ -1,12 +1,14 @@
-package upgrade
+package game
 
 import "core:fmt"
 import "core:math/rand"
 import rl "vendor:raylib"
 
+Apply_Upgrade :: #type proc(g : ^Game_State, u : Upgrade)
+
 Upgrade_Target :: enum { Player, Radial_Liberation, Dash }
-Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, CurrentHealth, MaxHealth,
-    Amount, Lifesteal }
+// Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, CurrentHealth, MaxHealth,
+//     Amount, Lifesteal }
 Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division, Toogle }
 Upgrade_Toogle_Target :: enum{Pierce, LifeStealAbility }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }
@@ -25,8 +27,8 @@ Upgrade :: struct{
     value : Upgrade_Value,
     texture : rl.Color,
     rarity : Rarity,
+    apply : Apply_Upgrade,
     target : Upgrade_Target,
-    stat : Upgrade_Stat,
     type : Upgrade_Type,
     toogle_target : Upgrade_Toogle_Target,
     max_used : i32,
@@ -116,6 +118,7 @@ create_upgrades :: proc(a : ^[dynamic]Upgrade){
     create_health_upgrades(a)
     create_rl_upgrades(a)
     create_dash_upgrades(a)
+    create_bullet_upgrades(a)
 }
 
 create_upgrade_slot :: proc(u : ^Upgrade, mul : f32) -> UI_Upgrade_Slot{
@@ -140,4 +143,22 @@ get_upgrade_color :: proc(r : Rarity) -> rl.Color{
         case .Legendary: return rl.ORANGE
     }
     return rl.WHITE
+}
+
+apply_normal_upgrade :: proc(type : Upgrade_Type, stat : ^f32, v : f32){
+    switch type{
+        case .Additive:
+            stat^ += v
+        case .Multiplicative:
+            stat^ *= v
+        case .Subtrative:
+            stat^ -= v
+        case .Division:
+            stat^ /= v
+        case .Toogle:
+    }
+}
+
+apply_toogle_upgrade :: proc(stat : ^bool, v : bool){
+    stat^ = v
 }

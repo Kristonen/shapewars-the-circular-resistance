@@ -4,13 +4,14 @@ import "core:fmt"
 import rl "vendor:raylib"
 import cl "collider"
 import "ui"
-import "upgrade"
 
 Weapon :: struct {
     fire_rate : f32,
     cooldown : f32,
     bullet : Bullet,
     lifesteal : f32,
+    can_pierce : bool,
+    amount : f32,
 }
 
 Loot_Bag :: struct{
@@ -28,7 +29,7 @@ Player :: struct {
     weapon : Weapon,
     ability : Ability,
     ability_cd : Ability_Cooldown,
-    target_ability : upgrade.Upgrade_Target,
+    target_ability : Upgrade_Target,
     health : Health,
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
@@ -48,6 +49,7 @@ create_player :: proc() -> Player{
         weapon = {
             fire_rate = 0.5,
             bullet = create_bullet(),
+            amount = 1,
         },
         health = {
           current = 50,

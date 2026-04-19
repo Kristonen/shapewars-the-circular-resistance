@@ -5,7 +5,6 @@ import m "map"
 import pacl "particle"
 import "loot"
 import "ui"
-import "upgrade"
 
 Create_Hit_Particle :: #type proc(p : ^[dynamic]pacl.Particle, pos : rl.Vector2)
 
@@ -44,9 +43,9 @@ Level_Data :: struct{
     loot : [dynamic]loot.Shape_Shard,
 
     power_level_up : bool,
-    upgrade_menu : upgrade.UI_Upgrade_Menu,
-    upgrade_pool : [dynamic]upgrade.Upgrade,
-    available_upgrades : [dynamic]upgrade.Upgrade,
+    upgrade_menu : UI_Upgrade_Menu,
+    upgrade_pool : [dynamic]Upgrade,
+    available_upgrades : [dynamic]Upgrade,
 
     ui_elements : [dynamic]ui.UI_Element,
     level_visual : m.Tiled_Map,

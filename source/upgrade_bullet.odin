@@ -1,0 +1,36 @@
+package game
+
+import "core:fmt"
+import rl "vendor:raylib"
+
+create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
+    legendary := create_bullet_upgrade("Pierce Bullet", "Bullets will not destroy on hit.", true, .Toogle, .Legendary)
+    epic := create_bullet_upgrade("Multishot", "Add one bullet to your primary shotting.", 1, .Additive, .Epic)
+    legendary.apply = apply_pierce_upgrade
+    epic.apply = apply_amount_upgrade
+    append(a, epic)
+    append(a, legendary)
+}
+
+create_bullet_upgrade :: proc(name : string, desc : string, value : Upgrade_Value, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
+    return {
+        name = name,
+        desc = desc,
+        value = value,
+        texture = rl.BLACK,
+        rarity = rarity,
+        type = type,
+    }
+}
+
+apply_pierce_upgrade :: proc(g : ^Game_State, u : Upgrade){
+    stat := &g.player.weapon.can_pierce
+    v := u.value.(bool)
+    apply_toogle_upgrade(stat, v)
+}
+
+apply_amount_upgrade :: proc(g : ^Game_State, u : Upgrade){
+    stat := &g.player.weapon.amount
+    v := u.value.(f32)
+    apply_normal_upgrade(u.type, stat, v)
+}
