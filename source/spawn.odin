@@ -1,7 +1,5 @@
 package game
 
-import rl "vendor:raylib"
-
 Spawner :: struct{
     enemy : Enemy,
     count : i32,

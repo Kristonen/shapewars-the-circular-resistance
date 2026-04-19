@@ -13,20 +13,16 @@ Bullet :: struct {
     radius : f32,
     collider : cl.Collider_Circle,
     can_lifesteal : bool,
+    can_pierce : bool,
+    hitted_enemies : [dynamic]rawptr,
     is_active : bool,
 }
 
-update_bullet :: proc(b : ^Bullet, dt : f32){
-    b.vel = b.dir * b.speed //Not 100% sure, but can probaly be called once
-    b.pos += b.vel * dt
-    b.collider.pos = b.pos
-}
-
-create_bullet :: proc() -> Bullet{
+create_bullet :: proc(radius : f32, speed : f32, dmg : f32) -> Bullet{
     b := Bullet{
-        damage = 10,
-        radius = 8,
-        speed = 500,
+        damage = dmg,
+        radius = radius,
+        speed = speed,
         is_active = true,
         can_lifesteal = true,
     }

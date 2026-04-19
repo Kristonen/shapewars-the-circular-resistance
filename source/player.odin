@@ -10,7 +10,6 @@ Weapon :: struct {
     cooldown : f32,
     bullet : Bullet,
     lifesteal : f32,
-    can_pierce : bool,
     amount : f32,
 }
 
@@ -34,8 +33,6 @@ Player :: struct {
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
 
-    // bullet : b.Bullet,
-
     loot_bag : Loot_Bag,
     increase_value : proc(b : ^Loot_Bag, value : f32) -> bool,
 
@@ -48,7 +45,7 @@ create_player :: proc() -> Player{
         radius = 32,
         weapon = {
             fire_rate = 0.5,
-            bullet = create_bullet(),
+            bullet = create_bullet(8, 700, 10),
             amount = 1,
         },
         health = {

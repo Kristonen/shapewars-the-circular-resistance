@@ -38,14 +38,32 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
     for &e in g.current_level.enemies{
         e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
         if rl.CheckCollisionCircleRec(b.pos, b.radius, e_rect){
-            e.on_hit(g, &e, b.damage)
-            b.is_active = false
-            b.pos = {-10000, -10000}
+
+            if !check_if_enemy_already_hitted(&e, b^){
+                e.on_hit(g, &e, b.damage)
+            }
+
+            if !b.can_pierce{
+                b.is_active = false
+                b.pos = {-10000, -10000}
+            } else{
+                append(&b.hitted_enemies, &e)
+            }
+
             if b.can_lifesteal{
                 apply_lifesteal(&g.player, b.damage)
             }
         }
     }
+}
+
+check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
+    for &hitted_enemy in b.hitted_enemies{
+        if hitted_enemy == e{
+            return true
+        }
+    }
+    return false
 }
 
 check_bullet_player :: proc(g : ^Game_State){

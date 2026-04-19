@@ -117,7 +117,7 @@ create_second_enemy :: proc() -> Enemy{
         max_distance = 350,
         weapon = {
             fire_rate = 1,
-            bullet = create_bullet()
+            bullet = create_bullet(8, 200, 5)
         }
     }
     return e
