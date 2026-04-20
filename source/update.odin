@@ -196,9 +196,8 @@ update_spawner :: proc(g : ^Game_State, dt : f32){
 update_enemy :: proc(g : ^Game_State, dt : f32){
     for &e, idx in g.current_level.enemies{
         if e.health.is_dead{
-            e.on_death(g, e, i32(idx))
-            delete(e.applied_status)
             delete(e.statuses)
+            e.on_death(g, e, i32(idx))
             continue
         }
         kb_speed := rl.Vector2Length(e.knocback.vel)

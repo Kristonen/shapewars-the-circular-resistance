@@ -62,8 +62,7 @@ main :: proc(){
     // append(&game.ui_elements, p_bar)
 
     defer{
-        delete(game.current_level.enemies)
-        delete(game.current_level.spawner)
+        
         delete(game.current_level.player_bullets)
         delete(game.current_level.enemy_bullets)
         delete(game.current_level.enemy_fragments)
@@ -79,9 +78,14 @@ main :: proc(){
         delete(game.menu.elements)
         delete(game.player.statuses)
         delete(game.player.weapon.bullet.applied_status)
+        for &e in game.current_level.enemies{
+            delete(e.statuses)
+        }
         for &s in game.current_level.spawner{
             delete(s.enemy.applied_status)
         }
+        delete(game.current_level.enemies)
+        delete(game.current_level.spawner)
         for &element in game.current_level.ui_elements{
             switch &e in &element{
                 case ui.UI_Cooldown:
