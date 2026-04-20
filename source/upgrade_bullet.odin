@@ -1,14 +1,16 @@
 package game
 
-import "core:fmt"
 import rl "vendor:raylib"
 
 create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
+    common := create_bullet_upgrade("Faster projectile", "Increase the speed of your bullet by 25.", 25, .Additive, .Common)
     legendary := create_bullet_upgrade("Pierce Bullet", "Bullets will not destroy on hit.", true, .Toogle, .Legendary)
     epic := create_bullet_upgrade("Multishot", "Add one bullet to your primary shotting.", 1, .Additive, .Epic)
+    common.apply = apply_speed_upgrade
     legendary.apply = apply_pierce_upgrade
     legendary.max_used = 1
     epic.apply = apply_amount_upgrade
+    append(a, common)
     append(a, epic)
     append(a, legendary)
 }
@@ -32,6 +34,12 @@ apply_pierce_upgrade :: proc(g : ^Game_State, u : Upgrade){
 
 apply_amount_upgrade :: proc(g : ^Game_State, u : Upgrade){
     stat := &g.player.weapon.amount
+    v := u.value.(f32)
+    apply_normal_upgrade(u.type, stat, v)
+}
+
+apply_speed_upgrade :: proc(g : ^Game_State, u : Upgrade){
+    stat := &g.player.weapon.bullet.speed
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }

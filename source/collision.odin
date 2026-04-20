@@ -41,6 +41,9 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
 
             if !check_if_enemy_already_hitted(&e, b^){
                 e.on_hit(g, &e, b.damage)
+                if b.can_lifesteal{
+                    apply_lifesteal(&g.player, b.damage)
+                }
             }
 
             if !b.can_pierce{
@@ -48,10 +51,6 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
                 b.pos = {-10000, -10000}
             } else{
                 append(&b.hitted_enemies, &e)
-            }
-
-            if b.can_lifesteal{
-                apply_lifesteal(&g.player, b.damage)
             }
         }
     }
