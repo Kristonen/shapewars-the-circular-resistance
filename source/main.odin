@@ -7,7 +7,6 @@ import "core:fmt"
 import "core:mem"
 import cl "collider"
 import m "map"
-import pacl "particle"
 import "ui"
 import "handler"
 import "loot"
@@ -48,7 +47,7 @@ main :: proc(){
         },
         helper_activated = false,
         current_menu = .Pause,
-        create_hit_particle = pacl.create_hit_particles
+        create_hit_particle = create_hit_particles
     }
     sync_menu(&game)
 
@@ -78,6 +77,7 @@ main :: proc(){
 
         delete(game.level_data)
         delete(game.menu.elements)
+        delete(game.player.statuses)
         rl.CloseWindow()
     }
     level_visual, ok := m.load_map("assets/test_map.json", map_allocator)
@@ -88,19 +88,29 @@ main :: proc(){
         level := create_start_level()
         level.level_visual = level_visual
 
-        spawner := create_spawner(5, 1, 2)
+        spawner := create_spawner(1, 1, 1, 500)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(2, 2, 1, 10)
+        spawner = create_spawner(10, 0.1, 0)
+        spawner.enemy = create_dummy_enemy()
+        append(&level.spawner, spawner)
+
+        spawner = create_spawner(2, 2, 1, 500)
         spawner.enemy = create_second_enemy()
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(1, 1, 1, 15)
+        spawner = create_spawner(1, 1, 1, 500)
         spawner.enemy = create_third_enemy()
         append(&level.spawner, spawner)
 
         append(&game.level_data, level)
+
+        status := create_poison_status()
+        status.create_particle = create_poison_particle
+        // append(&game.player.statuses, status)
+        append(&game.player.weapon.bullet.applied_status, status)
+
         game.current_level = level
         level_up_spawner_update(&game)
         

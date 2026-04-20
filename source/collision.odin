@@ -3,7 +3,6 @@ package game
 import "core:fmt"
 import rl "vendor:raylib"
 import "ui"
-import "particle"
 
 check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, g : Game_State) -> bool{
     if !g.map_drawing{
@@ -41,6 +40,7 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
 
             if !check_if_enemy_already_hitted(&e, b^){
                 e.on_hit(g, &e, b.damage)
+                add_bullet_status_to_hitted_enemy(b^, &e)
                 if b.can_lifesteal{
                     apply_lifesteal(&g.player, b.damage)
                 }
@@ -54,6 +54,21 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
             }
         }
     }
+}
+
+add_bullet_status_to_hitted_enemy :: proc(b : Bullet, e : ^Enemy){
+    for s in b.applied_status{
+        if !check_if_entity_already_got_status(e.statuses, s){
+            append(&e.statuses, s)
+        }
+    }
+}
+
+check_if_entity_already_got_status :: proc(s_array : [dynamic]Status_Effect, s : Status_Effect) -> bool{
+    for e_s in s_array{
+        if e_s.type == s.type do return true
+    }
+    return false
 }
 
 check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
@@ -82,8 +97,17 @@ check_enemy_player :: proc(g : ^Game_State){
     for &e in g.current_level.enemies{
         e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
         if rl.CheckCollisionCircleRec(g.player.collider.pos, g.player.collider.radius, e_rect) && g.player.health.invincible_timer <= 0{
+            add_enemy_status_to_player(e, &g.player)
             g.player.health.take_dmg(&g.player.health, 10)
             g.player.health.invincible_timer = 2
+        }
+    }
+}
+
+add_enemy_status_to_player :: proc(e : Enemy, p : ^Player){
+    for s in e.applied_status{
+        if !check_if_entity_already_got_status(p.statuses, s){
+            append(&p.statuses, s)
         }
     }
 }
@@ -99,7 +123,7 @@ check_bullet_wall :: proc(g : ^Game_State, b : ^Bullet){
 
             if rl.CheckCollisionCircleRec(b.pos, b.radius, rect){
                 b.is_active = false
-                particle.create_destroy_bullet_particle(&g.current_level.particles, b.pos)
+                create_destroy_bullet_particle(&g.current_level.particles, b.pos)
             }
         }
     }

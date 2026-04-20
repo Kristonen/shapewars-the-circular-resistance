@@ -49,6 +49,9 @@ Enemy :: struct {
     health_bar : ui.UI_Progress_Bar,
     knocback : Knockback,
 
+    applied_status : [dynamic]Status_Effect,
+    statuses : [dynamic]Status_Effect,
+
     spawner : rawptr,
 
     on_hit : On_Hit,
@@ -81,6 +84,28 @@ apply_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
 }
 
 apply_no_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2){}
+
+
+create_dummy_enemy :: proc() -> Enemy{
+    e := create_enemy({width = 50, height = 40}, 0, rl.ORANGE)
+    e.health = {
+        current = 1000,
+        max = 2000,
+        take_dmg = take_damage,
+    }
+    e.knocback = {
+        // strength = 800,
+        // friction = 0.99,
+        // threshold = 4,
+        // apply = apply_knockback,
+        apply = apply_no_knockback,
+    }
+    e.behavior = Melee_Data{}
+    status := create_poison_status()
+    status.strength = 0.2
+    append(&e.applied_status, status)
+    return e
+}
 
 create_start_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
     e := create_enemy(rect, speed, color)

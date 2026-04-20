@@ -77,6 +77,22 @@ update_player :: proc(g : ^Game_State, dt : f32){
 
     g.player.pos += g.player.vel * g.player.speed * dt
     g.player.collider.pos = g.player.pos
+    
+    //Other player update stuff
+    update_player_status(g, dt)
+}
+
+update_player_status :: proc(g : ^Game_State, dt : f32){
+    for &s, idx in g.player.statuses{
+        s.apply(&g.player, &s, dt)
+        if s.state == .Applied{
+            s.state = .None
+            s.create_particle(&g.current_level.particles, g.player.pos)
+        }
+        if !s.is_active{
+            unordered_remove(&g.player.statuses, idx)
+        }
+    }
 }
 
 update_player_bullets :: proc(g : ^Game_State, dt :f32){
@@ -89,6 +105,7 @@ update_player_bullets :: proc(g : ^Game_State, dt :f32){
         }
         if !b.is_active{
             delete(b.hitted_enemies)
+            // delete(b.applied_status)
             unordered_remove(&g.current_level.player_bullets, idx)
         }
     }
@@ -205,6 +222,22 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
         e.health_bar.value = e.health.current
         e.health_bar.rect.x = e.pos.x - 10
         e.health_bar.rect.y = e.pos.y - 20
+        update_enemy_status(g, &e, dt)
+    }
+    
+}
+
+update_enemy_status :: proc(g : ^Game_State, e : ^Enemy, dt : f32){
+
+    for &s, idx in e.statuses{
+        s.apply(e, &s, dt)
+        if s.state == .Applied{
+            s.state = .None
+            s.create_particle(&g.current_level.particles, e.origin)
+        }
+        if !s.is_active{
+            unordered_remove(&e.statuses, idx)
+        }
     }
 }
 

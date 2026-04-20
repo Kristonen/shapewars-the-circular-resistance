@@ -15,6 +15,8 @@ Bullet :: struct {
     can_lifesteal : bool,
     can_pierce : bool,
     hitted_enemies : [dynamic]rawptr,
+    applied_status : [dynamic]Status_Effect,
+
     is_active : bool,
 }
 

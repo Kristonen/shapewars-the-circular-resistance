@@ -1,10 +1,11 @@
-package particle
+package game
 
 import "core:math"
 import rl "vendor:raylib"
 
 Particle :: struct{
     pos : rl.Vector2,
+    entity_pos : rl.Vector2,
     vel: rl.Vector2,
     color : rl.Color,
     life : f32,
@@ -40,10 +41,38 @@ create_destroy_bullet_particle :: proc(particles : ^[dynamic]Particle, pos : rl.
             vel = {math.cos(angle) * speed, math.sin(angle) * speed},
             color = rl.GRAY,
             max_life = f32(rl.GetRandomValue(3, 5)) / 10,
-            life = 0,
             size = f32(rl.GetRandomValue(2, 5)),
             alive = true
         }
         append(particles, p)
+    }
+}
+
+create_poison_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
+    amount := rl.GetRandomValue(5, 10)
+    directions := []rl.Vector2{{1,1}, {-1, -1}, {-1, 1}, {1, -1}}
+    for i in 0..<4{
+        dir := directions[i]
+        new_pos := pos + dir * 20
+        speed := f32(rl.GetRandomValue(25, 50))
+        for _ in 0..<amount{
+            green_c : u8 = u8(rl.GetRandomValue(150, 200))
+            x := f32(rl.GetRandomValue(-8, 8))
+            y : f32
+            if x > 0{
+                y = f32(rl.GetRandomValue(0, 8))
+            } else {
+                y = f32(rl.GetRandomValue(-8, 0))
+            }
+            p : Particle = {
+                pos = {new_pos.x + x, new_pos.y + y},
+                vel = {-(dir.x * speed), -(dir.y * speed)},
+                color = {0, green_c, 0, 255},
+                max_life = f32(rl.GetRandomValue(3, 6)) / 10,
+                size = f32(rl.GetRandomValue(3, 9)),
+                alive = true
+            }
+            append(particles, p)
+        }
     }
 }

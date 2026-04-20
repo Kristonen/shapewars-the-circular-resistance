@@ -1,0 +1,58 @@
+package game
+
+import "core:fmt"
+import rl "vendor:raylib"
+
+Status_Type :: enum{Poison, Burn, Haste}
+Status_State :: enum {None, Applied}
+
+Apply_Status :: #type proc(e : any, s : ^Status_Effect, dt : f32)
+
+Status_Effect :: struct{
+    type : Status_Type,
+    strength : f32,
+    current_tick : f32,
+    tick : f32,
+    duration : f32,
+    apply : Apply_Status,
+    state : Status_State,
+    is_active : bool,
+    create_particle : proc(particles : ^[dynamic]Particle, pos : rl.Vector2)
+}
+
+create_poison_status :: proc() -> Status_Effect{
+    return {
+        type = .Poison,
+        strength = 2,
+        tick = 0.5,
+        duration = 5,
+        apply = apply_poison,
+        create_particle = create_poison_particle,
+        is_active = true,
+    }
+}
+
+apply_poison :: proc(entity : any, poison : ^Status_Effect, dt : f32){
+    
+    if poison.duration <= 0{
+        poison.is_active = false
+    }
+    
+    if !poison.is_active do return
+    
+    poison.duration -= dt
+
+    if poison.current_tick > 0{
+        poison.current_tick -= dt
+    } else{
+        poison.current_tick = poison.tick
+        poison.state = .Applied
+        switch &c_entity in entity{
+            case ^Player:
+                c_entity.health->take_dmg(poison.strength)
+            case ^Enemy:
+                c_entity.health->take_dmg(poison.strength)
+        }
+    }
+    
+}

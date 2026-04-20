@@ -2,11 +2,12 @@ package game
 
 import rl "vendor:raylib"
 import m "map"
-import pacl "particle"
 import "loot"
 import "ui"
 
-Create_Hit_Particle :: #type proc(p : ^[dynamic]pacl.Particle, pos : rl.Vector2)
+Create_Hit_Particle :: #type proc(p : ^[dynamic]Particle, pos : rl.Vector2)
+
+Entity :: union {Player, Enemy}
 
 Game_State :: struct{
     player : Player,
@@ -36,7 +37,7 @@ Level_Data :: struct{
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
     enemy_bullets : [dynamic]Bullet,
 
-    particles : [dynamic]pacl.Particle,
+    particles : [dynamic]Particle,
 
     player_bullets : [dynamic]Bullet,
 

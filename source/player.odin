@@ -26,13 +26,18 @@ Player :: struct {
     vel : rl.Vector2,
     radius : f32,
     speed : f32,
+
     weapon : Weapon,
+
     ability : Ability,
     ability_cd : Ability_Cooldown,
     target_ability : Upgrade_Target,
+
     health : Health,
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
+
+    statuses : [dynamic]Status_Effect,
 
     loot_bag : Loot_Bag,
     increase_value : proc(b : ^Loot_Bag, value : f32) -> bool,
