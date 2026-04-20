@@ -78,6 +78,22 @@ main :: proc(){
         delete(game.level_data)
         delete(game.menu.elements)
         delete(game.player.statuses)
+        delete(game.player.weapon.bullet.applied_status)
+        for &s in game.current_level.spawner{
+            delete(s.enemy.applied_status)
+        }
+        for &element in game.current_level.ui_elements{
+            switch &e in &element{
+                case ui.UI_Cooldown:
+                case ui.UI_Button:
+                case ui.UI_Menu:
+                case ui.UI_Progress_Bar:
+                case ui.UI_Label:
+                case ui.UI_Slider:
+                case ui.UI_Status_Bar:
+                    delete(e.slots)
+            }
+        }
         rl.CloseWindow()
     }
     level_visual, ok := m.load_map("assets/test_map.json", map_allocator)
@@ -92,10 +108,6 @@ main :: proc(){
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(10, 0.1, 0)
-        spawner.enemy = create_dummy_enemy()
-        append(&level.spawner, spawner)
-
         spawner = create_spawner(2, 2, 1, 500)
         spawner.enemy = create_second_enemy()
         append(&level.spawner, spawner)
@@ -104,10 +116,17 @@ main :: proc(){
         spawner.enemy = create_third_enemy()
         append(&level.spawner, spawner)
 
+        spawner = create_spawner(10, 0.1, 0)
+        spawner.enemy = create_dummy_enemy()
+        status := create_poison_status()
+        status.strength = 0.2
+        append(&spawner.enemy.applied_status, status)
+        append(&level.spawner, spawner)
+
         append(&game.level_data, level)
 
-        status := create_poison_status()
-        status.create_particle = create_poison_particle
+        // status = create_poison_status()
+        // status.create_particle = create_poison_particle
         // append(&game.player.statuses, status)
         append(&game.player.weapon.bullet.applied_status, status)
 
@@ -147,9 +166,14 @@ main :: proc(){
         fill_available_upgrades(&game)
         game.player.h_bar = p_bar
         game.player.v_bar = v_bar
+
+        pos : rl.Vector2 = {p_bar.rect.x, p_bar.rect.y - 25}
+        status_bar := ui.create_ui_status_bar(pos)
+
         append(&game.current_level.ui_elements, cooldown)
         append(&game.current_level.ui_elements, game.player.h_bar)
         append(&game.current_level.ui_elements, game.player.v_bar)
+        append(&game.current_level.ui_elements, status_bar)
     } else{
         panic("Could not load the level!")
     }

@@ -9,6 +9,7 @@ UI_Element :: union{
     UI_Progress_Bar,
     UI_Label,
     UI_Slider,
+    UI_Status_Bar,
 }
 //Structs
 //UI_Menu

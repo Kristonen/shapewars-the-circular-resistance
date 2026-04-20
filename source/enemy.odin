@@ -101,9 +101,6 @@ create_dummy_enemy :: proc() -> Enemy{
         apply = apply_no_knockback,
     }
     e.behavior = Melee_Data{}
-    status := create_poison_status()
-    status.strength = 0.2
-    append(&e.applied_status, status)
     return e
 }
 

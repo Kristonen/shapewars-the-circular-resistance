@@ -16,6 +16,7 @@ Status_Effect :: struct{
     duration : f32,
     apply : Apply_Status,
     state : Status_State,
+    texture : rl.Color,
     is_active : bool,
     create_particle : proc(particles : ^[dynamic]Particle, pos : rl.Vector2)
 }
@@ -27,6 +28,7 @@ create_poison_status :: proc() -> Status_Effect{
         tick = 0.5,
         duration = 5,
         apply = apply_poison,
+        texture = rl.GREEN,
         create_particle = create_poison_particle,
         is_active = true,
     }
@@ -54,5 +56,4 @@ apply_poison :: proc(entity : any, poison : ^Status_Effect, dt : f32){
                 c_entity.health->take_dmg(poison.strength)
         }
     }
-    
 }

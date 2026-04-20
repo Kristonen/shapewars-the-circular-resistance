@@ -169,6 +169,8 @@ draw_in_game_ui :: proc(g : Game_State){
             case ui.UI_Menu:
             case ui.UI_Label:
             case ui.UI_Slider:
+            case ui.UI_Status_Bar:
+                draw_status_bar(e)
         }
     }
 }
@@ -227,6 +229,7 @@ draw_menu :: proc(g : Game_State){
                 draw_label(e)
             case ui.UI_Slider:
                 draw_slider(e)
+            case ui.UI_Status_Bar:
         } 
     }
 }
@@ -256,4 +259,10 @@ draw_slider :: proc(s : ui.UI_Slider){
     // rl.DrawLineV(s.pos, end_pos, rl.BLACK)
     rl.DrawLineEx(s.pos, end_pos, 5, rl.BLACK)
     rl.DrawRectangleV({s.slider.x, s.slider.y}, {s.slider.width, s.slider.height}, s.color)
+}
+
+draw_status_bar :: proc(sbar : ui.UI_Status_Bar){
+    for slot in sbar.slots{
+        rl.DrawRectangleV(slot.pos, {slot.width, slot.height}, slot.texture)
+    }
 }

@@ -40,7 +40,7 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
 
             if !check_if_enemy_already_hitted(&e, b^){
                 e.on_hit(g, &e, b.damage)
-                add_bullet_status_to_hitted_enemy(b^, &e)
+                add_bullet_status_to_hitted_enemy(b, &e)
                 if b.can_lifesteal{
                     apply_lifesteal(&g.player, b.damage)
                 }
@@ -56,7 +56,7 @@ check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
     }
 }
 
-add_bullet_status_to_hitted_enemy :: proc(b : Bullet, e : ^Enemy){
+add_bullet_status_to_hitted_enemy :: proc(b : ^Bullet, e : ^Enemy){
     for s in b.applied_status{
         if !check_if_entity_already_got_status(e.statuses, s){
             append(&e.statuses, s)
@@ -183,6 +183,7 @@ check_collision_menu :: proc(g : ^Game_State){
             case ui.UI_Label:
             case ui.UI_Slider:
                 check_collision_slider(&e)
+            case ui.UI_Status_Bar:
         }
     }
 }

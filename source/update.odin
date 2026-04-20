@@ -105,7 +105,7 @@ update_player_bullets :: proc(g : ^Game_State, dt :f32){
         }
         if !b.is_active{
             delete(b.hitted_enemies)
-            // delete(b.applied_status)
+            clear(&b.applied_status)
             unordered_remove(&g.current_level.player_bullets, idx)
         }
     }
@@ -197,6 +197,8 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
     for &e, idx in g.current_level.enemies{
         if e.health.is_dead{
             e.on_death(g, e, i32(idx))
+            delete(e.applied_status)
+            delete(e.statuses)
             continue
         }
         kb_speed := rl.Vector2Length(e.knocback.vel)
@@ -326,6 +328,8 @@ update_in_game_ui :: proc(g : ^Game_State, dt : f32){
             case ui.UI_Menu:
             case ui.UI_Label:
             case ui.UI_Slider:
+            case ui.UI_Status_Bar:
+                update_status_bar(g.player, &e)
         }
     }
 }
@@ -348,6 +352,7 @@ update_menu :: proc(g : ^Game_State){
             case ui.UI_Label:
             case ui.UI_Slider:
                 update_slider(&e)
+            case ui.UI_Status_Bar:
         } 
     }
 }
@@ -380,6 +385,18 @@ update_slider :: proc(s : ^ui.UI_Slider){
             s.slider.x = rl.GetMousePosition().x
     }
 
+}
+
+update_status_bar :: proc(p : Player, sbar : ^ui.UI_Status_Bar){
+    clear(&sbar.slots)
+    width : f32 = 20
+    height : f32 = 20
+    for i in 0..<len(p.statuses){
+        x := sbar.pos.x + (width + sbar.seperation) * f32(i)
+        y := sbar.pos.y + (height + sbar.seperation) * f32(i)
+        slot := ui.create_status_slot({x, y}, width, height, p.statuses[i].texture)
+        append(&sbar.slots, slot)
+    }
 }
 
 check_direction_col :: proc(g : Game_State, pos : rl.Vector2, vel : rl.Vector2, speed : f32, dt : f32) -> f32{
