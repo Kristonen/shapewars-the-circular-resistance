@@ -76,3 +76,26 @@ create_poison_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2)
         }
     }
 }
+
+create_fire_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
+    amount := rl.GetRandomValue(30, 50)
+    dir := rl.Vector2 {0, -1}
+    for _ in 0..<amount{
+        red := u8(rl.GetRandomValue(150, 255))
+        speed := f32(rl.GetRandomValue(30, 60))
+        x := f32(rl.GetRandomValue(-25, 25))
+        p : Particle = {
+            pos = {pos.x + x, pos.y},
+            vel = dir * speed,
+            color = {red, 0, 0, 255},
+            max_life = f32(rl.GetRandomValue(5, 8)) / 10,
+            size = f32(rl.GetRandomValue(1, 7)),
+            alive = true,
+        }
+        append(particles, p)
+        smoke_p := p
+        smoke_p.pos.y -= 20
+        smoke_p.color = {65, 65, 65, 255}
+        append(particles, smoke_p)
+    }
+}

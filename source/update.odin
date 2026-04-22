@@ -392,7 +392,7 @@ update_status_bar :: proc(p : Player, sbar : ^ui.UI_Status_Bar){
     height : f32 = 20
     for i in 0..<len(p.statuses){
         x := sbar.pos.x + (width + sbar.seperation) * f32(i)
-        y := sbar.pos.y + (height + sbar.seperation) * f32(i)
+        y := sbar.pos.y
         slot := ui.create_status_slot({x, y}, width, height, p.statuses[i].texture)
         append(&sbar.slots, slot)
     }

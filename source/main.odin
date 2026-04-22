@@ -125,13 +125,17 @@ main :: proc(){
         status := create_poison_status()
         status.strength = 0.2
         append(&spawner.enemy.applied_status, status)
+        status = create_fire_status()
+        status.strength = 0.2
+        append(&spawner.enemy.applied_status, status)
         append(&level.spawner, spawner)
 
         append(&game.level_data, level)
 
-        // status = create_poison_status()
-        // status.create_particle = create_poison_particle
+        status = create_poison_status()
         // append(&game.player.statuses, status)
+        append(&game.player.weapon.bullet.applied_status, status)
+        status = create_fire_status()
         append(&game.player.weapon.bullet.applied_status, status)
 
         game.current_level = level
@@ -163,6 +167,7 @@ main :: proc(){
         ability_cd := Ability_Cooldown{
             cast_rate = 5,
         }
+        //TODO -> Make ability cd part of the ability instead of player
         game.player.ability = ability_test
         game.player.ability_cd = ability_cd
         get_upgrade_target(&game.player)

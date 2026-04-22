@@ -34,6 +34,19 @@ create_poison_status :: proc() -> Status_Effect{
     }
 }
 
+create_fire_status :: proc() -> Status_Effect{
+    return {
+        type = .Burn,
+        strength = 5,
+        tick = 0.25,
+        duration = 2,
+        apply = apply_fire,
+        texture = rl.RED,
+        create_particle = create_fire_particle,
+        is_active = true,
+    }
+}
+
 apply_poison :: proc(entity : any, poison : ^Status_Effect, dt : f32){
     
     if poison.duration <= 0{
@@ -54,6 +67,29 @@ apply_poison :: proc(entity : any, poison : ^Status_Effect, dt : f32){
                 c_entity.health->take_dmg(poison.strength)
             case ^Enemy:
                 c_entity.health->take_dmg(poison.strength)
+        }
+    }
+}
+
+apply_fire :: proc(entity : any, fire : ^Status_Effect, dt : f32){
+    if fire.duration <= 0{
+        fire.is_active = false
+    }
+
+    if !fire.is_active do return
+
+    fire.duration -= dt
+
+    if fire.current_tick > 0{
+        fire.current_tick -= dt
+    } else{
+        fire.current_tick = fire.tick
+        fire.state = .Applied
+        switch &e in entity{
+            case ^Player:
+                e.health->take_dmg(fire.strength)
+            case ^Enemy:
+                e.health->take_dmg(fire.strength)
         }
     }
 }

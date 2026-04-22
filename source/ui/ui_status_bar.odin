@@ -21,7 +21,8 @@ UI_Status_Slot :: struct{
 
 create_ui_status_bar :: proc(pos : rl.Vector2) -> UI_Status_Bar{
     return{
-        pos = pos
+        pos = pos,
+        seperation = 5,
     }
     // status_bar.pos = pos
     // width : f32 = 50

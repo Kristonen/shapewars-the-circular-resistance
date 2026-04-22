@@ -89,8 +89,8 @@ apply_no_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vecto
 create_dummy_enemy :: proc() -> Enemy{
     e := create_enemy({width = 50, height = 40}, 0, rl.ORANGE)
     e.health = {
-        current = 25,
-        max = 50,
+        current = 100,
+        max = 200,
         take_dmg = take_damage,
     }
     e.knocback = {
