@@ -9,7 +9,7 @@ get_tooltips :: proc(allocator : mem.Allocator) -> (map[string]string, bool){
 
     if ok != os.General_Error.None do return {}, false
     tooltips : map[string]string
-    err := json.unmarshal(data, &tooltips, .JSON, allocator)
+    err := json.unmarshal(data, &tooltips, allocator = allocator)
     defer delete(tooltips)
     return tooltips, true
 }

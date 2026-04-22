@@ -7,7 +7,7 @@ create_dash_upgrades :: proc(a : ^[dynamic]Upgrade){
 
 create_dash_upgrade :: proc(name : string, desc : string,
     value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    
+        
     return{
         name = name,
         desc = desc,

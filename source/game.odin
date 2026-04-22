@@ -5,8 +5,7 @@ import m "map"
 import "loot"
 import "ui"
 
-global_game_state : Game_State
-
+game : Game_State
 
 Create_Hit_Particle :: #type proc(p : ^[dynamic]Particle, pos : rl.Vector2)
 

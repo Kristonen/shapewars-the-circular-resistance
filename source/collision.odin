@@ -180,7 +180,7 @@ check_collision_upgrade_slot :: proc(g : ^Game_State){
 }
 
 check_in_game_ui :: proc(){
-    for &element in global_game_state.current_level.ui_elements{
+    for &element in game.current_level.ui_elements{
         switch &e in element{
             case ui.UI_Cooldown:
             case ui.UI_Button:

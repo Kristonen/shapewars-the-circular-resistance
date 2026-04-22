@@ -40,7 +40,7 @@ main :: proc(){
         virtual.arena_free_all(&arena)
     }
 
-    global_game_state = Game_State {
+    game = Game_State {
         camera = {
             zoom = 1,
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
@@ -49,7 +49,7 @@ main :: proc(){
         current_menu = .Pause,
         create_hit_particle = create_hit_particles
     }
-    sync_menu(&global_game_state)
+    sync_menu(&game)
 
     cooldown := ui.UI_Cooldown{
         pos = {550, f32(rl.GetScreenHeight() - 100)},
@@ -63,31 +63,31 @@ main :: proc(){
 
     defer{
         
-        delete(global_game_state.current_level.player_bullets)
-        delete(global_game_state.current_level.enemy_bullets)
-        delete(global_game_state.current_level.enemy_fragments)
-        delete(global_game_state.current_level.loot)
-        delete(global_game_state.current_level.upgrade_pool)
-        delete(global_game_state.current_level.available_upgrades)
-        delete(global_game_state.current_level.particles)
-        delete(global_game_state.current_level.level_visual.tilesets)
-        delete(global_game_state.current_level.level_visual.layers)
-        delete(global_game_state.current_level.ui_elements)
+        delete(game.current_level.player_bullets)
+        delete(game.current_level.enemy_bullets)
+        delete(game.current_level.enemy_fragments)
+        delete(game.current_level.loot)
+        delete(game.current_level.upgrade_pool)
+        delete(game.current_level.available_upgrades)
+        delete(game.current_level.particles)
+        delete(game.current_level.level_visual.tilesets)
+        delete(game.current_level.level_visual.layers)
+        delete(game.current_level.ui_elements)
 
-        delete(global_game_state.level_data)
-        delete(global_game_state.menu.elements)
-        delete(global_game_state.player.statuses)
-        delete(global_game_state.player.weapon.bullet.applied_status)
-        for &e in global_game_state.current_level.enemies{
+        delete(game.level_data)
+        delete(game.menu.elements)
+        delete(game.player.statuses)
+        delete(game.player.weapon.bullet.applied_status)
+        for &e in game.current_level.enemies{
             delete(e.statuses)
         }
-        for &s in global_game_state.current_level.spawner{
+        for &s in game.current_level.spawner{
             delete(s.enemy.applied_status)
         }
-        delete(global_game_state.current_level.enemies)
-        delete(global_game_state.current_level.spawner)
-        delete(global_game_state.tooltips)
-        for &element in global_game_state.current_level.ui_elements{
+        delete(game.current_level.enemies)
+        delete(game.current_level.spawner)
+        delete(game.tooltips)
+        for &element in game.current_level.ui_elements{
             switch &e in &element{
                 case ui.UI_Cooldown:
                 case ui.UI_Button:
@@ -101,19 +101,19 @@ main :: proc(){
         }
         rl.CloseWindow()
     }
-    level_visual, ok := m.load_map("assets/test_map.json", map_allocator)
-    if tooltips, t_ok := get_tooltips(map_allocator); t_ok{
-        global_game_state.tooltips = tooltips
+    
+    if tooltips, ok := get_tooltips(map_allocator); ok{
+        game.tooltips = tooltips
     }
     
-    if ok{
-        global_game_state.player = create_player()
-        global_game_state.player.pos = m.get_player_spawn_pos(level_visual)
-        global_game_state.camera.target = global_game_state.player.pos
+    if level_visual, ok := m.load_map("assets/test_map.json", map_allocator); ok{
+        game.player = create_player()
+        game.player.pos = m.get_player_spawn_pos(level_visual)
+        game.camera.target = game.player.pos
         level := create_start_level()
         level.level_visual = level_visual
 
-        spawner := create_spawner(1, 1, 1, 500)
+        spawner := create_spawner(1, 1, 1)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
@@ -125,7 +125,7 @@ main :: proc(){
         spawner.enemy = create_third_enemy()
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(10, 0.1, 0)
+        spawner = create_spawner(10, 0.1, 0, 500)
         spawner.enemy = create_dummy_enemy()
         status := create_poison_status()
         status.strength = 0.2
@@ -135,16 +135,16 @@ main :: proc(){
         append(&spawner.enemy.applied_status, status)
         append(&level.spawner, spawner)
 
-        append(&global_game_state.level_data, level)
+        append(&game.level_data, level)
 
         status = create_poison_status()
         // append(&game.player.statuses, status)
-        append(&global_game_state.player.weapon.bullet.applied_status, status)
+        append(&game.player.weapon.bullet.applied_status, status)
         status = create_fire_status()
-        append(&global_game_state.player.weapon.bullet.applied_status, status)
+        append(&game.player.weapon.bullet.applied_status, status)
 
-        global_game_state.current_level = level
-        level_up_spawner_update(&global_game_state)
+        game.current_level = level
+        level_up_spawner_update(&game)
         
         rect := rl.Rectangle {
             x = 50,
@@ -173,34 +173,34 @@ main :: proc(){
             cast_rate = 5,
         }
         //TODO -> Make ability cd part of the ability instead of player
-        global_game_state.player.ability = ability_test
-        global_game_state.player.ability_cd = ability_cd
-        get_upgrade_target(&global_game_state.player)
-        create_upgrades(&global_game_state.current_level.upgrade_pool)
-        fill_available_upgrades(&global_game_state)
-        global_game_state.player.h_bar = p_bar
-        global_game_state.player.v_bar = v_bar
+        game.player.ability = ability_test
+        game.player.ability_cd = ability_cd
+        get_upgrade_target(&game.player)
+        create_upgrades(&game.current_level.upgrade_pool)
+        fill_available_upgrades(&game)
+        game.player.h_bar = p_bar
+        game.player.v_bar = v_bar
 
         pos : rl.Vector2 = {p_bar.rect.x, p_bar.rect.y - 25}
         status_bar := ui.create_ui_status_bar(pos)
 
-        append(&global_game_state.current_level.ui_elements, cooldown)
-        append(&global_game_state.current_level.ui_elements, global_game_state.player.h_bar)
-        append(&global_game_state.current_level.ui_elements, global_game_state.player.v_bar)
-        append(&global_game_state.current_level.ui_elements, status_bar)
+        append(&game.current_level.ui_elements, cooldown)
+        append(&game.current_level.ui_elements, game.player.h_bar)
+        append(&game.current_level.ui_elements, game.player.v_bar)
+        append(&game.current_level.ui_elements, status_bar)
     } else{
         panic("Could not load the level!")
     }
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
-        update_camera(&global_game_state, dt)
-        update_game(&global_game_state, dt)
-        check_collisions(&global_game_state)
+        update_camera(&game, dt)
+        update_game(&game, dt)
+        check_collisions(&game)
         //game.camera.target += handler.get_camera_follow_pos(game.player.pos, game.camera, dt)
         
-        draw_game(global_game_state)
+        draw_game(game)
 
-        if global_game_state.should_close{
+        if game.should_close{
             break
         }
     }
