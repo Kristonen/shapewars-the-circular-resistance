@@ -50,7 +50,6 @@ main :: proc(){
         create_hit_particle = create_hit_particles
     }
     sync_menu(&global_game_state)
-    get_tooltips(&global_game_state.tooltips, map_allocator)
 
     cooldown := ui.UI_Cooldown{
         pos = {550, f32(rl.GetScreenHeight() - 100)},
@@ -87,6 +86,7 @@ main :: proc(){
         }
         delete(global_game_state.current_level.enemies)
         delete(global_game_state.current_level.spawner)
+        delete(global_game_state.tooltips)
         for &element in global_game_state.current_level.ui_elements{
             switch &e in &element{
                 case ui.UI_Cooldown:
@@ -102,6 +102,10 @@ main :: proc(){
         rl.CloseWindow()
     }
     level_visual, ok := m.load_map("assets/test_map.json", map_allocator)
+    if tooltips, t_ok := get_tooltips(map_allocator); t_ok{
+        global_game_state.tooltips = tooltips
+    }
+    
     if ok{
         global_game_state.player = create_player()
         global_game_state.player.pos = m.get_player_spawn_pos(level_visual)
