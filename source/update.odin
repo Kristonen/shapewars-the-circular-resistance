@@ -399,12 +399,15 @@ update_status_bar :: proc(p : Player, sbar : ^ui.UI_Status_Bar){
     }
 }
 
-update_tooltip :: proc(){
+update_tooltip :: proc(dt : f32){
     if game.tooltip_ptr == nil do return
+
+    if game.tooltip_timer > 0{
+        game.tooltip_timer -= dt
+    }
 
     switch &t in game.tooltip_ptr{
         case ui.UI_Status_Slot:
-            fmt.println(t.pos)
             game.tooltip = ui.create_tooltip(t.pos)
             game.tooltip.text.text = t.text
             game.tooltip.text.font_size = 20

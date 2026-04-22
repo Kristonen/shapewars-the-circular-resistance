@@ -269,6 +269,7 @@ draw_status_bar :: proc(sbar : ui.UI_Status_Bar){
 
 draw_tooltip :: proc(){
     if game.tooltip_ptr == nil do return
+    if game.tooltip_timer > 0 do return
 
     rl.DrawRectangleV(game.tooltip.pos, {game.tooltip.width, game.tooltip.height}, game.tooltip.color)
     rec := rl.Rectangle{

@@ -236,6 +236,7 @@ check_in_game_ui_tooltip :: proc(){
             case ui.UI_Button:
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:
+                
             case ui.UI_Label:
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
@@ -243,6 +244,10 @@ check_in_game_ui_tooltip :: proc(){
                     check_mouse_status_slot(&s)
                 }
         }
+    }
+
+    if game.tooltip_ptr == nil{
+        game.tooltip_timer = 0.25
     }
 }
 

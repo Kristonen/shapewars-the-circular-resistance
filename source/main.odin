@@ -220,7 +220,7 @@ update_game :: proc(g : ^Game_State, dt : f32) {
         update_loot(g, dt)
         update_particle(g, dt)
         update_in_game_ui(g, dt)
-        update_tooltip()
+        update_tooltip(dt)
     } else if g.current_level.power_level_up{
         update_upgrade(g, dt)
     } else{
