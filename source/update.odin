@@ -394,6 +394,12 @@ update_status_bar :: proc(p : Player, sbar : ^ui.UI_Status_Bar){
         x := sbar.pos.x + (width + sbar.seperation) * f32(i)
         y := sbar.pos.y
         slot := ui.create_status_slot({x, y}, width, height, p.statuses[i].texture)
+        slot.tooltip = ui.create_tooltip(slot.pos)
+        text := fmt.tprintf("%v", p.statuses[i].type)
+        slot.tooltip.text.text = global_game_state.tooltips[text]
+        slot.tooltip.text.text_color = rl.WHITE
+        slot.tooltip.text.font_size = 15
+        
         append(&sbar.slots, slot)
     }
 }

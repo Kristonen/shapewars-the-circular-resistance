@@ -264,5 +264,15 @@ draw_slider :: proc(s : ui.UI_Slider){
 draw_status_bar :: proc(sbar : ui.UI_Status_Bar){
     for slot in sbar.slots{
         rl.DrawRectangleV(slot.pos, {slot.width, slot.height}, slot.texture)
+        if slot.tooltip.is_active{
+            rl.DrawRectangleV(slot.tooltip.pos, {slot.tooltip.width, slot.tooltip.height}, slot.tooltip.color)
+            rect := rl.Rectangle{
+                width = slot.tooltip.width,
+                height = slot.tooltip.height,
+                x = slot.tooltip.pos.x,
+                y = slot.tooltip.pos.y,
+            }
+            draw_text(slot.tooltip.text.text, rect, slot.tooltip.text.font_size, slot.tooltip.text.text_color)
+        }
     }
 }

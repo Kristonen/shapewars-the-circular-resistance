@@ -3,6 +3,7 @@ package game
 import "core:fmt"
 import rl "vendor:raylib"
 import "ui"
+import "handler"
 
 check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, g : Game_State) -> bool{
     if !g.map_drawing{
@@ -178,6 +179,23 @@ check_collision_upgrade_slot :: proc(g : ^Game_State){
     }
 }
 
+check_in_game_ui :: proc(){
+    for &element in global_game_state.current_level.ui_elements{
+        switch &e in element{
+            case ui.UI_Cooldown:
+            case ui.UI_Button:
+            case ui.UI_Menu:
+            case ui.UI_Progress_Bar:
+            case ui.UI_Label:
+            case ui.UI_Slider:
+            case ui.UI_Status_Bar:
+                for &s in e.slots{
+                    check_mouse_status_slot(&s)
+                }
+        }
+    }
+}
+
 check_collision_menu :: proc(g : ^Game_State){
     for &element in g.menu.elements{
         switch &e in element{
@@ -194,16 +212,31 @@ check_collision_menu :: proc(g : ^Game_State){
     }
 }
 
+check_mouse_status_slot :: proc(slot : ^ui.UI_Status_Slot){
+    mouse_pos := rl.GetMousePosition()
+    rec := rl.Rectangle{
+        width = slot.width,
+        height = slot.height,
+        x = slot.pos.x,
+        y = slot.pos.y,
+    }
+    if rl.CheckCollisionPointRec(mouse_pos, rec){
+        slot.tooltip.is_active = true
+    } else {
+        slot.tooltip.is_active = false
+    }
+}
+
 check_collision_button :: proc(b : ^ui.UI_Button){
     mouse_pos := rl.GetMousePosition()
-    rect := rl.Rectangle{
+    rec := rl.Rectangle{
         x = b.pos.x,
         y = b.pos.y,
         width = b.width,
         height = b.height,
     }
 
-    if rl.CheckCollisionPointRec(mouse_pos, rect){
+    if rl.CheckCollisionPointRec(mouse_pos, rec){
         b.state = .Focus
         if rl.IsMouseButtonDown(.LEFT){
             b.state = .Pressing

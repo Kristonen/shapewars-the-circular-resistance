@@ -5,6 +5,9 @@ import m "map"
 import "loot"
 import "ui"
 
+global_game_state : Game_State
+
+
 Create_Hit_Particle :: #type proc(p : ^[dynamic]Particle, pos : rl.Vector2)
 
 Entity :: union {Player, Enemy}
@@ -29,6 +32,9 @@ Game_State :: struct{
     helper_activated : bool,
     map_drawing : bool,
     should_close : bool,
+
+    tooltips : map[string]string,
+    tooltip_timer : f32
 }
 
 Level_Data :: struct{

@@ -17,6 +17,7 @@ UI_Status_Slot :: struct{
     height : f32,
     pos : rl.Vector2,
     texture : rl.Color,
+    tooltip : UI_ToolTip,
 }
 
 create_ui_status_bar :: proc(pos : rl.Vector2) -> UI_Status_Bar{
