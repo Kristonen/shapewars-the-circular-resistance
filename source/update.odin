@@ -411,7 +411,11 @@ update_tooltip :: proc(dt : f32){
             game.tooltip = ui.create_tooltip(t.pos)
             game.tooltip.text.text = t.text
             game.tooltip.text.font_size = 20
-            game.tooltip.text.text_color = rl.WHITE         
+            game.tooltip.text.text_color = rl.WHITE
+        case ui.UI_Progress_Bar:
+            game.tooltip = ui.create_tooltip({t.rect.x, t.rect.y})
+            game.tooltip.text.text = fmt.tprintf("%0.0f/%0.0f", t.value, t.max)       
+            game.tooltip.text.text_color = rl.WHITE
     }
 }
 

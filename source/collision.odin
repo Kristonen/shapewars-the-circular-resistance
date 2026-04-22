@@ -236,7 +236,7 @@ check_in_game_ui_tooltip :: proc(){
             case ui.UI_Button:
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:
-                
+                check_mouse_progress_bar(&e)
             case ui.UI_Label:
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
@@ -262,5 +262,14 @@ check_mouse_status_slot :: proc(slot : ^ui.UI_Status_Slot){
     if rl.CheckCollisionPointRec(mouse_pos, rec){
         game.tooltip_ptr = any{data = rawptr(slot), id = typeid_of(ui.UI_Status_Slot)}
         game.tooltip_pos = slot.pos
+    }
+}
+
+check_mouse_progress_bar :: proc(pb : ^ui.UI_Progress_Bar){
+    mouse_pos := rl.GetMousePosition()
+    
+    if rl.CheckCollisionPointRec(mouse_pos, pb.rect){
+        game.tooltip_ptr = any{data = rawptr(pb), id = typeid_of(ui.UI_Progress_Bar)}
+        game.tooltip_pos = {pb.rect.x, pb.rect.y}
     }
 }
