@@ -179,23 +179,6 @@ check_collision_upgrade_slot :: proc(g : ^Game_State){
     }
 }
 
-check_in_game_ui :: proc(){
-    for &element in game.current_level.ui_elements{
-        switch &e in element{
-            case ui.UI_Cooldown:
-            case ui.UI_Button:
-            case ui.UI_Menu:
-            case ui.UI_Progress_Bar:
-            case ui.UI_Label:
-            case ui.UI_Slider:
-            case ui.UI_Status_Bar:
-                for &s in e.slots{
-                    check_mouse_status_slot(&s)
-                }
-        }
-    }
-}
-
 check_collision_menu :: proc(g : ^Game_State){
     for &element in g.menu.elements{
         switch &e in element{
@@ -209,21 +192,6 @@ check_collision_menu :: proc(g : ^Game_State){
                 check_collision_slider(&e)
             case ui.UI_Status_Bar:
         }
-    }
-}
-
-check_mouse_status_slot :: proc(slot : ^ui.UI_Status_Slot){
-    mouse_pos := rl.GetMousePosition()
-    rec := rl.Rectangle{
-        width = slot.width,
-        height = slot.height,
-        x = slot.pos.x,
-        y = slot.pos.y,
-    }
-    if rl.CheckCollisionPointRec(mouse_pos, rec){
-        slot.tooltip.is_active = true
-    } else {
-        slot.tooltip.is_active = false
     }
 }
 
@@ -258,4 +226,36 @@ check_collision_slider :: proc(s : ^ui.UI_Slider){
         s.state = .None
     }
     //TODO mouse click on the line
+}
+
+check_in_game_ui_tooltip :: proc(){
+    game.tooltip_ptr = nil
+    for &element in game.current_level.ui_elements{
+        switch &e in element{
+            case ui.UI_Cooldown:
+            case ui.UI_Button:
+            case ui.UI_Menu:
+            case ui.UI_Progress_Bar:
+            case ui.UI_Label:
+            case ui.UI_Slider:
+            case ui.UI_Status_Bar:
+                for &s in e.slots{
+                    check_mouse_status_slot(&s)
+                }
+        }
+    }
+}
+
+check_mouse_status_slot :: proc(slot : ^ui.UI_Status_Slot){
+    mouse_pos := rl.GetMousePosition()
+    rec := rl.Rectangle{
+        width = slot.width,
+        height = slot.height,
+        x = slot.pos.x,
+        y = slot.pos.y,
+    }
+    if rl.CheckCollisionPointRec(mouse_pos, rec){
+        game.tooltip_ptr = any{data = rawptr(slot), id = typeid_of(ui.UI_Status_Slot)}
+        game.tooltip_pos = slot.pos
+    }
 }

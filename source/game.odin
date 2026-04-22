@@ -33,6 +33,9 @@ Game_State :: struct{
     should_close : bool,
 
     tooltips : map[string]string,
+    tooltip_ptr : any,
+    tooltip_pos : rl.Vector2,
+    tooltip : ui.UI_ToolTip,
     tooltip_timer : f32
 }
 

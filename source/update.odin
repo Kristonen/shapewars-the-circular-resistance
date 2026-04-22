@@ -394,13 +394,21 @@ update_status_bar :: proc(p : Player, sbar : ^ui.UI_Status_Bar){
         x := sbar.pos.x + (width + sbar.seperation) * f32(i)
         y := sbar.pos.y
         slot := ui.create_status_slot({x, y}, width, height, p.statuses[i].texture)
-        slot.tooltip = ui.create_tooltip(slot.pos)
-        text := fmt.tprintf("%v", p.statuses[i].type)
-        slot.tooltip.text.text = game.tooltips[text]
-        slot.tooltip.text.text_color = rl.WHITE
-        slot.tooltip.text.font_size = 15
-        
+        slot.text = fmt.tprintf("%v", p.statuses[i].type)
         append(&sbar.slots, slot)
+    }
+}
+
+update_tooltip :: proc(){
+    if game.tooltip_ptr == nil do return
+
+    switch &t in game.tooltip_ptr{
+        case ui.UI_Status_Slot:
+            fmt.println(t.pos)
+            game.tooltip = ui.create_tooltip(t.pos)
+            game.tooltip.text.text = t.text
+            game.tooltip.text.font_size = 20
+            game.tooltip.text.text_color = rl.WHITE         
     }
 }
 

@@ -113,7 +113,7 @@ main :: proc(){
         level := create_start_level()
         level.level_visual = level_visual
 
-        spawner := create_spawner(1, 1, 1)
+        spawner := create_spawner(1, 1, 1, 500)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
@@ -125,7 +125,7 @@ main :: proc(){
         spawner.enemy = create_third_enemy()
         append(&level.spawner, spawner)
 
-        spawner = create_spawner(10, 0.1, 0, 500)
+        spawner = create_spawner(10, 0.1, 0)
         spawner.enemy = create_dummy_enemy()
         status := create_poison_status()
         status.strength = 0.2
@@ -194,14 +194,12 @@ main :: proc(){
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         update_camera(&game, dt)
-        update_game(&game, dt)
         check_collisions(&game)
-        //game.camera.target += handler.get_camera_follow_pos(game.player.pos, game.camera, dt)
-        
+        update_game(&game, dt)
         draw_game(game)
 
         if game.should_close{
-            break
+            //break
         }
     }
 }
@@ -222,6 +220,7 @@ update_game :: proc(g : ^Game_State, dt : f32) {
         update_loot(g, dt)
         update_particle(g, dt)
         update_in_game_ui(g, dt)
+        update_tooltip()
     } else if g.current_level.power_level_up{
         update_upgrade(g, dt)
     } else{
@@ -236,7 +235,7 @@ check_collisions :: proc(g : ^Game_State){
         check_bullet_player(g)
         check_collisions_detection_loot(g)
         check_collisions_pickup_loot(g)
-        check_in_game_ui()
+        check_in_game_ui_tooltip()
     } else if g.current_level.power_level_up{
         check_collision_upgrade_slot(g)
     } else{
@@ -259,6 +258,7 @@ draw_game :: proc(g : Game_State){
     draw_particles(g)
     rl.EndMode2D()
     draw_in_game_ui(g)
+    draw_tooltip()
     if g.is_paused{
         draw_menu(g)
     } else if g.current_level.power_level_up{
