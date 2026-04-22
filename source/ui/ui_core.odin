@@ -102,13 +102,13 @@ UI_Slider :: struct{
     n_color : rl.Color,
     a_color : rl.Color,
 }
-
+//Text
 UI_Text :: struct{
     text : string,
     font_size : i32,
     text_color : rl.Color,
 }
-
+//Tooltip
 UI_ToolTip :: struct {
     pos : rl.Vector2,
     width : f32,
