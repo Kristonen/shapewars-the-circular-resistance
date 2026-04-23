@@ -1,5 +1,7 @@
 package game
 
+import rl "vendor:raylib"
+
 create_health_upgrades :: proc(a : ^[dynamic]Upgrade){
     common_m := create_max_health_upgrade("Better Nutrition", "Increase the life by 10.", 10.0, .Additive, .Common)
     common_c := create_current_health_upgrade("Medicine", "Heals you by 5.", 5, .Additive, .Common)
@@ -15,8 +17,20 @@ create_max_health_upgrade :: proc(name : string, desc : string,
     value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
     
     return {
-        name = name,
-        desc = desc,
+        name = {
+            content = name,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE,
+        },
+        desc = {
+            content = desc,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE
+        },
         value = value,
         type = type,
         rarity = rarity,
@@ -29,8 +43,20 @@ create_current_health_upgrade :: proc(name : string, desc : string,
     value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
     
     return {
-        name = name,
-        desc = desc,
+        name = {
+            content = name,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE,
+        },
+        desc = {
+            content = desc,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE
+        },
         value = value,
         type = type,
         rarity = rarity,

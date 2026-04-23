@@ -93,10 +93,20 @@ UI_Slider :: struct{
     a_color : rl.Color,
 }
 //Text
+V_Alignment :: enum {
+    Left, Center, Right
+}
+
+H_Alignment :: enum{
+    Top, Center, Bottom
+}
+
 UI_Text :: struct{
     content : string,
     font_size : i32,
     text_color : rl.Color,
+    valign : V_Alignment,
+    halign : H_Alignment,
 }
 //Tooltip
 UI_ToolTip :: struct {

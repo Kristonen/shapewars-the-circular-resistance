@@ -10,6 +10,8 @@ create_button :: proc(text : string, pos : rl.Vector2, size : rl.Vector2) -> UI_
             content = text,
             font_size = 50,
             text_color = rl.WHITE,
+            halign = .Center,
+            valign = .Center,
         },
         rec = {
             x = pos.x,

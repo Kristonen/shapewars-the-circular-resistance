@@ -17,8 +17,20 @@ create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
 
 create_bullet_upgrade :: proc(name : string, desc : string, value : Upgrade_Value, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
     return {
-        name = name,
-        desc = desc,
+        name = {
+            content = name,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE,
+        },
+        desc = {
+            content = desc,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE
+        },
         value = value,
         texture = rl.BLACK,
         rarity = rarity,

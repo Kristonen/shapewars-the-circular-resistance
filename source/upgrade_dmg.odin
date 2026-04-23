@@ -13,8 +13,20 @@ create_dmg_upgrades :: proc(a : ^[dynamic]Upgrade){
 
 create_dmg_upgrade :: proc(name : string, desc : string, value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
     return{
-        name = name,
-        desc = desc,
+        name = {
+            content = name,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE,
+        },
+        desc = {
+            content = desc,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE
+        },
         value = value,
         texture = rl.BLACK,
         rarity = rarity,
@@ -26,8 +38,20 @@ create_dmg_upgrade :: proc(name : string, desc : string, value : f32, type : Upg
 
 create_ls_upgrade :: proc(name : string, desc : string, value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
     return{
-        name = name,
-        desc = desc,
+        name = {
+            content = name,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE,
+        },
+        desc = {
+            content = desc,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE
+        },
         value = value,
         texture = rl.BLACK,
         rarity = rarity,

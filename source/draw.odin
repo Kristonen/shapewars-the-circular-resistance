@@ -127,31 +127,46 @@ draw_upgrade :: proc(){
         if slot.state == .Focused{
             gray = {180, 180, 180, 150}
         }
+        //Draw whole upgrade rec
         rl.DrawRectangleV({slot.rect.x, slot.rect.y}, {slot.rect.width, slot.rect.height}, gray)
         rl.DrawRectangleLinesEx(slot.rect, 5, slot.color)
-
-        rect := rl.Rectangle {slot.rect.x + 25, slot.rect.y + 100, slot.rect.width - 50, 50}
-        rl.DrawRectangleV({rect.x, rect.y}, {rect.width, rect.height}, rl.BLACK)
-        draw_text(slot.upgrade.name, rect)
-
-        texture_rect := rect
-        texture_rect.x = slot.rect.x + slot.rect.width/2 - 32
-        texture_rect.y += rect.height + 50
-        rl.DrawRectangleV({texture_rect.x, texture_rect.y}, {64, 64}, slot.color)
-        rect.y += 64 + 150
-        rl.DrawRectangleV({rect.x, rect.y}, {rect.width, 200}, rl.BLACK)
+        //Draw head of upgrade (name)
+        rec := rl.Rectangle {slot.rect.x + 25, slot.rect.y + 100, slot.rect.width - 50, 50}
+        rl.DrawRectangleV({rec.x, rec.y}, {rec.width, rec.height}, rl.BLACK)
+        draw_better_text(slot.upgrade.name, rec)
+        //Draw icon
+        texture_rec := rec
+        texture_rec.x = slot.rect.x + slot.rect.width/2 - 32
+        texture_rec.y += rec.height + 50
+        rl.DrawRectangleV({texture_rec.x, texture_rec.y}, {64, 64}, slot.color)
+        //Draw desc rec of upgrade
+        rec.y += 64 + 150
+        rl.DrawRectangleV({rec.x, rec.y}, {rec.width, 200}, rl.BLACK)
         desc : string
         if slot.upgrade.max_used > 0{
-            desc = fmt.tprintf("%v\n\n\tUsed: %i/%i", slot.upgrade.desc, slot.upgrade.count_used, slot.upgrade.max_used)
+            desc = fmt.tprintf("%v\n\n\tUsed: %i/%i", slot.upgrade.desc.content, slot.upgrade.count_used, slot.upgrade.max_used)
         } else {
-            desc = fmt.tprintf("%v\n\n\tUsed: %i", slot.upgrade.desc, slot.upgrade.count_used)
+            desc = fmt.tprintf("%v\n\n\tUsed: %i", slot.upgrade.desc.content, slot.upgrade.count_used)
         }
         
-        draw_text(desc, rect, 20)
-        rect.y = slot.rect.y + slot.rect.height - 100
-        rl.DrawRectangleV({rect.x, rect.y}, {rect.width, rect.height}, rl.BLACK)
+        // draw_text(desc, rec, 20)
+        ui_desc := slot.upgrade.desc
+        ui_desc.content = desc
+        ui_desc.font_size = 20
+        draw_better_text(ui_desc, rec)
+        //Draw rarirty rec
+        rec.y = slot.rect.y + slot.rect.height - 100
+        rl.DrawRectangleV({rec.x, rec.y}, {rec.width, rec.height}, rl.BLACK)
         r_string := fmt.tprintf("%v", slot.upgrade.rarity)
-        draw_text(r_string, rect, 20, slot.color)
+        rarity_text := ui.UI_Text{
+            content = r_string,
+            font_size = 30,
+            halign = .Center,
+            valign = .Center,
+            text_color = slot.color
+        }
+        draw_better_text(rarity_text, rec)
+        // draw_text(r_string, rec, 20, slot.color)
     }
 }
 
@@ -183,8 +198,15 @@ draw_progress_bar :: proc(bar : ui.UI_Progress_Bar){
     rl.DrawRectangleV({f_bar.x, f_bar.y}, {f_bar.width, f_bar.height}, bar.fill_color)
 
     if bar.show_text{
-        text := fmt.tprintf("%0.f/%0.f", bar.value, bar.max);
-        draw_text(text, bar.rec)
+        content := fmt.tprintf("%0.f/%0.f", bar.value, bar.max);
+        text := ui.UI_Text{
+            content = content,
+            valign = .Center,
+            halign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE,
+        }
+        draw_better_text(text, bar.rec)
     }
 }
 
@@ -213,7 +235,35 @@ draw_text :: proc(text : string, r : rl.Rectangle, font_size : i32 = 30, color :
     text_height : i32 = font_size
     text_x := i32(r.x) + (i32(r.width) - text_width) / 2
     text_y := i32(r.y) + (i32(r.height) - text_height) / 2
-    rl.DrawText(ctext, i32(text_x), i32(text_y), font_size, color)
+    rl.DrawText(ctext, text_x, text_y, font_size, color)
+    delete(ctext)
+}
+
+draw_better_text :: proc(t : ui.UI_Text, rec : rl.Rectangle){
+    ctext := strings.clone_to_cstring(t.content)
+    text_width := rl.MeasureText(ctext, t.font_size)
+    text_height : i32 = t.font_size
+    //
+    text_x : i32
+    text_y : i32
+    switch t.valign{
+        case .Left:
+            text_x = i32(rec.x) + 10
+        case .Center:
+            text_x = i32(rec.x) + (i32(rec.width) - text_width) / 2
+        case .Right:
+            text_x = i32(rec.x + rec.width) - text_width - 10
+    }
+
+    switch t.halign{
+        case .Top:
+            text_y = i32(rec.y) + 10
+        case .Center:
+            text_y = i32(rec.y) + (i32(rec.height) - text_height) / 2
+        case .Bottom:
+            text_y = i32(rec.y + rec.height) - text_height - 10
+    }
+    rl.DrawText(ctext, text_x, text_y, t.font_size, t.text_color)
     delete(ctext)
 }
 
@@ -238,13 +288,13 @@ draw_menu :: proc(){
 draw_button :: proc(b : ui.UI_Button){
     rl.DrawRectangleV({b.rec.x, b.rec.y}, {b.rec.width, b.rec.height}, b.color)
     rl.DrawRectangleLinesEx(b.rec, 5, rl.BLACK)
-    draw_text(b.text, b.rec)
+    draw_better_text(b.text, b.rec)
 }
 
 draw_label :: proc(l : ui.UI_Label){
     rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
     rl.DrawRectangleLinesEx(l.rec, 5, rl.BLACK)
-    draw_text(l.text, l.rec)
+    draw_better_text(l.text, l.rec)
 }
 
 draw_slider :: proc(s : ui.UI_Slider){

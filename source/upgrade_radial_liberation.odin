@@ -1,6 +1,7 @@
 package game
 
-import "core:fmt"
+import rl "vendor:raylib"
+
 create_rl_upgrades :: proc(a : ^[dynamic]Upgrade){
     epic := create_rl_upgrade("More Bullets", "Increase the amount of bullets by 2.", 2, .Additive, .Epic)
     uncommon := create_rl_upgrade("Radical Damage", "Increase the damage of your ability by 5.", 5, .Additive, .Uncommon)
@@ -23,8 +24,20 @@ create_rl_upgrade :: proc(name : string, desc : string,
     value : Upgrade_Value, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
     
     return{
-        name = name,
-        desc = desc,
+        name = {
+            content = name,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE,
+        },
+        desc = {
+            content = desc,
+            halign = .Center,
+            valign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE
+        },
         value = value,
         type = type,
         rarity = rarity,

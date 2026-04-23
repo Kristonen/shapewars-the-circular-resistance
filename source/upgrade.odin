@@ -3,6 +3,7 @@ package game
 import "core:fmt"
 import "core:math/rand"
 import rl "vendor:raylib"
+import "ui"
 
 Apply_Upgrade :: #type proc(u : Upgrade)
 
@@ -22,8 +23,8 @@ Upgrade_Value :: union{
 }
 
 Upgrade :: struct{
-    name : string,
-    desc : string,
+    name : ui.UI_Text,
+    desc : ui.UI_Text,
     value : Upgrade_Value,
     texture : rl.Color,
     rarity : Rarity,
