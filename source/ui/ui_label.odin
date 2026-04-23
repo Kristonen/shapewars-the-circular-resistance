@@ -6,7 +6,7 @@ create_label :: proc(text : string, pos : rl.Vector2, size : rl.Vector2) -> UI_L
     return {
         text = {
             content = text,
-            font_size = 50,
+            font_size = 30,
             text_color = rl.WHITE,
             halign = .Center,
             valign = .Center,

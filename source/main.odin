@@ -321,7 +321,7 @@ sync_menu :: proc(){
             btn.type = .Back
             append(&game.menu.elements, btn)
 
-            label := ui.create_label("Test:", {100, 100}, {500, 100})
+            label := ui.create_label("Test dauwildjwaj wdajaidwjaidj  wdjaidjaiod:", {100, 100}, {500, 100})
             append(&game.menu.elements, label)
 
             slider := ui.create_slider({700, 100}, {1000, 100})

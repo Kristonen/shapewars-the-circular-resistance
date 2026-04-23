@@ -263,8 +263,50 @@ draw_better_text :: proc(t : ui.UI_Text, rec : rl.Rectangle){
         case .Bottom:
             text_y = i32(rec.y + rec.height) - text_height - 10
     }
-    rl.DrawText(ctext, text_x, text_y, t.font_size, t.text_color)
+    other_text := t
+    wrap_text_to_rec(&other_text, rec, {f32(text_x), f32(text_y)})
+    draw_ctext := strings.clone_to_cstring(other_text.content)
+    rl.DrawText(draw_ctext, text_x, text_y, t.font_size, t.text_color)
     delete(ctext)
+    delete(draw_ctext)
+}
+
+wrap_text_to_rec :: proc(t : ^ui.UI_Text, rec : rl.Rectangle, text_start : rl.Vector2){
+// 1. Use temp memory so we don't leak strings every frame
+    // builder := strings.make_builder(context.temp_allocator)
+    builder : strings.Builder
+    strings.builder_init(&builder, context.temp_allocator)
+    
+    // 2. Split the text into individual words
+    words := strings.split(t.content, " ", context.temp_allocator)
+    
+    current_line_width: f32 = 0
+    space_width := f32(rl.MeasureText(" ", t.font_size))
+
+    for word, i in words {
+        // Measure the word
+        word_width := f32(rl.MeasureText(strings.clone_to_cstring(word, context.temp_allocator), t.font_size))
+
+        // 3. If word doesn't fit, move to next line
+        if current_line_width + word_width > rec.width {
+            strings.write_string(&builder, "\n")
+            current_line_width = 0
+        }
+
+        // 4. Write the word
+        strings.write_string(&builder, word)
+        current_line_width += word_width
+
+        // Add a space back if it's not the last word of the original text
+        if i < len(words) - 1 {
+            strings.write_string(&builder, " ")
+            current_line_width += space_width
+        }
+    }
+
+    // Assign the newly formatted string back to the text component
+    t.content = strings.to_string(builder)
+    strings.builder_destroy(&builder)
 }
 
 draw_menu :: proc(){
