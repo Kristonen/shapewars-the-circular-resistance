@@ -36,8 +36,7 @@ check_bullet :: proc(g : ^Game_State){
 
 check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
     for &e in g.current_level.enemies{
-        e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
-        if rl.CheckCollisionCircleRec(b.pos, b.radius, e_rect){
+        if rl.CheckCollisionCircleRec(b.pos, b.radius, e.rec){
 
             if !check_if_enemy_already_hitted(&e, b^){
                 e.on_hit(g, &e, b.damage)
@@ -99,8 +98,7 @@ check_bullet_player :: proc(g : ^Game_State){
 
 check_enemy_player :: proc(g : ^Game_State){
     for &e in g.current_level.enemies{
-        e_rect := rl.Rectangle{x = e.pos.x, y = e.pos.y, width = e.width, height = e.height}
-        if rl.CheckCollisionCircleRec(g.player.collider.pos, g.player.collider.radius, e_rect) && g.player.health.invincible_timer <= 0{
+        if rl.CheckCollisionCircleRec(g.player.collider.pos, g.player.collider.radius, e.rec) && g.player.health.invincible_timer <= 0{
             add_enemy_status_to_player(e, &g.player)
             g.player.health.take_dmg(&g.player.health, 10)
             g.player.health.invincible_timer = 2
@@ -197,14 +195,8 @@ check_collision_menu :: proc(g : ^Game_State){
 
 check_collision_button :: proc(b : ^ui.UI_Button){
     mouse_pos := rl.GetMousePosition()
-    rec := rl.Rectangle{
-        x = b.pos.x,
-        y = b.pos.y,
-        width = b.width,
-        height = b.height,
-    }
 
-    if rl.CheckCollisionPointRec(mouse_pos, rec){
+    if rl.CheckCollisionPointRec(mouse_pos, b.rec){
         b.state = .Focus
         if rl.IsMouseButtonDown(.LEFT){
             b.state = .Pressing
@@ -253,23 +245,17 @@ check_in_game_ui_tooltip :: proc(){
 
 check_mouse_status_slot :: proc(slot : ^ui.UI_Status_Slot){
     mouse_pos := rl.GetMousePosition()
-    rec := rl.Rectangle{
-        width = slot.width,
-        height = slot.height,
-        x = slot.pos.x,
-        y = slot.pos.y,
-    }
-    if rl.CheckCollisionPointRec(mouse_pos, rec){
+    if rl.CheckCollisionPointRec(mouse_pos, slot.rec){
         game.tooltip_ptr = any{data = rawptr(slot), id = typeid_of(ui.UI_Status_Slot)}
-        game.tooltip_pos = slot.pos
+        game.tooltip_pos = {slot.rec.x, slot.rec.y}
     }
 }
 
 check_mouse_progress_bar :: proc(pb : ^ui.UI_Progress_Bar){
     mouse_pos := rl.GetMousePosition()
     
-    if rl.CheckCollisionPointRec(mouse_pos, pb.rect){
+    if rl.CheckCollisionPointRec(mouse_pos, pb.rec){
         game.tooltip_ptr = any{data = rawptr(pb), id = typeid_of(ui.UI_Progress_Bar)}
-        game.tooltip_pos = {pb.rect.x, pb.rect.y}
+        game.tooltip_pos = {pb.rec.x, pb.rec.y}
     }
 }

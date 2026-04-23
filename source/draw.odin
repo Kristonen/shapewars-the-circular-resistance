@@ -78,12 +78,12 @@ draw_bullet :: proc(g : Game_State){
 
 draw_enemies :: proc(g : Game_State){
     for e in g.current_level.enemies{
-        width := e.width * e.visual_scale.x
-        height := e.height * e.visual_scale.y
-        pos := e.pos
-        if width != e.width{
-            pos.x -= (width - e.width) / 2
-            pos.y += (height - e.height) / 2 
+        width := e.rec.width * e.visual_scale.x
+        height := e.rec.height * e.visual_scale.y
+        pos : rl.Vector2 = {e.rec.x, e.rec.y}
+        if width != e.rec.width{
+            pos.x -= (width - e.rec.width) / 2
+            pos.y += (height - e.rec.height) / 2 
         }
         rl.DrawRectangleV(pos, {width, height}, e.color)
         draw_progress_bar(e.health_bar)
@@ -101,7 +101,8 @@ draw_fragments :: proc(g : Game_State){
 
 draw_loot :: proc(g : Game_State){
     for l in g.current_level.loot{
-        rl.DrawRectangleV(l.pos, l.size, l.color)
+        rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
+        // rl.DrawRectangleRec(l.rec, l.color)
         if g.helper_activated{
             draw_collider_circle(l.detection)
             draw_collider_circle(l.pickup)
@@ -177,21 +178,21 @@ draw_in_game_ui :: proc(g : Game_State){
 
 draw_progress_bar :: proc(bar : ui.UI_Progress_Bar){
     b_bar, f_bar := ui.get_health_bars(bar, 2.0)
-    rl.DrawRectangleV({bar.rect.x, bar.rect.y}, {bar.rect.width, bar.rect.height}, bar.outline_color)
+    rl.DrawRectangleV({bar.rec.x, bar.rec.y}, {bar.rec.width, bar.rec.height}, bar.outline_color)
     rl.DrawRectangleV({b_bar.x, b_bar.y}, {b_bar.width, b_bar.height}, bar.background_color)
     rl.DrawRectangleV({f_bar.x, f_bar.y}, {f_bar.width, f_bar.height}, bar.fill_color)
 
     if bar.show_text{
         text := fmt.tprintf("%0.f/%0.f", bar.value, bar.max);
-        draw_text(text, bar.rect)
+        draw_text(text, bar.rec)
     }
 }
 
 draw_cooldown :: proc(cd : ui.UI_Cooldown){
-    rl.DrawRectangleV({cd.pos.x, cd.pos.y}, {cd.width, cd.height}, rl.BLACK)
+    rl.DrawRectangleV({cd.rec.x, cd.rec.y}, {cd.rec.width, cd.rec.height}, rl.BLACK)
     color := rl.Color{255, 255, 255, 100}
-    height := cd.height * (cd.value/cd.max)
-    rl.DrawRectangleV({cd.pos.x, cd.pos.y}, {cd.width, height}, color)
+    height := cd.rec.height * (cd.value/cd.max)
+    rl.DrawRectangleV({cd.rec.x, cd.rec.y}, {cd.rec.width, height}, color)
 }
 
 draw_collider_circle :: proc(c : collider.Collider_Circle){
@@ -203,7 +204,7 @@ draw_collider_circle :: proc(c : collider.Collider_Circle){
 draw_collider_rect :: proc(c : collider.Collider_Rectangle){
     color := rl.GREEN
     color.a = 100
-    rl.DrawRectangleV(c.pos, {c.width, c.height}, color)
+    rl.DrawRectangleV({c.rec.x, c.rec.y}, {c.rec.width, c.rec.height}, color)
 }
 
 draw_text :: proc(text : string, r : rl.Rectangle, font_size : i32 = 30, color : rl.Color = rl.WHITE){
@@ -235,35 +236,29 @@ draw_menu :: proc(g : Game_State){
 }
 
 draw_button :: proc(b : ui.UI_Button){
-    rect := rl.Rectangle{
-        x = b.pos.x,
-        y = b.pos.y,
-        width = b.width,
-        height = b.height,
-    }
-    rl.DrawRectangleV(b.pos, {b.width, b.height}, b.color)
-    rl.DrawRectangleLinesEx(rect, 5, rl.BLACK)
-    draw_text(b.text, rect)
+    rl.DrawRectangleV({b.rec.x, b.rec.y}, {b.rec.width, b.rec.height}, b.color)
+    rl.DrawRectangleLinesEx(b.rec, 5, rl.BLACK)
+    draw_text(b.text, b.rec)
 }
 
 draw_label :: proc(l : ui.UI_Label){
-    rl.DrawRectangleV(l.pos, {l.width, l.height}, l.color)
-    rl.DrawRectangleLinesEx({l.pos.x, l.pos.y, l.width, l.height}, 5, rl.BLACK)
-    draw_text(l.text, {l.pos.x, l.pos.y, l.width, l.height})
+    rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
+    rl.DrawRectangleLinesEx(l.rec, 5, rl.BLACK)
+    draw_text(l.text, l.rec)
 }
 
 draw_slider :: proc(s : ui.UI_Slider){
     end_pos := rl.Vector2{
-        s.pos.x + s.width, s.pos.y
+        s.rec.x + s.rec.width, s.rec.y
     }
     // rl.DrawLineV(s.pos, end_pos, rl.BLACK)
-    rl.DrawLineEx(s.pos, end_pos, 5, rl.BLACK)
+    rl.DrawLineEx({s.rec.x, s.rec.y}, end_pos, 5, rl.BLACK)
     rl.DrawRectangleV({s.slider.x, s.slider.y}, {s.slider.width, s.slider.height}, s.color)
 }
 
 draw_status_bar :: proc(sbar : ui.UI_Status_Bar){
     for slot in sbar.slots{
-        rl.DrawRectangleV(slot.pos, {slot.width, slot.height}, slot.texture)
+        rl.DrawRectangleV({slot.rec.x, slot.rec.y}, {slot.rec.width, slot.rec.height}, slot.texture)
     }
 }
 
@@ -271,12 +266,7 @@ draw_tooltip :: proc(){
     if game.tooltip_ptr == nil do return
     if game.tooltip_timer > 0 do return
 
-    rl.DrawRectangleV(game.tooltip.pos, {game.tooltip.width, game.tooltip.height}, game.tooltip.color)
-    rec := rl.Rectangle{
-        width = game.tooltip.width,
-        height = game.tooltip.height,
-        x = game.tooltip.pos.x,
-        y = game.tooltip.pos.y,
-    }
-    draw_text(game.tooltip.text.text, rec, game.tooltip.text.font_size, game.tooltip.text.text_color)
+    rl.DrawRectangleV({game.tooltip.rec.x, game.tooltip.rec.y}, 
+        {game.tooltip.rec.width, game.tooltip.rec.height}, game.tooltip.color)
+    draw_text(game.tooltip.text.text, game.tooltip.rec, game.tooltip.text.font_size, game.tooltip.text.text_color)
 }

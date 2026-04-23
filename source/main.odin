@@ -52,9 +52,12 @@ main :: proc(){
     sync_menu(&game)
 
     cooldown := ui.UI_Cooldown{
-        pos = {550, f32(rl.GetScreenHeight() - 100)},
-        width = 64,
-        height = 64,
+        rec = {
+            x = 550,
+            y = f32(rl.GetScreenHeight() - 100),
+            width = 64,
+            height = 64,
+        },
         icon = rl.LoadTexture("assets/igel.png")
     }
     
@@ -113,7 +116,7 @@ main :: proc(){
         level := create_start_level()
         level.level_visual = level_visual
 
-        spawner := create_spawner(1, 1, 1, 500)
+        spawner := create_spawner(1, 1, 1, 1)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
@@ -158,7 +161,7 @@ main :: proc(){
         p_bar.type = .Health
 
         v_bar := p_bar
-        v_bar.rect.x += p_bar.rect.width + 100
+        v_bar.rec.x += p_bar.rec.width + 100
         v_bar.fill_color = rl.BLUE
         v_bar.type = .Value
 
@@ -181,7 +184,7 @@ main :: proc(){
         game.player.h_bar = p_bar
         game.player.v_bar = v_bar
 
-        pos : rl.Vector2 = {p_bar.rect.x, p_bar.rect.y - 25}
+        pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
         status_bar := ui.create_ui_status_bar(pos)
 
         append(&game.current_level.ui_elements, cooldown)
@@ -301,11 +304,11 @@ sync_menu :: proc(g : ^Game_State){
             btn := ui.create_button("Continue", {pos_x, pos_y}, {width, height})
             btn.type = .Continue
             append(&g.menu.elements, btn)
-            pos_y += btn.height * 2 + 50 
+            pos_y += btn.rec.height * 2 + 50 
             btn = ui.create_button("Options", {pos_x, pos_y}, {width, height})
             btn.type = .Options
             append(&g.menu.elements, btn)
-            pos_y += btn.height * 2 + 50 
+            pos_y += btn.rec.height * 2 + 50 
             btn = ui.create_button("Exit", {pos_x, pos_y}, {width, height})
             btn.type = .Exit
             append(&g.menu.elements, btn)

@@ -40,18 +40,14 @@ UI_Button :: struct{
     n_color : rl.Color,
     f_color : rl.Color,
     p_color : rl.Color,
-    pos : rl.Vector2,
-    width : f32,
-    height : f32,
+    rec : rl.Rectangle,
     state : Button_State,
     type : Button_Type,
 }
 
 //UI Cooldown
 UI_Cooldown :: struct{
-    width : f32,
-    height : f32,
-    pos : rl.Vector2,
+    rec : rl.Rectangle,
     value : f32,
     max : f32,
     icon : rl.Texture2D,
@@ -60,9 +56,10 @@ UI_Cooldown :: struct{
 //UI_Label
 UI_Label :: struct{
     text : string,
-    pos : rl.Vector2,
-    width : f32,
-    height : f32,
+    rec : rl.Rectangle,
+    // pos : rl.Vector2,
+    // width : f32,
+    // height : f32,
     font_size : i32,
     text_color : rl.Color,
     color : rl.Color,
@@ -78,7 +75,7 @@ UI_Progress_Bar :: struct{
     min : f32,
     max : f32,
     value : f32,
-    rect : rl.Rectangle,
+    rec : rl.Rectangle,
     roundness : f32,
     segments : i32,
     outline_color : rl.Color,
@@ -93,9 +90,7 @@ Slider_state :: enum{
 }
 
 UI_Slider :: struct{
-    pos : rl.Vector2,
-    width : f32,
-    height : f32,
+    rec : rl.Rectangle,
     slider : rl.Rectangle,
     state : Slider_state,
     color : rl.Color,
@@ -110,10 +105,24 @@ UI_Text :: struct{
 }
 //Tooltip
 UI_ToolTip :: struct {
-    pos : rl.Vector2,
-    width : f32,
-    height : f32,
+    rec : rl.Rectangle,
     color : rl.Color,
     text : UI_Text,
     is_active : bool,
+}
+//Status
+UI_Status_Bar :: struct{
+    pos : rl.Vector2,
+    complete_width : f32,
+    complete_height : f32,
+    slot_width : f32,
+    slot_height : f32,
+    seperation : f32,
+    slots : [dynamic]UI_Status_Slot,
+}
+
+UI_Status_Slot :: struct{
+    rec : rl.Rectangle,
+    texture : rl.Color,
+    text : string,
 }

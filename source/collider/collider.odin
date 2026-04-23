@@ -8,9 +8,10 @@ Collider :: union{
 }
 
 Collider_Rectangle :: struct {
-    pos : rl.Vector2,
-    width : f32,
-    height : f32,
+    rec : rl.Rectangle,
+    // pos : rl.Vector2,
+    // width : f32,
+    // height : f32,
 }
 
 Collider_Circle :: struct{

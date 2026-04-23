@@ -4,7 +4,7 @@ import rl "vendor:raylib"
 
 create_progress_bar :: proc(rect : rl.Rectangle, o_color, b_color, f_color : rl.Color) -> UI_Progress_Bar{
     bar : UI_Progress_Bar
-    bar.rect = rect
+    bar.rec = rect
     bar.outline_color = o_color
     bar.background_color = b_color
     bar.fill_color = f_color
@@ -13,7 +13,7 @@ create_progress_bar :: proc(rect : rl.Rectangle, o_color, b_color, f_color : rl.
 }
 //TODO instead of creating 3 different rectangles use the black one for DrawRectangleLinesEX
 get_health_bars :: proc(p : UI_Progress_Bar, margin : f32) -> (rl.Rectangle, rl.Rectangle){
-    inner_health_bar := p.rect
+    inner_health_bar := p.rec
     inner_health_bar.x += margin
     inner_health_bar.y += margin
     inner_health_bar.height -= margin * 2

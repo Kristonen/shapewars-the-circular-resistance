@@ -175,21 +175,23 @@ update_spawner :: proc(g : ^Game_State, dt : f32){
             s.spawn_timer -= dt
             continue
         }
-        new_enemy := s.enemy
-        new_enemy.pos = handler.get_random_spawn_pos(g.camera)
-        rect := rl.Rectangle{
-            width = new_enemy.width + 20,
+        new_e := s.enemy
+        pos := handler.get_random_spawn_pos(g.camera)
+        new_e.rec.x = pos.x
+        new_e.rec.y = pos.y
+        rec := rl.Rectangle{
+            width = new_e.rec.width + 20,
             height = 10,
-            x = new_enemy.pos.x + 10,
-            y = new_enemy.pos.y + 20,
+            x = new_e.rec.x + 10,
+            y = new_e.rec.y + 20,
         }
-        new_enemy.health_bar = ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
-        new_enemy.health_bar.value = new_enemy.health.current
-        new_enemy.health_bar.max = new_enemy.health.max
-        new_enemy.spawner = &s
+        new_e.health_bar = ui.create_progress_bar(rec, rl.BLACK, rl.GRAY, rl.RED)
+        new_e.health_bar.value = new_e.health.current
+        new_e.health_bar.max = new_e.health.max
+        new_e.spawner = &s
         s.count += 1
         s.spawn_timer = s.spawn_time
-        append(&g.current_level.enemies, new_enemy)
+        append(&g.current_level.enemies, new_e)
     }
 }
 
@@ -202,7 +204,10 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
         }
         kb_speed := rl.Vector2Length(e.knocback.vel)
         if kb_speed > e.knocback.threshold{
-            e.pos += e.knocback.vel * dt
+            pos : rl.Vector2 = {e.rec.x, e.rec.y}
+            pos += e.knocback.vel * dt
+            e.rec.x = pos.x
+            e.rec.y = pos.y
             e.knocback.vel *= e.knocback.friction
             e.visual_scale.x = 1.0 + (kb_speed * 0.005)
             e.visual_scale.y = 1.0 - (kb_speed * 0.005)
@@ -218,11 +223,12 @@ update_enemy :: proc(g : ^Game_State, dt : f32){
             }
         }
         
-        e.origin = {e.pos.x + e.width/2, e.pos.y + e.height/2}
-        e.collidor.pos = e.pos
+        e.origin = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
+        e.collidor.rec.x = e.rec.x
+        e.collidor.rec.y = e.rec.y
         e.health_bar.value = e.health.current
-        e.health_bar.rect.x = e.pos.x - 10
-        e.health_bar.rect.y = e.pos.y - 20
+        e.health_bar.rec.x = e.rec.x - 10
+        e.health_bar.rec.y = e.rec.y - 20
         update_enemy_status(g, &e, dt)
     }
     
@@ -276,21 +282,24 @@ update_loot :: proc(g : ^Game_State, dt : f32){
                 l.is_active = true
                 continue
             }
-            l.pos += l.dir * l.speed * dt
-            l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
-            l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
+            pos : rl.Vector2 = {l.rec.x, l.rec.y} + l.dir * l.speed * dt
+            l.rec.x = pos.x
+            l.rec.y = pos.y
+            l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+            l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
         }
         if !l.is_following do continue
-        dir := g.player.pos - l.pos
+        dir := g.player.pos - {l.rec.x, l.rec.y}
         dir = rl.Vector2Normalize(dir)
 
         if l.current_speed <= l.max_speed{
             l.current_speed += l.acceleration
         }
-
-        l.pos += dir * l.current_speed * dt
-        l.detection.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
-        l.pickup.pos = {l.pos.x + l.size.x/2, l.pos.y + l.size.y/2}
+        pos : rl.Vector2 = {l.rec.x, l.rec.y} + dir * l.current_speed * dt
+        l.rec.x = pos.x
+        l.rec.y = pos.y
+        l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+        l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
     }
 }
 
@@ -408,12 +417,12 @@ update_tooltip :: proc(dt : f32){
 
     switch &t in game.tooltip_ptr{
         case ui.UI_Status_Slot:
-            game.tooltip = ui.create_tooltip(t.pos)
+            game.tooltip = ui.create_tooltip({t.rec.x, t.rec.y})
             game.tooltip.text.text = t.text
             game.tooltip.text.font_size = 20
             game.tooltip.text.text_color = rl.WHITE
         case ui.UI_Progress_Bar:
-            game.tooltip = ui.create_tooltip({t.rect.x, t.rect.y})
+            game.tooltip = ui.create_tooltip({t.rec.x, t.rec.y})
             game.tooltip.text.text = fmt.tprintf("%0.0f/%0.0f", t.value, t.max)       
             game.tooltip.text.text_color = rl.WHITE
     }

@@ -35,11 +35,12 @@ Behavior_Data :: union{
 }
 
 Enemy :: struct {
-    pos : rl.Vector2,
+    rec : rl.Rectangle,
     origin : rl.Vector2,
     speed : f32,
-    width : f32,
-    height : f32,
+    // pos : rl.Vector2,
+    // width : f32,
+    // height : f32,
     visual_scale : rl.Vector2,
     color : rl.Color,
     collidor : cl.Collider_Rectangle,
@@ -74,16 +75,17 @@ Knockback :: struct{
     vel : rl.Vector2,
     threshold : f32,
     friction : f32,
-    apply : proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2),
+    apply : proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Rectangle),
 }
 
-apply_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2){
-    dir := v_pos^ - a_pos
+apply_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, rec : ^rl.Rectangle){
+    pos : rl.Vector2 = {rec.x, rec.y}
+    dir := pos - a_pos
     dir = rl.Vector2Normalize(dir)
     k.vel += dir * k.strength
 }
 
-apply_no_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2){}
+apply_no_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Rectangle){}
 
 
 create_dummy_enemy :: proc() -> Enemy{
@@ -163,24 +165,23 @@ create_third_enemy :: proc() -> Enemy{
     return e
 }
 
-create_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
+create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
     e := Enemy{
-        width = rect.width,
-        height = rect.height,
+        rec = rec,
         speed = speed,
         color = color,
         visual_scale = {1, 1},
         on_hit = on_hit,
         on_death = on_death,
     }
-    e.collidor = { width = e.width, height = e.height}
+    e.collidor.rec = rec
     return e
 }
 
 on_hit :: proc(g : ^Game_State, e : ^Enemy, dmg : f32){
-    p_pos : rl.Vector2 = {e.pos.x + e.width/2, e.pos.y + e.height/2}
+    p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
     g.create_hit_particle(&g.current_level.particles, e.origin)
-    e.knocback->apply(g.player.pos, &e.pos)
+    e.knocback->apply(g.player.pos, &e.rec)
     e.health->take_dmg(dmg)
 }
 
@@ -191,18 +192,16 @@ on_death :: proc(g : ^Game_State, e : Enemy, idx : i32){
     if spawner := (^Spawner)(e.spawner); spawner != nil{
         spawner.count -= 1
     }
-    // spawner : ^Spawner = (^Spawner)(e.spawner)
-    // spawner.count -= 1
     create_fragments_death(&g.current_level.enemy_fragments ,e)
     unordered_remove(&g.current_level.enemies, idx)
 }
 
 create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){
     f : Enemy_Death_Fragment
-    f.pos.x = e.pos.x
-    f.pos.y = e.pos.y
-    f.width = e.width/2
-    f.height = e.height/2
+    f.pos.x = e.rec.x
+    f.pos.y = e.rec.y
+    f.width = e.rec.width/2
+    f.height = e.rec.height/2
     f.speed = rand.float32_range(10, 20)
     f.life_time = rand.float32_range(3, 5)
     f.move_time = 0.25
@@ -219,7 +218,7 @@ create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){
     f.life_time = rand.float32_range(3, 8)
     f.vel = {1, 1}
     append(a, f)
-    f.pos.x = e.pos.x
+    f.pos.x = e.rec.x
     f.speed = rand.float32_range(10, 100)
     f.life_time = rand.float32_range(3, 8)
     f.vel = {-1, 1}
@@ -227,38 +226,47 @@ create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){
 }
 
 melee_enemy_behavior :: proc(e : ^Enemy, data : Melee_Data, player_pos : rl.Vector2, dt : f32){
-    dir := player_pos - e.pos
+    dir := player_pos - {e.rec.x, e.rec.y}
     vel := rl.Vector2Normalize(dir) * e.speed
-    e.pos += vel * dt
+    new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
+    new_pos += vel * dt
+    e.rec.x = new_pos.x
+    e.rec.y = new_pos.y
 }
 
 distance_enemy_behavior :: proc(e : ^Enemy, data : ^Distance_Data, g : ^Game_State, dt : f32){
-    dist := rl.Vector2Distance(e.pos, g.player.pos)
+    dist := rl.Vector2Distance({e.rec.x, e.rec.y}, g.player.pos)
     if data.max_distance <= dist{
-        dir := g.player.pos - e.pos
+        dir := g.player.pos - {e.rec.x, e.rec.y}
         vel := rl.Vector2Normalize(dir) * e.speed
-        e.pos += vel * dt
+        new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
+        new_pos += vel * dt
+        e.rec.x = new_pos.x
+        e.rec.y = new_pos.y
     } else if data.weapon.cooldown >= 0{
         data.weapon.cooldown -= dt
     } else{
         data.weapon.cooldown = data.weapon.fire_rate
         b := data.weapon.bullet
         pos := rl.Vector2{
-            e.pos.x + e.width/2, e.pos.y + e.height/2
+            e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2
         }
         b.pos = pos
-        dir := g.player.pos - e.pos
+        dir := g.player.pos - {e.rec.x, e.rec.y}
         b.dir = rl.Vector2Normalize(dir)
         append(&g.current_level.enemy_bullets, b)
     }
 }
 
 charge_enemy_behavior :: proc(e : ^Enemy, data : ^Charge_Data, g : ^Game_State, dt : f32){
-    dist := rl.Vector2Distance(g.player.pos, e.pos)
+    dist := rl.Vector2Distance(g.player.pos, {e.rec.x, e.rec.y})
     if data.max_distance <= dist && !data.is_charging{
-        dir := g.player.pos - e.pos
+        dir := g.player.pos - {e.rec.x, e.rec.y}
         vel := rl.Vector2Normalize(dir) * e.speed
-        e.pos += vel * dt
+        new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
+        new_pos += vel * dt
+        e.rec.x = new_pos.x
+        e.rec.y = new_pos.y
         return
     } else if !data.is_charging {
         data.is_charging = true
@@ -272,12 +280,15 @@ charge_enemy_behavior :: proc(e : ^Enemy, data : ^Charge_Data, g : ^Game_State, 
     }
 
     if data.is_charging{
-        dir := data.charge_pos - e.pos
+        dir := data.charge_pos - {e.rec.x, e.rec.y}
         vel := rl.Vector2Normalize(dir) * data.charge_speed
-        e.pos += vel * dt
+        new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
+        new_pos += vel * dt
+        e.rec.x = new_pos.x
+        e.rec.y = new_pos.y
     }
 
-    if data.is_charging && rl.Vector2Distance(e.pos, data.charge_pos) < 10{
+    if data.is_charging && rl.Vector2Distance({e.rec.x, e.rec.y}, data.charge_pos) < 10{
         data.is_charging = false
     }
 }

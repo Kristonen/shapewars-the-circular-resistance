@@ -10,9 +10,10 @@ Shard_Type :: enum {
 }
 
 Shape_Shard :: struct{
-    pos : rl.Vector2,
+    rec : rl.Rectangle,
+    // pos : rl.Vector2,
+    // size : rl.Vector2,
     value : f32,
-    size : rl.Vector2,
     detection : cl.Collider_Circle,
     pickup : cl.Collider_Circle,
     color : rl.Color,
@@ -52,13 +53,15 @@ spawn_shards :: proc(drops : ^[dynamic]Shape_Shard, count : i32, pos : rl.Vector
 give_shard_everything :: proc(shard : ^Shape_Shard, pos : rl.Vector2){
     shard.max_speed = 600
     shard.acceleration = 2
-    shard.pos = pos
+    shard.rec.x = pos.x
+    shard.rec.y = pos.y
     shard.value = 10
-    shard.size = {20, 20}
-    shard.detection.pos = {shard.pos.x + shard.size.x/2, shard.pos.y + shard.size.y/2}
-    shard.detection.radius = shard.size.x * 6
-    shard.pickup.pos = {shard.pos.x + shard.size.x/2, shard.pos.y + shard.size.y/2}
-    shard.pickup.radius = shard.size.x / 4
+    shard.rec.width = 20
+    shard.rec.height = 20
+    shard.detection.pos = {shard.rec.x + shard.rec.width/2, shard.rec.y + shard.rec.height/2}
+    shard.detection.radius = shard.rec.width * 6
+    shard.pickup.pos = {shard.rec.x + shard.rec.width/2, shard.rec.y + shard.rec.height/2}
+    shard.pickup.radius = shard.rec.width / 4
 
     roll := rand.float32()
     if roll < 0.05{
