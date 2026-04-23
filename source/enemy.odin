@@ -6,9 +6,9 @@ import cl "collider"
 import "ui"
 import "loot"
 
-Behavior :: #type proc(g : ^Game_State, e : ^Enemy, $T : typeid)
-On_Hit :: #type proc(g : ^Game_State, e : ^Enemy, dmg : f32)
-On_Death :: #type proc(g : ^Game_State, e : Enemy, idx : i32)
+Behavior :: #type proc(e : ^Enemy, $T : typeid)
+On_Hit :: #type proc(e : ^Enemy, dmg : f32)
+On_Death :: #type proc(e : Enemy, idx : i32)
 // Apply_Knockback :: #type proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
 
 Melee_Data :: struct{
@@ -178,22 +178,22 @@ create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy
     return e
 }
 
-on_hit :: proc(g : ^Game_State, e : ^Enemy, dmg : f32){
+on_hit :: proc(e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
-    g.create_hit_particle(&g.current_level.particles, e.origin)
-    e.knocback->apply(g.player.pos, &e.rec)
+    game.create_hit_particle(e.origin)
+    e.knocback->apply(game.player.pos, &e.rec)
     e.health->take_dmg(dmg)
 }
 
-on_death :: proc(g : ^Game_State, e : Enemy, idx : i32){
-    g.shake = 100
+on_death :: proc(e : Enemy, idx : i32){
+    game.shake = 100
     count := rand.int32_range(3, 7)
-    loot.spawn_shards(&g.current_level.loot, count, e.origin)
+    loot.spawn_shards(&game.current_level.loot, count, e.origin)
     if spawner := (^Spawner)(e.spawner); spawner != nil{
         spawner.count -= 1
     }
-    create_fragments_death(&g.current_level.enemy_fragments ,e)
-    unordered_remove(&g.current_level.enemies, idx)
+    create_fragments_death(&game.current_level.enemy_fragments ,e)
+    unordered_remove(&game.current_level.enemies, idx)
 }
 
 create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){

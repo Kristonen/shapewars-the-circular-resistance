@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:math/rand"
 import rl "vendor:raylib"
 
-Apply_Upgrade :: #type proc(g : ^Game_State, u : Upgrade)
+Apply_Upgrade :: #type proc(u : Upgrade)
 
 Upgrade_Target :: enum { Player, Radial_Liberation, Dash }
 // Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, CurrentHealth, MaxHealth,

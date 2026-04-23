@@ -37,14 +37,14 @@ create_ls_upgrade :: proc(name : string, desc : string, value : f32, type : Upgr
     }
 }
 
-apply_dmg_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.weapon.bullet.damage
+apply_dmg_upgrade :: proc(u : Upgrade){
+    stat := &game.player.weapon.bullet.damage
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
 
-apply_lifesteal_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.weapon.lifesteal
+apply_lifesteal_upgrade :: proc(u : Upgrade){
+    stat := &game.player.weapon.lifesteal
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }

@@ -5,11 +5,11 @@ import rl "vendor:raylib"
 import "ui"
 import "handler"
 
-check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, g : Game_State) -> bool{
-    if !g.map_drawing{
+check_player_wall :: proc(pos_player : rl.Vector2, radius : f32) -> bool{
+    if !game.map_drawing{
         return false
     }
-    for layer in g.current_level.level_visual.layers{
+    for layer in game.current_level.level_visual.layers{
         if layer.name == "Walls"{
             for obj in layer.objects{
                 wall_rect := rl.Rectangle{
@@ -27,22 +27,22 @@ check_player_wall :: proc(pos_player : rl.Vector2, radius : f32, g : Game_State)
     return false
 }
 
-check_bullet :: proc(g : ^Game_State){
-    for &b, idx in g.current_level.player_bullets{
-        check_bullet_enemy(g, &b)
-        check_bullet_wall(g, &b)
+check_bullet :: proc(){
+    for &b, idx in game.current_level.player_bullets{
+        check_bullet_enemy(&b)
+        check_bullet_wall(&b)
     }
 }
 
-check_bullet_enemy :: proc(g : ^Game_State, b : ^Bullet){
-    for &e in g.current_level.enemies{
+check_bullet_enemy :: proc(b : ^Bullet){
+    for &e in game.current_level.enemies{
         if rl.CheckCollisionCircleRec(b.pos, b.radius, e.rec){
 
             if !check_if_enemy_already_hitted(&e, b^){
-                e.on_hit(g, &e, b.damage)
+                e.on_hit(&e, b.damage)
                 add_bullet_status_to_hitted_enemy(b, &e)
                 if b.can_lifesteal{
-                    apply_lifesteal(&g.player, b.damage)
+                    apply_lifesteal(&game.player, b.damage)
                 }
             }
 
@@ -83,25 +83,25 @@ check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
     return false
 }
 
-check_bullet_player :: proc(g : ^Game_State){
-    for &b in g.current_level.enemy_bullets{
-        c_player := g.player.collider
+check_bullet_player :: proc(){
+    for &b in game.current_level.enemy_bullets{
+        c_player := game.player.collider
         c_bullet := b.collider
         if rl.CheckCollisionCircles(c_player.pos, c_player.radius, c_bullet.pos, c_bullet.radius){
-            g.player.health->take_dmg(5)
-            g.player.health.invincible_timer = 2
+            game.player.health->take_dmg(5)
+            game.player.health.invincible_timer = 2
             b.pos = {-10000, -10000}
             b.is_active = false
         }
     }
 }
 
-check_enemy_player :: proc(g : ^Game_State){
-    for &e in g.current_level.enemies{
-        if rl.CheckCollisionCircleRec(g.player.collider.pos, g.player.collider.radius, e.rec) && g.player.health.invincible_timer <= 0{
-            add_enemy_status_to_player(e, &g.player)
-            g.player.health.take_dmg(&g.player.health, 10)
-            g.player.health.invincible_timer = 2
+check_enemy_player :: proc(){
+    for &e in game.current_level.enemies{
+        if rl.CheckCollisionCircleRec(game.player.collider.pos, game.player.collider.radius, e.rec) && game.player.health.invincible_timer <= 0{
+            add_enemy_status_to_player(e, &game.player)
+            game.player.health.take_dmg(&game.player.health, 10)
+            game.player.health.invincible_timer = 2
         }
     }
 }
@@ -117,8 +117,8 @@ add_enemy_status_to_player :: proc(e : Enemy, p : ^Player){
     }
 }
 
-check_bullet_wall :: proc(g : ^Game_State, b : ^Bullet){
-    for layer in g.current_level.level_visual.layers{
+check_bullet_wall :: proc(b : ^Bullet){
+    for layer in game.current_level.level_visual.layers{
         if layer.name != "Walls" do continue
         for obj in layer.objects{
             rect := rl.Rectangle{
@@ -128,47 +128,47 @@ check_bullet_wall :: proc(g : ^Game_State, b : ^Bullet){
 
             if rl.CheckCollisionCircleRec(b.pos, b.radius, rect){
                 b.is_active = false
-                create_destroy_bullet_particle(&g.current_level.particles, b.pos)
+                create_destroy_bullet_particle(b.pos)
             }
         }
     }
 }
 
-check_collisions_detection_loot :: proc(g : ^Game_State){
-    for &l in g.current_level.loot{
+check_collisions_detection_loot :: proc(){
+    for &l in game.current_level.loot{
         if l.is_following || !l.is_active do continue
 
-        if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, g.player.collider.pos, g.player.radius){
+        if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, game.player.collider.pos, game.player.radius){
             l.is_following = true
         }
     }
 }
 
-check_collisions_pickup_loot :: proc(g : ^Game_State){
-    for &l, idx in g.current_level.loot{
+check_collisions_pickup_loot :: proc(){
+    for &l, idx in game.current_level.loot{
         if !l.is_active do continue
 
-        if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, g.player.collider.pos, g.player.collider.radius){
-            g.current_level.power_level_up = g.player.increase_value(&g.player.loot_bag, l.value)
-            if g.current_level.power_level_up{
-                level_up_spawner_update(g)
-                create_upgrade_menu(&g.current_level.upgrade_menu, g.current_level.available_upgrades, g.player.target_ability)
+        if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, game.player.collider.pos, game.player.collider.radius){
+            game.current_level.power_level_up = game.player.increase_value(&game.player.loot_bag, l.value)
+            if game.current_level.power_level_up{
+                level_up_spawner_update()
+                create_upgrade_menu(&game.current_level.upgrade_menu, game.current_level.available_upgrades, game.player.target_ability)
             }
-            unordered_remove(&g.current_level.loot, idx)
+            unordered_remove(&game.current_level.loot, idx)
         }
     }
 }
 
-check_collision_upgrade_slot :: proc(g : ^Game_State){
+check_collision_upgrade_slot :: proc(){
     mouse_pos := rl.GetMousePosition()
-    if !g.current_level.upgrade_menu.is_active && rl.IsMouseButtonReleased(.LEFT){
-        g.current_level.upgrade_menu.is_active = true
+    if !game.current_level.upgrade_menu.is_active && rl.IsMouseButtonReleased(.LEFT){
+        game.current_level.upgrade_menu.is_active = true
         return
     }
-    for &slot in g.current_level.upgrade_menu.upgrades{
+    for &slot in game.current_level.upgrade_menu.upgrades{
         if rl.CheckCollisionPointRec(mouse_pos, slot.rect){
             slot.state = .Focused
-            if rl.IsMouseButtonReleased(.LEFT) && g.current_level.upgrade_menu.is_active{
+            if rl.IsMouseButtonReleased(.LEFT) && game.current_level.upgrade_menu.is_active{
                 slot.state = .Selected
             }
         } else{
@@ -177,8 +177,8 @@ check_collision_upgrade_slot :: proc(g : ^Game_State){
     }
 }
 
-check_collision_menu :: proc(g : ^Game_State){
-    for &element in g.menu.elements{
+check_collision_menu :: proc(){
+    for &element in game.menu.elements{
         switch &e in element{
             case ui.UI_Cooldown:
             case ui.UI_Button:

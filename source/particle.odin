@@ -14,7 +14,7 @@ Particle :: struct{
     alive : bool
 }
 
-create_hit_particles :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
+create_hit_particles :: proc(pos : rl.Vector2){
     amount := rl.GetRandomValue(25, 40)
     for _ in 0..<amount{
         angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
@@ -27,11 +27,11 @@ create_hit_particles :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
             size = f32(rl.GetRandomValue(5, 9)),
             alive = true
         }
-        append(particles, p)
+        append(&game.current_level.particles, p)
     }
 }
 
-create_destroy_bullet_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
+create_destroy_bullet_particle :: proc(pos : rl.Vector2){
     amount := rl.GetRandomValue(10, 20)
     for _ in 0..<amount{
         angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
@@ -44,11 +44,11 @@ create_destroy_bullet_particle :: proc(particles : ^[dynamic]Particle, pos : rl.
             size = f32(rl.GetRandomValue(2, 5)),
             alive = true
         }
-        append(particles, p)
+        append(&game.current_level.particles, p)
     }
 }
 
-create_poison_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
+create_poison_particle :: proc(pos : rl.Vector2){
     amount := rl.GetRandomValue(5, 10)
     directions := []rl.Vector2{{1,1}, {-1, -1}, {-1, 1}, {1, -1}}
     for i in 0..<4{
@@ -72,12 +72,12 @@ create_poison_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2)
                 size = f32(rl.GetRandomValue(3, 9)),
                 alive = true
             }
-            append(particles, p)
+            append(&game.current_level.particles, p)
         }
     }
 }
 
-create_fire_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
+create_fire_particle :: proc(pos : rl.Vector2){
     amount := rl.GetRandomValue(30, 50)
     dir := rl.Vector2 {0, -1}
     for _ in 0..<amount{
@@ -92,10 +92,10 @@ create_fire_particle :: proc(particles : ^[dynamic]Particle, pos : rl.Vector2){
             size = f32(rl.GetRandomValue(1, 7)),
             alive = true,
         }
-        append(particles, p)
+        append(&game.current_level.particles, p)
         smoke_p := p
         smoke_p.pos.y -= 20
         smoke_p.color = {65, 65, 65, 255}
-        append(particles, smoke_p)
+        append(&game.current_level.particles, smoke_p)
     }
 }

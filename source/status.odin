@@ -18,7 +18,7 @@ Status_Effect :: struct{
     state : Status_State,
     texture : rl.Color,
     is_active : bool,
-    create_particle : proc(particles : ^[dynamic]Particle, pos : rl.Vector2)
+    create_particle : proc(pos : rl.Vector2)
 }
 
 create_poison_status :: proc() -> Status_Effect{

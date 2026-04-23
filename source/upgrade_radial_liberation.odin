@@ -32,28 +32,28 @@ create_rl_upgrade :: proc(name : string, desc : string,
     }
 }
 
-apply_rl_cd_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.ability_cd.cast_rate
+apply_rl_cd_upgrade :: proc(u : Upgrade){
+    stat := &game.player.ability_cd.cast_rate
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
 
-apply_rl_dmg_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    ability := &g.player.ability.(Radial_Liberation)
+apply_rl_dmg_upgrade :: proc(u : Upgrade){
+    ability := &game.player.ability.(Radial_Liberation)
     stat := &ability.damage
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
 
-apply_rl_amount_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    ability := &g.player.ability.(Radial_Liberation)
+apply_rl_amount_upgrade :: proc(u : Upgrade){
+    ability := &game.player.ability.(Radial_Liberation)
     stat := &ability.count
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
 
-apply_rl_lifesteal_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    ability := &g.player.ability.(Radial_Liberation)
+apply_rl_lifesteal_upgrade :: proc(u : Upgrade){
+    ability := &game.player.ability.(Radial_Liberation)
     stat := &ability.can_lifesteal
     v := u.value.(bool)
     apply_toogle_upgrade(stat, v)

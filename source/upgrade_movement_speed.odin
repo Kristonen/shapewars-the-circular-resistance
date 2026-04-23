@@ -17,8 +17,8 @@ create_movement_speed_upgrade :: proc(name : string, desc : string, value : f32,
     }
 }
 
-apply_movespeed_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.speed
+apply_movespeed_upgrade :: proc(u : Upgrade){
+    stat := &game.player.speed
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }

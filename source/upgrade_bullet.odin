@@ -26,20 +26,20 @@ create_bullet_upgrade :: proc(name : string, desc : string, value : Upgrade_Valu
     }
 }
 
-apply_pierce_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.weapon.bullet.can_pierce
+apply_pierce_upgrade :: proc(u : Upgrade){
+    stat := &game.player.weapon.bullet.can_pierce
     v := u.value.(bool)
     apply_toogle_upgrade(stat, v)
 }
 
-apply_amount_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.weapon.amount
+apply_amount_upgrade :: proc(u : Upgrade){
+    stat := &game.player.weapon.amount
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
 
-apply_speed_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.weapon.bullet.speed
+apply_speed_upgrade :: proc(u : Upgrade){
+    stat := &game.player.weapon.bullet.speed
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }

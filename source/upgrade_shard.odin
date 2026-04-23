@@ -18,8 +18,8 @@ create_shard_upgrade :: proc(name : string, desc : string, value : Upgrade_Value
     }
 }
 
-apply_mul_shard_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.loot_bag.mul
+apply_mul_shard_upgrade :: proc(u : Upgrade){
+    stat := &game.player.loot_bag.mul
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }

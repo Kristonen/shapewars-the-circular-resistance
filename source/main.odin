@@ -49,7 +49,7 @@ main :: proc(){
         current_menu = .Pause,
         create_hit_particle = create_hit_particles
     }
-    sync_menu(&game)
+    sync_menu()
 
     cooldown := ui.UI_Cooldown{
         rec = {
@@ -147,7 +147,7 @@ main :: proc(){
         append(&game.player.weapon.bullet.applied_status, status)
 
         game.current_level = level
-        level_up_spawner_update(&game)
+        level_up_spawner_update()
         
         rect := rl.Rectangle {
             x = 50,
@@ -196,10 +196,10 @@ main :: proc(){
     }
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
-        update_camera(&game, dt)
-        check_collisions(&game)
-        update_game(&game, dt)
-        draw_game(game)
+        update_camera(dt)
+        check_collisions()
+        update_game(dt)
+        draw_game()
 
         if game.should_close{
             //break
@@ -207,65 +207,65 @@ main :: proc(){
     }
 }
 
-update_game :: proc(g : ^Game_State, dt : f32) {
-    update_helper(g)
-    update_handler(g, dt)
-    if !g.is_paused && !g.current_level.power_level_up{
-        g.play_time += dt
-        update_player(g, dt)
-        update_player_shooting(g, dt)
-        update_player_bullets(g, dt)
-        update_enemy_bullets(g, dt)
-        update_player_casting(g, dt)
-        update_spawner(g, dt)
-        update_enemy(g, dt)
-        update_fragement(g, dt)
-        update_loot(g, dt)
-        update_particle(g, dt)
-        update_in_game_ui(g, dt)
+update_game :: proc(dt : f32) {
+    update_helper()
+    update_handler(dt)
+    if !game.is_paused && !game.current_level.power_level_up{
+        game.play_time += dt
+        update_player(dt)
+        update_player_shooting(dt)
+        update_player_bullets(dt)
+        update_enemy_bullets(dt)
+        update_player_casting(dt)
+        update_spawner(dt)
+        update_enemy(dt)
+        update_fragement(dt)
+        update_loot(dt)
+        update_particle(dt)
+        update_in_game_ui(dt)
         update_tooltip(dt)
-    } else if g.current_level.power_level_up{
-        update_upgrade(g, dt)
+    } else if game.current_level.power_level_up{
+        update_upgrade(dt)
     } else{
-        update_menu(g)
+        update_menu()
     }
 }
 
-check_collisions :: proc(g : ^Game_State){
-    if !g.is_paused && !g.current_level.power_level_up{
-        check_enemy_player(g)
-        check_bullet(g)
-        check_bullet_player(g)
-        check_collisions_detection_loot(g)
-        check_collisions_pickup_loot(g)
+check_collisions :: proc(){
+    if !game.is_paused && !game.current_level.power_level_up{
+        check_enemy_player()
+        check_bullet()
+        check_bullet_player()
+        check_collisions_detection_loot()
+        check_collisions_pickup_loot()
         check_in_game_ui_tooltip()
-    } else if g.current_level.power_level_up{
-        check_collision_upgrade_slot(g)
+    } else if game.current_level.power_level_up{
+        check_collision_upgrade_slot()
     } else{
-        check_collision_menu(g)
+        check_collision_menu()
     }
 }
 
-draw_game :: proc(g : Game_State){
+draw_game :: proc(){
     rl.BeginDrawing()
     rl.ClearBackground(rl.BLUE)
-    rl.BeginMode2D(g.camera)
-    if g.map_drawing{
-        draw_map(g)
+    rl.BeginMode2D(game.camera)
+    if game.map_drawing{
+        draw_map()
     }
-    draw_fragments(g)
-    draw_player(g)
-    draw_loot(g)
-    draw_bullet(g)
-    draw_enemies(g)
-    draw_particles(g)
+    draw_fragments()
+    draw_player()
+    draw_loot()
+    draw_bullet()
+    draw_enemies()
+    draw_particles()
     rl.EndMode2D()
-    draw_in_game_ui(g)
+    draw_in_game_ui()
     draw_tooltip()
-    if g.is_paused{
-        draw_menu(g)
-    } else if g.current_level.power_level_up{
-        draw_upgrade(g)
+    if game.is_paused{
+        draw_menu()
+    } else if game.current_level.power_level_up{
+        draw_upgrade()
     }
     rl.EndDrawing()
 }
@@ -279,23 +279,23 @@ cast_ability :: proc(g : ^Game_State){
     }
 }
 
-check_which_btn_was_pressed :: proc(g : ^Game_State, b : ^ui.UI_Button){
+check_which_btn_was_pressed :: proc(b : ^ui.UI_Button){
     b.state = .None
     switch b.type{
         case .Continue:
-            on_click_continue(g)
+            on_click_continue()
         case .Options:
-            on_click_options(g)
+            on_click_options()
         case .Back:
-            on_click_back(g)
+            on_click_back()
         case .Exit:
-            on_click_quit(g)
+            on_click_quit()
     }
 }
 
-sync_menu :: proc(g : ^Game_State){
-    clear(&g.menu.elements)
-    switch g.current_menu{
+sync_menu :: proc(){
+    clear(&game.menu.elements)
+    switch game.current_menu{
         case .Pause:
             width : f32 = 500
             height : f32 = 100
@@ -303,15 +303,15 @@ sync_menu :: proc(g : ^Game_State){
             pos_y := f32(rl.GetScreenHeight()) * 0.25
             btn := ui.create_button("Continue", {pos_x, pos_y}, {width, height})
             btn.type = .Continue
-            append(&g.menu.elements, btn)
+            append(&game.menu.elements, btn)
             pos_y += btn.rec.height * 2 + 50 
             btn = ui.create_button("Options", {pos_x, pos_y}, {width, height})
             btn.type = .Options
-            append(&g.menu.elements, btn)
+            append(&game.menu.elements, btn)
             pos_y += btn.rec.height * 2 + 50 
             btn = ui.create_button("Exit", {pos_x, pos_y}, {width, height})
             btn.type = .Exit
-            append(&g.menu.elements, btn)
+            append(&game.menu.elements, btn)
         case .Options:
             width : f32 = 500
             height : f32 = 100
@@ -319,13 +319,13 @@ sync_menu :: proc(g : ^Game_State){
             pos_y := f32(rl.GetScreenHeight()) * 0.85
             btn := ui.create_button("Back", {pos_x, pos_y}, {width, height})
             btn.type = .Back
-            append(&g.menu.elements, btn)
+            append(&game.menu.elements, btn)
 
             label := ui.create_label("Test:", {100, 100}, {500, 100})
-            append(&g.menu.elements, label)
+            append(&game.menu.elements, label)
 
             slider := ui.create_slider({700, 100}, {1000, 100})
-            append(&g.menu.elements, slider)
+            append(&game.menu.elements, slider)
         case.Main:
     }
 }

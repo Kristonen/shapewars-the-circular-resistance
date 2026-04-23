@@ -19,8 +19,8 @@ create_as_upgrade :: proc(name : string, desc : string, value : f32, type : Upgr
     }
 }
 
-apply_attack_speed_upgrade :: proc(g : ^Game_State, u : Upgrade){
-    stat := &g.player.weapon.fire_rate
+apply_attack_speed_upgrade :: proc(u : Upgrade){
+    stat := &game.player.weapon.fire_rate
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
