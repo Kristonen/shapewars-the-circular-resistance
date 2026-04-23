@@ -33,7 +33,7 @@ Button_Type :: enum{
 }
 
 UI_Button :: struct{
-    text : string,
+    text : UI_Text,
     text_color : rl.Color,
     font_size : i32,
     color : rl.Color,
@@ -55,13 +55,8 @@ UI_Cooldown :: struct{
 
 //UI_Label
 UI_Label :: struct{
-    text : string,
+    text : UI_Text,
     rec : rl.Rectangle,
-    // pos : rl.Vector2,
-    // width : f32,
-    // height : f32,
-    font_size : i32,
-    text_color : rl.Color,
     color : rl.Color,
 }
 
@@ -99,7 +94,7 @@ UI_Slider :: struct{
 }
 //Text
 UI_Text :: struct{
-    text : string,
+    content : string,
     font_size : i32,
     text_color : rl.Color,
 }

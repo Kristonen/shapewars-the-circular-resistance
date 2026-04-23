@@ -268,5 +268,5 @@ draw_tooltip :: proc(){
 
     rl.DrawRectangleV({game.tooltip.rec.x, game.tooltip.rec.y}, 
         {game.tooltip.rec.width, game.tooltip.rec.height}, game.tooltip.color)
-    draw_text(game.tooltip.text.text, game.tooltip.rec, game.tooltip.text.font_size, game.tooltip.text.text_color)
+    draw_text(game.tooltip.text.content, game.tooltip.rec, game.tooltip.text.font_size, game.tooltip.text.text_color)
 }

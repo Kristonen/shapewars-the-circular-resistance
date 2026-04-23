@@ -17,7 +17,7 @@ create_tooltip :: proc(pos : rl.Vector2) -> UI_ToolTip{
 
 create_text :: proc(text : string, color : rl.Color, font_size : i32) -> UI_Text{
     return {
-        text = text,
+        content = text,
         text_color = color,
         font_size = font_size,
     }
