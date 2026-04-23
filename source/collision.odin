@@ -36,7 +36,7 @@ check_bullet :: proc(){
 
 check_bullet_enemy :: proc(b : ^Bullet){
     for &e in game.current_level.enemies{
-        if rl.CheckCollisionCircleRec(b.pos, b.radius, e.rec){
+        if rl.CheckCollisionCircleRec(b.collider.pos, b.collider.radius, e.rec){
 
             if !check_if_enemy_already_hitted(&e, b^){
                 e.on_hit(&e, b.damage)
@@ -126,7 +126,7 @@ check_bullet_wall :: proc(b : ^Bullet){
                 width = obj.width, height = obj.height,
             }
 
-            if rl.CheckCollisionCircleRec(b.pos, b.radius, rect){
+            if rl.CheckCollisionCircleRec(b.collider.pos, b.collider.radius, rect){
                 b.is_active = false
                 create_destroy_bullet_particle(b.pos)
             }
