@@ -262,7 +262,7 @@ check_node_focusing :: proc(n : ^ui.UI_Skill_Node){
     mouse_pos := rl.GetMousePosition()
     if rl.CheckCollisionPointCircle(mouse_pos, n.pos, n.radius){
         n.state = .Focussed
-        if rl.IsMouseButtonPressed(.LEFT){
+        if rl.IsMouseButtonPressed(.LEFT) && n.is_active{
             n.state = .Pressed
         }
     } else{

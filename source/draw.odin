@@ -350,16 +350,31 @@ draw_menu :: proc(){
 }
 
 draw_skill_tree :: proc(st : ui.UI_Skill_Tree){
-    for n in st.nodes{
-        if n.state == .None{
-            rl.DrawCircleV(n.pos, n.radius, {255, 255, 255, 255})
-        } else if n.state == .Focussed{
-            rl.DrawCircleV(n.pos, (n.radius * 1.5), {255, 255, 255, 255})
-        }
-    }
-
     for l in st.lines{
-        rl.DrawLineEx(l.from.pos, l.to.pos, 2.5, {255,255,255,255})
+        color : rl.Color
+        if l.from.is_active{
+            color = {255, 255, 255, 255}
+        } else{
+            color = {150, 150, 150, 100}
+        }
+        rl.DrawLineEx(l.from.pos, l.to.pos, 2.5, color)
+    }
+    color : rl.Color
+    r : f32
+    pos : rl.Vector2
+    for n in st.nodes{
+        pos = n.pos
+        if n.state == .None{
+            r = n.radius
+        } else if n.state == .Focussed{
+            r = n.radius * 1.5
+        }
+        if n.is_active{
+            color = {255, 255, 255, 255}
+        } else{
+            color = {150, 150, 150, 255}
+        }
+        rl.DrawCircleV(pos, r, color)
     }
 }
 

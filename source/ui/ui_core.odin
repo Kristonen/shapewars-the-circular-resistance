@@ -61,6 +61,7 @@ UI_Skill_Node :: struct{
     radius : f32,
     state : UI_Node_State,
     apply : proc(),
+    is_active : bool,
 }
 
 UI_Skill_Line :: struct{

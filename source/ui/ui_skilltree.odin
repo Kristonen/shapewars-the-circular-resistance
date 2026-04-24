@@ -23,14 +23,25 @@ create_test_skilltree :: proc(st : ^UI_Skill_Tree){
         pos = {mid.x + 200, mid.y + 500},
         radius = 20,
         apply = proc(){fmt.println("Test")},
+        is_active = true
     }
     node_two := node_one
     node_two.pos.x += 200
+    node_two.is_active = false
+    node_three := node_two
+    node_three.pos.x += 150
+    node_three.pos.y -= 150
     append(&st.nodes, node_one)
     append(&st.nodes, node_two)
+    append(&st.nodes, node_three)
     line := UI_Skill_Line{
         to = node_two,
         from = node_one,
     }
+    line_two := UI_Skill_Line{
+        to = node_three,
+        from = node_two,
+    }
     append(&st.lines, line)
+    append(&st.lines, line_two)
 }
