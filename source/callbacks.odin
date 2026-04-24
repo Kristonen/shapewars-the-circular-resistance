@@ -20,6 +20,12 @@ on_click_quit :: proc(){
     game.should_close = true
 }
 
+on_click_btn_skilltree :: proc(){
+    game.last_menu = game.current_menu
+    game.current_menu = .Skilltree
+    sync_menu()
+}
+
 on_upgrade :: proc(u : ^Upgrade){
     u.count_used += 1
     u.apply(u^)

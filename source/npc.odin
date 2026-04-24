@@ -22,6 +22,7 @@ create_test_npc :: proc(pos : rl.Vector2) -> NPC{
             pos = n.pos,
             radius = n.radius * 2
         },
+        action = test_interact,
     }
     
     return n

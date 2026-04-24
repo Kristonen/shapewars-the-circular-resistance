@@ -176,6 +176,17 @@ update_player_casting :: proc(dt : f32){
     }
 }
 
+update_player_interact :: proc(dt : f32){
+    if game.current_level.interact.interactable == nil do return
+
+    if rl.IsKeyPressed(.E){
+        switch &e in game.current_level.interact.interactable{
+            case NPC:
+                e.interactable.action()
+        }
+    }
+}
+
 update_spawner :: proc(dt : f32){
     for &s in game.current_level.spawner{
         if !s.is_active do continue
@@ -347,6 +358,7 @@ update_in_game_ui :: proc(dt : f32){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 update_status_bar(&e)
+            case ui.UI_Skill_Tree:
         }
     }
     update_interact()
@@ -379,7 +391,20 @@ update_menu :: proc(){
             case ui.UI_Slider:
                 update_slider(&e)
             case ui.UI_Status_Bar:
+            case ui.UI_Skill_Tree:
+                for &n in e.nodes{
+                    update_skill_nodes(&n)
+                }
         } 
+    }
+}
+
+update_skill_nodes :: proc(n : ^ui.UI_Skill_Node){
+    switch n.state{
+        case .None:
+        case .Focussed:
+        case .Pressed:
+            n.apply()
     }
 }
 

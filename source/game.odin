@@ -61,6 +61,7 @@ Level_Data :: struct{
     ui_elements : [dynamic]ui.UI_Element,
     interact : ui.UI_Interact,
     level_visual : m.Tiled_Map,
+    skilltree : ui.UI_Skill_Tree,
 }
 
 create_start_level :: proc() -> Level_Data{

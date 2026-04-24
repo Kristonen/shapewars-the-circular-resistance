@@ -198,9 +198,12 @@ draw_in_game_ui :: proc(){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 draw_status_bar(e)
+            case ui.UI_Skill_Tree:
         }
     }
-    draw_interact()
+    if !game.is_paused{
+        draw_interact()
+    }
 }
 
 draw_interact :: proc(){
@@ -340,7 +343,23 @@ draw_menu :: proc(){
             case ui.UI_Slider:
                 draw_slider(e)
             case ui.UI_Status_Bar:
+            case ui.UI_Skill_Tree:
+                draw_skill_tree(e)
         } 
+    }
+}
+
+draw_skill_tree :: proc(st : ui.UI_Skill_Tree){
+    for n in st.nodes{
+        if n.state == .None{
+            rl.DrawCircleV(n.pos, n.radius, {255, 255, 255, 255})
+        } else if n.state == .Focussed{
+            rl.DrawCircleV(n.pos, (n.radius * 1.5), {255, 255, 255, 255})
+        }
+    }
+
+    for l in st.lines{
+        rl.DrawLineEx(l.from.pos, l.to.pos, 2.5, {255,255,255,255})
     }
 }
 

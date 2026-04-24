@@ -10,11 +10,12 @@ UI_Element :: union{
     UI_Label,
     UI_Slider,
     UI_Status_Bar,
+    UI_Skill_Tree,
 }
 //Structs
 //UI_Menu
 Menu_Type :: enum{
-    Pause, Main, Options,
+    Pause, Main, Options, Gunsmith, Skilltree
 }
 
 UI_Menu :: struct{
@@ -29,7 +30,7 @@ Button_State :: enum{
 }
 
 Button_Type :: enum{
-    Continue, Options, Back, Exit
+    Continue, Options, Back, Exit, Skilltree
 }
 
 UI_Button :: struct{
@@ -43,6 +44,28 @@ UI_Button :: struct{
     rec : rl.Rectangle,
     state : Button_State,
     type : Button_Type,
+}
+
+//UI Skill Tree
+UI_Node_State :: enum{None, Focussed, Pressed}
+
+UI_Skill_Tree :: struct{
+    nodes : [dynamic]UI_Skill_Node,
+    lines : [dynamic]UI_Skill_Line,
+}
+
+UI_Skill_Node :: struct{
+    name : UI_Text,
+    desc : UI_Text,
+    pos : rl.Vector2,
+    radius : f32,
+    state : UI_Node_State,
+    apply : proc(),
+}
+
+UI_Skill_Line :: struct{
+    from : UI_Skill_Node,
+    to : UI_Skill_Node,
 }
 
 //UI Cooldown

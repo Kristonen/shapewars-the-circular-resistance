@@ -76,6 +76,8 @@ main :: proc(){
         delete(game.current_level.level_visual.tilesets)
         delete(game.current_level.level_visual.layers)
         delete(game.current_level.ui_elements)
+        delete(game.current_level.skilltree.lines)
+        delete(game.current_level.skilltree.nodes)
 
         delete(game.level_data)
         delete(game.menu.elements)
@@ -101,6 +103,9 @@ main :: proc(){
                 case ui.UI_Slider:
                 case ui.UI_Status_Bar:
                     delete(e.slots)
+                case ui.UI_Skill_Tree:
+                    delete(e.lines)
+                    delete(e.nodes)
             }
         }
         rl.CloseWindow()
@@ -234,6 +239,7 @@ update_game :: proc(dt : f32) {
     if !game.is_paused && !game.current_level.power_level_up{
         game.play_time += dt
         update_player(dt)
+        update_player_interact(dt)
         update_player_shooting(dt)
         update_player_bullets(dt)
         update_npc(dt)
@@ -314,6 +320,8 @@ check_which_btn_was_pressed :: proc(b : ^ui.UI_Button){
             on_click_back()
         case .Exit:
             on_click_quit()
+        case .Skilltree:
+            on_click_btn_skilltree()
     }
 }
 
@@ -351,6 +359,27 @@ sync_menu :: proc(){
             slider := ui.create_slider({700, 100}, {1000, 100})
             append(&game.menu.elements, slider)
         case.Main:
+        case .Gunsmith:
+            x := f32(rl.GetScreenWidth() / 2 - 50)
+            y := f32(100)
+            first_gun := ui.create_button("Test", {x, y}, {180, 80})
+            first_gun.text.font_size = 30
+            first_gun.type = .Skilltree
+            append(&game.menu.elements, first_gun)
+            close_btn := first_gun
+            close_btn.text.content = "Close"
+            close_btn.rec.y += 100
+            close_btn.type = .Continue
+            append(&game.menu.elements, close_btn)
+        case .Skilltree:
+            x := f32(rl.GetScreenWidth() - 55)
+            y : f32 = 5
+            back_btn := ui.create_button("X", {x, y}, {50, 50})
+            back_btn.text.font_size = 15
+            back_btn.type = .Back
+            append(&game.menu.elements, back_btn)
+            ui.create_test_skilltree(&game.current_level.skilltree)
+            append(&game.menu.elements, game.current_level.skilltree)
     }
 }
 
