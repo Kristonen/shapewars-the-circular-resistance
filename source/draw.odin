@@ -351,15 +351,22 @@ draw_menu :: proc(){
 
 draw_skilltree :: proc(st : ui.UI_Skill_Tree){
     for l in st.lines{
-        color : rl.Color
         from := st.nodes[l.from_idx]
         to := st.nodes[l.to_idx]
-        if from.is_active{
-            color = {255, 255, 255, 255}
-        } else{
-            color = {150, 150, 150, 100}
+        pos := from.pos
+        if from.count != 0{
+            progress := f32(from.count)/f32(to.needed_count)
+            total_dist := rl.Vector2Distance(from.pos, to.pos)
+            dir := to.pos - from.pos
+            dir = rl.Vector2Normalize(dir)
+            pos = from.pos + (dir * total_dist * progress)
+            if total_dist < rl.Vector2Distance(pos, from.pos){
+                pos = to.pos
+            }
         }
-        rl.DrawLineEx(st.nodes[l.from_idx].pos, st.nodes[l.to_idx].pos, 2.5, color)
+        
+        rl.DrawLineEx(from.pos, to.pos, 2.5, {100, 100, 100, 255})
+        rl.DrawLineEx(from.pos, pos, 2.5, {255, 255, 255, 255})
     }
     
     for n in st.nodes{

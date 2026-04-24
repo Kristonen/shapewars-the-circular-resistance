@@ -42,9 +42,15 @@ create_test_skilltree :: proc(st : ^UI_Skill_Tree){
     node_three.pos.x += 150
     node_three.pos.y -= 150
     node_three.needed_count = 4
+    node_four := node_one
+    node_four.pos.y -= 300
+    node_four.pos.x += 50
+    node_four.needed_count = 3
+    node_four.is_active = false
     append(&st.nodes, node_one)
     append(&st.nodes, node_two)
     append(&st.nodes, node_three)
+    append(&st.nodes, node_four)
     line := UI_Skill_Line{
         to_idx = 1,
         from_idx = 0,
@@ -53,8 +59,13 @@ create_test_skilltree :: proc(st : ^UI_Skill_Tree){
         to_idx = 2,
         from_idx = 1,
     }
+    line_three := UI_Skill_Line{
+        to_idx = 3,
+        from_idx = 0,
+    }
     append(&st.lines, line)
     append(&st.lines, line_two)
+    append(&st.lines, line_three)
 }
 
 apply_skill_node :: proc(n : ^UI_Skill_Node){
