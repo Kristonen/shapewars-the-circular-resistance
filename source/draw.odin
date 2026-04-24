@@ -18,6 +18,9 @@ draw_player :: proc(){
 draw_npc :: proc(){
     for n in game.current_level.npcs{
         rl.DrawCircleV(n.pos, n.radius, n.texture)
+        if game.helper_activated{
+            draw_collider_circle(n.interactable.collider)
+        }
     }
 }
 
@@ -197,6 +200,12 @@ draw_in_game_ui :: proc(){
                 draw_status_bar(e)
         }
     }
+    draw_interact()
+}
+
+draw_interact :: proc(){
+    if game.current_level.interact.interactable == nil do return
+    draw_better_text(game.current_level.interact.text, game.current_level.interact.rec)
 }
 
 draw_progress_bar :: proc(bar : ui.UI_Progress_Bar){

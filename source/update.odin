@@ -100,7 +100,7 @@ update_player_status :: proc(dt : f32){
 
 update_npc :: proc(dt : f32){
     for &n in game.current_level.npcs{
-        n.interaction_collider.pos = n.pos
+        n.interactable.collider.pos = n.pos
     }
 }
 
@@ -348,6 +348,15 @@ update_in_game_ui :: proc(dt : f32){
             case ui.UI_Status_Bar:
                 update_status_bar(&e)
         }
+    }
+    update_interact()
+}
+
+update_interact :: proc(){
+    if game.current_level.interact.interactable == nil do return
+    switch &e in game.current_level.interact.interactable{
+        case NPC: 
+            game.current_level.interact.text.content = e.interactable.text
     }
 }
 

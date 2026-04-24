@@ -117,6 +117,16 @@ add_enemy_status_to_player :: proc(e : Enemy, p : ^Player){
     }
 }
 
+check_player_interact :: proc(){
+    game.current_level.interact.interactable = nil
+    for &n in game.current_level.npcs{
+        if rl.CheckCollisionCircles(n.interactable.collider.pos, n.interactable.collider.radius,
+        game.player.physics_collider.pos, game.player.radius){
+            game.current_level.interact.interactable = any{data = rawptr(&n), id = typeid_of(NPC)}//&n
+        }
+    }
+}
+
 check_bullet_wall :: proc(b : ^Bullet){
     for layer in game.current_level.level_visual.layers{
         if layer.name != "Walls" do continue

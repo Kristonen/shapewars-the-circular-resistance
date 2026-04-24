@@ -59,6 +59,7 @@ Level_Data :: struct{
     available_upgrades : [dynamic]Upgrade,
 
     ui_elements : [dynamic]ui.UI_Element,
+    interact : ui.UI_Interact,
     level_visual : m.Tiled_Map,
 }
 

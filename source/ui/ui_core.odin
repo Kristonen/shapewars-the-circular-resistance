@@ -131,3 +131,9 @@ UI_Status_Slot :: struct{
     texture : rl.Color,
     text : string,
 }
+//Interact in game
+UI_Interact :: struct{
+    rec : rl.Rectangle,
+    text : UI_Text,
+    interactable : any,
+}

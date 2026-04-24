@@ -168,6 +168,24 @@ main :: proc(){
         v_bar.fill_color = rl.BLUE
         v_bar.type = .Value
 
+        interact := ui.UI_Interact{
+            rec = {
+                x = f32(rl.GetScreenWidth()/2 - 400),
+                y = 50,
+                width = 800,
+                height = 25,
+            },
+            text = {
+                valign = .Center,
+                halign = .Center,
+                font_size = 30,
+                text_color = rl.WHITE
+            },
+            interactable = nil,
+        }
+
+        game.current_level.interact = interact
+
         ability_test := Radial_Liberation{   
             count = 8,
             damage = 5,
@@ -242,6 +260,7 @@ check_collisions :: proc(){
         check_bullet_player()
         check_collisions_detection_loot()
         check_collisions_pickup_loot()
+        check_player_interact()
         check_in_game_ui_tooltip()
     } else if game.current_level.power_level_up{
         check_collision_upgrade_slot()
