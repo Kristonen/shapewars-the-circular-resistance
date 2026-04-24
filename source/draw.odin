@@ -15,6 +15,12 @@ draw_player :: proc(){
     }
 }
 
+draw_npc :: proc(){
+    for n in game.current_level.npcs{
+        rl.DrawCircleV(n.pos, n.radius, n.texture)
+    }
+}
+
 draw_map :: proc(){
     tileset_name := game.current_level.level_visual.tilesets[0].image
     tileset_path := fmt.tprintf("assets/%s", tileset_name)

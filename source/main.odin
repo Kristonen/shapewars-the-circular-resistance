@@ -88,6 +88,7 @@ main :: proc(){
             delete(s.enemy.applied_status)
         }
         delete(game.current_level.enemies)
+        delete(game.current_level.npcs)
         delete(game.current_level.spawner)
         delete(game.tooltips)
         for &element in game.current_level.ui_elements{
@@ -115,7 +116,7 @@ main :: proc(){
         game.camera.target = game.player.pos
         level := create_start_level()
         level.level_visual = level_visual
-
+        //Test Spawner
         spawner := create_spawner(1, 1, 1, 100)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
@@ -139,11 +140,14 @@ main :: proc(){
         append(&level.spawner, spawner)
 
         append(&game.level_data, level)
-
+        //Test Status
         status = create_poison_status()
         append(&game.player.weapon.bullet.applied_status, status)
         status = create_fire_status()
         append(&game.player.weapon.bullet.applied_status, status)
+        //Test NPC
+        test_npc := create_test_npc({100, 100})
+        append(&level.npcs, test_npc)
 
         game.current_level = level
         level_up_spawner_update()
@@ -214,6 +218,7 @@ update_game :: proc(dt : f32) {
         update_player(dt)
         update_player_shooting(dt)
         update_player_bullets(dt)
+        update_npc(dt)
         update_enemy_bullets(dt)
         update_player_casting(dt)
         update_spawner(dt)
@@ -254,6 +259,7 @@ draw_game :: proc(){
     }
     draw_fragments()
     draw_player()
+    draw_npc()
     draw_loot()
     draw_bullet()
     draw_enemies()

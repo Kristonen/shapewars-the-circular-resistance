@@ -47,6 +47,8 @@ Level_Data :: struct{
 
     particles : [dynamic]Particle,
 
+    npcs : [dynamic]NPC,
+
     player_bullets : [dynamic]Bullet,
 
     loot : [dynamic]loot.Shape_Shard,

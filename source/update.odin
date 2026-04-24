@@ -98,6 +98,12 @@ update_player_status :: proc(dt : f32){
     }
 }
 
+update_npc :: proc(dt : f32){
+    for &n in game.current_level.npcs{
+        n.interaction_collider.pos = n.pos
+    }
+}
+
 update_player_bullets :: proc(dt :f32){
     for &b, idx in game.current_level.player_bullets{
         b.vel = b.dir * b.speed
