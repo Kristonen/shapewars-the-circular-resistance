@@ -8,17 +8,17 @@ create_test_skilltree :: proc(st : ^UI_Skill_Tree){
     node_one := UI_Skill_Node{
         name = {
             content = "Test",
-            font_size = 10,
+            font_size = 30,
             text_color = rl.WHITE,
-            halign = .Top,
-            valign = .Left,
+            halign = .Center,
+            valign = .Center,
         },
         desc = {
             content = "Add something",
-            font_size = 5,
+            font_size = 25,
             text_color = rl.WHITE,
             halign = .Top,
-            valign = .Left,
+            valign = .Center,
         },
         used = {
             font_size = 20,
@@ -35,8 +35,10 @@ create_test_skilltree :: proc(st : ^UI_Skill_Tree){
     node_two := node_one
     node_two.pos.x += 200
     node_two.needed_count = 2
+    node_two.name.content = "Krasser Skill"
     node_two.is_active = false
     node_three := node_two
+    node_three.name.content = "Ultimatives Super Teil"
     node_three.pos.x += 150
     node_three.pos.y -= 150
     node_three.needed_count = 4
@@ -56,6 +58,5 @@ create_test_skilltree :: proc(st : ^UI_Skill_Tree){
 }
 
 apply_skill_node :: proc(n : ^UI_Skill_Node){
-    fmt.println(n.count)
     n.count += 1
 }

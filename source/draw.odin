@@ -344,12 +344,12 @@ draw_menu :: proc(){
                 draw_slider(e)
             case ui.UI_Status_Bar:
             case ui.UI_Skill_Tree:
-                draw_skill_tree(e)
+                draw_skilltree(e)
         } 
     }
 }
 
-draw_skill_tree :: proc(st : ui.UI_Skill_Tree){
+draw_skilltree :: proc(st : ui.UI_Skill_Tree){
     for l in st.lines{
         color : rl.Color
         from := st.nodes[l.from_idx]
@@ -384,8 +384,25 @@ draw_skill_tree :: proc(st : ui.UI_Skill_Tree){
             height = 50,
         }
         draw_better_text(n.used, rec)
+        if n.state == .Focussed{
+            draw_skilltree_desc(n.name, n.desc)
+        }
     }
-    
+}
+
+draw_skilltree_desc :: proc(n : ui.UI_Text, desc : ui.UI_Text){
+    rec := rl.Rectangle{
+        x = f32(rl.GetScreenWidth() - 500),
+        y = f32(rl.GetScreenHeight() - 300),
+        width = 500,
+        height = 100,
+    }
+    rl.DrawRectangleLinesEx(rec, 5, rl.WHITE)
+    draw_better_text(n, rec)
+    rec.y += 95
+    rec.height = 200
+    rl.DrawRectangleLinesEx(rec, 5, rl.WHITE)
+    draw_better_text(desc, rec)
 }
 
 draw_button :: proc(b : ui.UI_Button){
