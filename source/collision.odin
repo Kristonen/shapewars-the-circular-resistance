@@ -201,9 +201,21 @@ check_collision_menu :: proc(){
             case ui.UI_Status_Bar:
             case ui.UI_Skill_Tree:
                 for &n in e.nodes{
-                    check_node_focusing(&n)
+                    check_skill_node(&n)
                 }
         }
+    }
+}
+
+check_skill_node :: proc(n : ^ui.UI_Skill_Node){
+    mouse_pos := rl.GetMousePosition()
+    if rl.CheckCollisionPointCircle(mouse_pos, n.pos, n.radius){
+        n.state = .Focussed
+        if rl.IsMouseButtonPressed(.LEFT) && n.is_active && n.count < n.max_count{
+            n.state = .Pressed
+        }
+    } else{
+        n.state = .None
     }
 }
 
@@ -255,18 +267,6 @@ check_in_game_ui_tooltip :: proc(){
 
     if game.tooltip_ptr == nil{
         game.tooltip_timer = 0.25
-    }
-}
-
-check_node_focusing :: proc(n : ^ui.UI_Skill_Node){
-    mouse_pos := rl.GetMousePosition()
-    if rl.CheckCollisionPointCircle(mouse_pos, n.pos, n.radius){
-        n.state = .Focussed
-        if rl.IsMouseButtonPressed(.LEFT) && n.is_active{
-            n.state = .Pressed
-        }
-    } else{
-        n.state = .None
     }
 }
 

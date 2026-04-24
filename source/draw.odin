@@ -352,18 +352,20 @@ draw_menu :: proc(){
 draw_skill_tree :: proc(st : ui.UI_Skill_Tree){
     for l in st.lines{
         color : rl.Color
-        if l.from.is_active{
+        from := st.nodes[l.from_idx]
+        to := st.nodes[l.to_idx]
+        if from.is_active{
             color = {255, 255, 255, 255}
         } else{
             color = {150, 150, 150, 100}
         }
-        rl.DrawLineEx(l.from.pos, l.to.pos, 2.5, color)
+        rl.DrawLineEx(st.nodes[l.from_idx].pos, st.nodes[l.to_idx].pos, 2.5, color)
     }
-    color : rl.Color
-    r : f32
-    pos : rl.Vector2
+    
     for n in st.nodes{
-        pos = n.pos
+        color : rl.Color
+        r : f32
+        pos := rl.Vector2 {n.pos.x, n.pos.y}
         if n.state == .None{
             r = n.radius
         } else if n.state == .Focussed{
@@ -375,7 +377,15 @@ draw_skill_tree :: proc(st : ui.UI_Skill_Tree){
             color = {150, 150, 150, 255}
         }
         rl.DrawCircleV(pos, r, color)
+        rec := rl.Rectangle{
+            x = n.pos.x - 20,
+            y = n.pos.y + 25,
+            width = 40,
+            height = 50,
+        }
+        draw_better_text(n.used, rec)
     }
+    
 }
 
 draw_button :: proc(b : ui.UI_Button){

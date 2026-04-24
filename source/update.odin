@@ -395,16 +395,25 @@ update_menu :: proc(){
                 for &n in e.nodes{
                     update_skill_nodes(&n)
                 }
+                for &l in e.lines{
+                    update_skill_lines(&l, &e.nodes)
+                }
         } 
     }
 }
 
 update_skill_nodes :: proc(n : ^ui.UI_Skill_Node){
-    switch n.state{
-        case .None:
-        case .Focussed:
-        case .Pressed:
-            n.apply()
+    n.used.content = fmt.tprintf("%i/%i", n.count, n.max_count)
+    if n.state == .Pressed{
+        n->apply()
+    }
+}
+
+update_skill_lines :: proc(l : ^ui.UI_Skill_Line, nodes : ^[dynamic]ui.UI_Skill_Node){
+    from := &nodes[l.from_idx]
+    to := &nodes[l.to_idx]
+    if from.count >= to.needed_count{
+        to.is_active = true
     }
 }
 

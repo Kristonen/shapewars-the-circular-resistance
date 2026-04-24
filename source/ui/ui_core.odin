@@ -57,16 +57,20 @@ UI_Skill_Tree :: struct{
 UI_Skill_Node :: struct{
     name : UI_Text,
     desc : UI_Text,
+    used : UI_Text,
     pos : rl.Vector2,
     radius : f32,
     state : UI_Node_State,
-    apply : proc(),
+    apply : proc(n : ^UI_Skill_Node),
+    count : i32,
+    max_count : i32,
+    needed_count : i32,
     is_active : bool,
 }
 
 UI_Skill_Line :: struct{
-    from : UI_Skill_Node,
-    to : UI_Skill_Node,
+    from_idx : i32,
+    to_idx : i32,
 }
 
 //UI Cooldown
