@@ -27,6 +27,15 @@ check_player_wall :: proc(pos_player : rl.Vector2, radius : f32) -> bool{
     return false
 }
 
+check_player_npc :: proc(pos : rl.Vector2) -> bool{
+    for n in game.current_level.npcs{
+        if rl.CheckCollisionCircles(pos, game.player.physics_collider.radius, n.pos, n.radius){
+            return true
+        }
+    }
+    return false
+}
+
 check_bullet :: proc(){
     for &b, idx in game.current_level.player_bullets{
         check_bullet_enemy(&b)

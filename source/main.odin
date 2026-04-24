@@ -372,6 +372,8 @@ sync_menu :: proc(){
             close_btn.type = .Continue
             append(&game.menu.elements, close_btn)
         case .Skilltree:
+            clear(&game.current_level.skilltree.lines)
+            clear(&game.current_level.skilltree.nodes)
             x := f32(rl.GetScreenWidth() - 55)
             y : f32 = 5
             back_btn := ui.create_button("X", {x, y}, {50, 50})

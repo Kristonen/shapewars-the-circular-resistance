@@ -483,7 +483,7 @@ update_tooltip :: proc(dt : f32){
 check_direction_col :: proc(vel : rl.Vector2, dt : f32) -> f32{
     n_vel := rl.Vector2Normalize(vel)
     next_pos := game.player.pos + vel * game.player.speed * dt
-    if check_player_wall(next_pos, game.player.physics_collider.radius){
+    if check_player_wall(next_pos, game.player.physics_collider.radius) || check_player_npc(next_pos){
         return 0
     }
     return 1
