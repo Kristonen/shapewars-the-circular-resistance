@@ -42,11 +42,14 @@ Player :: struct {
     loot_bag : Loot_Bag,
     increase_value : proc(b : ^Loot_Bag, value : f32) -> bool,
 
-    collider : cl.Collider_Circle,
+    hurt_collider : cl.Collider_Circle,
+    collector : cl.Collider_Circle,
+    physics_collider : cl.Collider_Circle,
+
 }
 
 create_player :: proc() -> Player{
-    return {
+    p := Player{
         speed = 400,
         radius = 32,
         weapon = {
@@ -60,9 +63,6 @@ create_player :: proc() -> Player{
           take_dmg = take_damage,
           heal = heal,
         },
-        collider = {
-            radius = 28,
-        },
         loot_bag = {
             max_value = 50,
             level = 1,
@@ -71,6 +71,19 @@ create_player :: proc() -> Player{
         },
         increase_value = increase_value,
     }
+    p.physics_collider = {
+        radius = p.radius,
+        pos = p.pos
+    }
+    p.collector = {
+        radius = p.radius * 0.5,
+        pos = p.pos,
+    }
+    p.hurt_collider = {
+        radius = p.radius * 0.75,
+        pos = p.pos
+    }
+    return p
 }
 
 increase_value :: proc(bag : ^Loot_Bag, value : f32) -> bool{

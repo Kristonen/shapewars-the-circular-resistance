@@ -84,8 +84,9 @@ create_fire_particle :: proc(pos : rl.Vector2){
         red := u8(rl.GetRandomValue(150, 255))
         speed := f32(rl.GetRandomValue(30, 60))
         x := f32(rl.GetRandomValue(-25, 25))
+        y := f32(rl.GetRandomValue(-20, 20))
         p : Particle = {
-            pos = {pos.x + x, pos.y},
+            pos = {pos.x + x, pos.y + y},
             vel = dir * speed,
             color = {red, 0, 0, 255},
             max_life = f32(rl.GetRandomValue(5, 8)) / 10,

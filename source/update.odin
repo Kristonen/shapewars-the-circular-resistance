@@ -76,7 +76,10 @@ update_player :: proc(dt : f32){
     }
 
     game.player.pos += game.player.vel * game.player.speed * dt
-    game.player.collider.pos = game.player.pos
+    //Update player colliders
+    game.player.hurt_collider.pos = game.player.pos
+    game.player.collector.pos = game.player.pos
+    game.player.physics_collider.pos = game.player.pos
     
     //Other player update stuff
     update_player_status(dt)
@@ -431,7 +434,7 @@ update_tooltip :: proc(dt : f32){
 check_direction_col :: proc(vel : rl.Vector2, dt : f32) -> f32{
     n_vel := rl.Vector2Normalize(vel)
     next_pos := game.player.pos + vel * game.player.speed * dt
-    if check_player_wall(next_pos, game.player.radius){
+    if check_player_wall(next_pos, game.player.physics_collider.radius){
         return 0
     }
     return 1

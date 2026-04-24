@@ -9,7 +9,9 @@ import "ui"
 draw_player :: proc(){
     rl.DrawCircleV(game.player.pos, game.player.radius, rl.VIOLET)
     if game.helper_activated{
-        draw_collider_circle(game.player.collider)
+        draw_collider_circle(game.player.physics_collider)
+        draw_collider_circle(game.player.hurt_collider)
+        draw_collider_circle(game.player.collector)
     }
 }
 

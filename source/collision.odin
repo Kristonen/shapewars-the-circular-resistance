@@ -85,7 +85,7 @@ check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
 
 check_bullet_player :: proc(){
     for &b in game.current_level.enemy_bullets{
-        c_player := game.player.collider
+        c_player := game.player.hurt_collider
         c_bullet := b.collider
         if rl.CheckCollisionCircles(c_player.pos, c_player.radius, c_bullet.pos, c_bullet.radius){
             game.player.health->take_dmg(5)
@@ -98,7 +98,7 @@ check_bullet_player :: proc(){
 
 check_enemy_player :: proc(){
     for &e in game.current_level.enemies{
-        if rl.CheckCollisionCircleRec(game.player.collider.pos, game.player.collider.radius, e.rec) && game.player.health.invincible_timer <= 0{
+        if rl.CheckCollisionCircleRec(game.player.hurt_collider.pos, game.player.hurt_collider.radius, e.rec) && game.player.health.invincible_timer <= 0{
             add_enemy_status_to_player(e, &game.player)
             game.player.health.take_dmg(&game.player.health, 10)
             game.player.health.invincible_timer = 2
@@ -138,7 +138,7 @@ check_collisions_detection_loot :: proc(){
     for &l in game.current_level.loot{
         if l.is_following || !l.is_active do continue
 
-        if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, game.player.collider.pos, game.player.radius){
+        if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, game.player.pos, game.player.radius){
             l.is_following = true
         }
     }
@@ -148,7 +148,7 @@ check_collisions_pickup_loot :: proc(){
     for &l, idx in game.current_level.loot{
         if !l.is_active do continue
 
-        if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, game.player.collider.pos, game.player.collider.radius){
+        if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, game.player.collector.pos, game.player.collector.radius){
             game.current_level.power_level_up = game.player.increase_value(&game.player.loot_bag, l.value)
             if game.current_level.power_level_up{
                 level_up_spawner_update()

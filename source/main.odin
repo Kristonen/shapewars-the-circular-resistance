@@ -116,7 +116,7 @@ main :: proc(){
         level := create_start_level()
         level.level_visual = level_visual
 
-        spawner := create_spawner(1, 1, 1, 1)
+        spawner := create_spawner(1, 1, 1, 100)
         spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
         append(&level.spawner, spawner)
 
@@ -141,7 +141,6 @@ main :: proc(){
         append(&game.level_data, level)
 
         status = create_poison_status()
-        // append(&game.player.statuses, status)
         append(&game.player.weapon.bullet.applied_status, status)
         status = create_fire_status()
         append(&game.player.weapon.bullet.applied_status, status)
