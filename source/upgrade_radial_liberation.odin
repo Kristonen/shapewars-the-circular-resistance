@@ -46,7 +46,8 @@ create_rl_upgrade :: proc(name : string, desc : string,
 }
 
 apply_rl_cd_upgrade :: proc(u : Upgrade){
-    stat := &game.player.ability_cd.cast_rate
+    stat := &get_ability_cd().cast_rate
+    // stat := &game.player.ability_cd.cast_rate
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }

@@ -122,13 +122,14 @@ main :: proc(){
     if tooltips, ok := get_tooltips(map_allocator); ok{
         game.tooltips = tooltips
     }
+    // create_upgrades(&game.level.upgrade_pool)
     create_level(game.current_level)
     
-    if level_visual, ok := m.load_map("assets/test_map.json", map_allocator); ok{
-        game.player = create_player()
-        game.player.pos = m.get_player_spawn_pos(level_visual)
-        game.camera.target = game.player.pos
-        game.level.level_visual = level_visual
+    // if level_visual, ok := m.load_map("assets/test_map.json", map_allocator); ok{
+    //     game.player = create_player()
+    //     game.player.pos = m.get_player_spawn_pos(level_visual)
+    //     game.camera.target = game.player.pos
+    //     game.level.level_visual = level_visual
         //Test Spawner
         // spawner := create_spawner(1, 1, 1, 100)
         // spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
@@ -163,69 +164,70 @@ main :: proc(){
         // append(&game.level.npcs, test_npc)
         // level_up_spawner_update()
         
-        rect := rl.Rectangle {
-            x = 50,
-            y = f32(rl.GetScreenHeight() - 100),
-            width = f32(rl.GetScreenWidth()) * 0.25,
-            height = 50,
-        }
-        p_bar := ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
-        p_bar.show_text = true
-        p_bar.min = 0
-        p_bar.type = .Health
+    rect := rl.Rectangle {
+        x = 50,
+        y = f32(rl.GetScreenHeight() - 100),
+        width = f32(rl.GetScreenWidth()) * 0.25,
+        height = 50,
+    }
+    p_bar := ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
+    p_bar.show_text = true
+    p_bar.min = 0
+    p_bar.type = .Health
 
-        v_bar := p_bar
-        v_bar.rec.x += p_bar.rec.width + 100
-        v_bar.fill_color = rl.BLUE
-        v_bar.type = .Value
+    v_bar := p_bar
+    v_bar.rec.x += p_bar.rec.width + 60
+    v_bar.fill_color = rl.BLUE
+    v_bar.type = .Value
 
-        interact := ui.UI_Interact{
-            rec = {
-                x = f32(rl.GetScreenWidth()/2 - 400),
-                y = 50,
-                width = 800,
-                height = 25,
-            },
-            text = {
-                valign = .Center,
-                halign = .Center,
-                font_size = 30,
-                text_color = rl.WHITE
-            },
-            interactable = nil,
-        }
+    game.player.h_bar = p_bar
+    game.player.v_bar = v_bar
 
-        game.level.interact = interact
+    interact := ui.UI_Interact{
+        rec = {
+            x = f32(rl.GetScreenWidth()/2 - 400),
+            y = 50,
+            width = 800,
+            height = 25,
+        },
+        text = {
+            valign = .Center,
+            halign = .Center,
+            font_size = 30,
+            text_color = rl.WHITE
+        },
+        interactable = nil,
+    }
 
-        ability_test := Radial_Liberation{   
-            count = 8,
-            damage = 5,
-        }
+    game.level.interact = interact
+
+        // ability_test := Radial_Liberation{   
+        //     count = 8,
+        //     damage = 5,
+        // }
         // ability_test := ab.Dash{
 
         // }
-        ability_cd := Ability_Cooldown{
-            cast_rate = 5,
-        }
+        // ability_cd := Ability_Cooldown{
+        //     cast_rate = 5,
+        // }
         //TODO -> Make ability cd part of the ability instead of player
         // game.player.ability = ability_test
         // game.player.ability_cd = ability_cd
         // get_upgrade_target(&game.player)
-        create_upgrades(&game.level.upgrade_pool)
+    create_upgrades(&game.level.upgrade_pool)
         // fill_available_upgrades(&game)
         // game.player.h_bar = p_bar
         // game.player.v_bar = v_bar
 
-        pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
-        status_bar := ui.create_ui_status_bar(pos)
+    pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
+    status_bar := ui.create_ui_status_bar(pos)
 
         // append(&game.level.ui_elements, cooldown)
         // append(&game.level.ui_elements, game.player.h_bar)
         // append(&game.level.ui_elements, game.player.v_bar)
         // append(&game.level.ui_elements, status_bar)
-    } else{
-        panic("Could not load the level!")
-    }
+
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         update_camera(dt)
@@ -407,17 +409,17 @@ sync_menu :: proc(){
     }
 }
 
-fill_available_upgrades :: proc(g : ^Game_State){
+fill_available_upgrades :: proc(){
     common : i32
     uncommon : i32
     rare : i32
     epic : i32
     legendary : i32
-    for u in g.level.upgrade_pool{
+    for u in game.level.upgrade_pool{
         if u.target == .Player{
-            append(&g.level.available_upgrades, u)
-        } else if g.player.target_ability == u.target{
-            append(&g.level.available_upgrades, u)
+            append(&game.level.available_upgrades, u)
+        } else if game.player.target_ability == u.target{
+            append(&game.level.available_upgrades, u)
         }
         switch u.rarity{
             case .Common: common += 1

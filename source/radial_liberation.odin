@@ -7,6 +7,7 @@ Radial_Liberation :: struct{
     damage : f32,
     count : f32,
     can_lifesteal : bool,
+    ability_cd : Ability_Cooldown,
 }
 
 cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]Bullet, pos : rl.Vector2){
@@ -24,6 +25,7 @@ cast_radial_liberation :: proc(a : Radial_Liberation, bullets : ^[dynamic]Bullet
             speed = 500,
             radius = 8,
             collider = {
+                pos = pos,
                 radius = 8,
             },
             is_active = true,

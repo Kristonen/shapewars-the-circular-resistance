@@ -30,7 +30,6 @@ Player :: struct {
     weapon : Weapon,
 
     ability : Ability,
-    ability_cd : Ability_Cooldown,
     target_ability : Upgrade_Target,
 
     health : Health,
@@ -104,11 +103,22 @@ apply_lifesteal :: proc(p : ^Player, dmg : f32){
     p.health->heal(add_h)
 }
 
-get_upgrade_target :: proc(p : ^Player) {
-    switch a in p.ability{
+get_upgrade_target :: proc() {
+    switch a in game.player.ability{
         case Radial_Liberation:
-            p.target_ability = .Radial_Liberation
+            game.player.target_ability = .Radial_Liberation
         case Dash:
-            p.target_ability = .Dash
+            game.player.target_ability = .Dash
     }
+}
+
+get_ability_cd :: proc() -> ^Ability_Cooldown{
+    cd : ^Ability_Cooldown
+    switch &a in game.player.ability{
+        case Radial_Liberation:
+            cd = &a.ability_cd
+        case Dash:
+            cd = &a.ability_cd
+    }
+    return cd
 }

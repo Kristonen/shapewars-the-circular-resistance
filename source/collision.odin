@@ -141,8 +141,10 @@ check_bullet_wall :: proc(b : ^Bullet){
         if layer.name != "Walls" do continue
         for obj in layer.objects{
             rect := rl.Rectangle{
-                x = obj.x, y = obj.y,
-                width = obj.width, height = obj.height,
+                x = obj.x,
+                y = obj.y,
+                width = obj.width,
+                height = obj.height,
             }
 
             if rl.CheckCollisionCircleRec(b.collider.pos, b.collider.radius, rect){

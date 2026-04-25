@@ -166,12 +166,18 @@ update_player_shooting :: proc(dt : f32){
 }
 
 update_player_casting :: proc(dt : f32){
-    if game.player.ability_cd.cooldown > 0{
-        game.player.ability_cd.cooldown -= dt
+    cd := get_ability_cd()
+    if cd.cooldown > 0{
+        cd.cooldown -= dt
     }
 
-    if rl.IsKeyPressed(.SPACE) && game.player.ability_cd.cooldown <= 0{
-        game.player.ability_cd.cooldown = game.player.ability_cd.cast_rate
+    if rl.IsKeyPressed(.SPACE) && cd.cooldown <= 0{
+        switch &a in game.player.ability{
+            case Radial_Liberation:
+                cd.cooldown = a.ability_cd.cast_rate
+            case Dash:
+                cd.cooldown = a.ability_cd.cast_rate
+        }
         cast_player_ability()
     }
 }
@@ -351,7 +357,8 @@ update_in_game_ui :: proc(dt : f32){
                     update_progress_bar(&e, game.player.loot_bag.value, game.player.loot_bag.max_value)
                 }
             case ui.UI_Cooldown:
-                update_cooldown(&e, game.player.ability_cd.cooldown, game.player.ability_cd.cast_rate)
+                cd := get_ability_cd()
+                update_cooldown(&e, cd.cooldown, cd.cast_rate)
             case ui.UI_Button:
             case ui.UI_Menu:
             case ui.UI_Label:
@@ -379,7 +386,8 @@ update_menu :: proc(){
         }
         switch &e in element{
             case ui.UI_Cooldown:
-                update_cooldown(&e, game.player.ability_cd.cooldown, game.player.ability_cd.cast_rate)
+                cd := get_ability_cd()
+                update_cooldown(&e, cd.cooldown, cd.cast_rate)
             case ui.UI_Button:
                 update_button(&e)
                 if e.state == .Pressed{
