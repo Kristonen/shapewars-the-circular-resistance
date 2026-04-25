@@ -10,7 +10,7 @@ import "loot"
 import "core:math"
 
 update_handler :: proc(dt : f32){
-    if rl.IsKeyPressed(.F1){
+    if rl.IsKeyPressed(.ESCAPE){
         game.is_paused = !game.is_paused
         clear(&game.menu.elements)
         ui.create_menu(&game.menu)

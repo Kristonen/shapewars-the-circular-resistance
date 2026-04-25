@@ -21,6 +21,8 @@ main :: proc(){
     rl.InitWindow(1920, 1080, "Shapewars: The Circular Resistance")
     rl.SetWindowState({.WINDOW_RESIZABLE})
     rl.SetTargetFPS(500)
+    rl.SetExitKey(.KEY_NULL)
+    // rl.SetMouseCursor(.CROSSHAIR)
 
     track : mem.Tracking_Allocator
     mem.tracking_allocator_init(&track, context.allocator)
@@ -236,7 +238,7 @@ main :: proc(){
         draw_game()
 
         if game.should_close{
-            //break
+            break
         }
     }
 }
