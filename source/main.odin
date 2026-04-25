@@ -30,6 +30,7 @@ main :: proc(){
     err := virtual.arena_init_growing(&arena)
     map_allocator := virtual.arena_allocator(&arena)
     game.map_allocator = map_allocator
+    game.arena = arena
 
     defer{
         for _, entry in track.allocation_map{
@@ -121,7 +122,7 @@ main :: proc(){
     if tooltips, ok := get_tooltips(map_allocator); ok{
         game.tooltips = tooltips
     }
-    create_level(game.current_level, map_allocator)
+    create_level(game.current_level)
     
     if level_visual, ok := m.load_map("assets/test_map.json", map_allocator); ok{
         game.player = create_player()
@@ -324,15 +325,15 @@ sync_menu :: proc(){
                 width = 500,
                 height = 100,
             }
-            btn := ui.create_button("Continue", rec, on_click_continue)
+            btn := ui.create_button("Continue", rec, on_click_continue, -1)
             btn.type = .Continue
             append(&game.menu.elements, btn)
             rec.y += btn.rec.height * 2 + 50 
-            btn = ui.create_button("Options", rec, on_click_options)
+            btn = ui.create_button("Options", rec, on_click_options, -1)
             btn.type = .Options
             append(&game.menu.elements, btn)
             rec.y += btn.rec.height * 2 + 50 
-            btn = ui.create_button("Exit", rec, on_click_quit)
+            btn = ui.create_button("Exit", rec, on_click_quit, -1)
             btn.type = .Exit
             append(&game.menu.elements, btn)
         case .Options:
@@ -343,7 +344,7 @@ sync_menu :: proc(){
                 y = f32(rl.GetScreenHeight()) * 0.85
             }
             
-            btn := ui.create_button("Back", rec, on_click_back)
+            btn := ui.create_button("Back", rec, on_click_back, -1)
             btn.type = .Back
             append(&game.menu.elements, btn)
 
@@ -360,7 +361,7 @@ sync_menu :: proc(){
                 width = 180,
                 height = 80,
             }
-            first_gun := ui.create_button("Test", rec, on_click_btn_skilltree)
+            first_gun := ui.create_button("Test", rec, on_click_skilltree, -1)
             first_gun.text.font_size = 30
             first_gun.type = .Skilltree
             append(&game.menu.elements, first_gun)
@@ -380,7 +381,7 @@ sync_menu :: proc(){
                 height = 50,
             }
             
-            back_btn := ui.create_button("X", rec, on_click_back)
+            back_btn := ui.create_button("X", rec, on_click_back, -1)
             back_btn.text.font_size = 15
             back_btn.type = .Back
             append(&game.menu.elements, back_btn)
@@ -394,12 +395,15 @@ sync_menu :: proc(){
                 width = 400,
                 height = 100,
             }
-            for type in game.levels{
+            for &type in game.levels{
                 // if type == .HQ do continue
-                btn := create_choose_level(rec, type)
+                btn := create_choose_level(rec, &type)
                 append(&game.menu.elements, btn)
+                refresh_ui_pointers()
                 rec.y += 105
             }
+            btn := ui.create_button("Back", rec, on_click_continue, -1)
+            append(&game.menu.elements, btn)
     }
 }
 
@@ -428,4 +432,20 @@ fill_available_upgrades :: proc(g : ^Game_State){
     fmt.printfln("Rare: %i", rare)
     fmt.printfln("Epic: %i", epic)
     fmt.printfln("Legendary: %i", legendary)
+}
+
+refresh_ui_pointers :: proc(){
+    for &element in game.menu.elements{
+        switch &e in element{
+            case ui.UI_Cooldown:
+            case ui.UI_Button:
+                e.data.data = &e.storage
+            case ui.UI_Menu:
+            case ui.UI_Progress_Bar:
+            case ui.UI_Label:
+            case ui.UI_Slider:
+            case ui.UI_Status_Bar:
+            case ui.UI_Skill_Tree:
+        }
+    }
 }

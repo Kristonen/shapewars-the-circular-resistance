@@ -44,7 +44,10 @@ UI_Button :: struct{
     rec : rl.Rectangle,
     state : Button_State,
     type : Button_Type,
+
+    storage : u64,
     data : any,
+
     on_click : On_Click,
 }
 

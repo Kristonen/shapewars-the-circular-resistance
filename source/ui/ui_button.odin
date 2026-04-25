@@ -4,8 +4,8 @@ import rl "vendor:raylib"
 
 On_Click :: #type proc(b : UI_Button)
 
-create_button :: proc(text : string, rec : rl.Rectangle, on_click : On_Click, data : any = nil) -> UI_Button{
-    return {
+create_button :: proc(text : string, rec : rl.Rectangle, on_click : On_Click, data : $T) -> UI_Button{
+    b := UI_Button{
         text = {
             content = text,
             font_size = 50,
@@ -19,8 +19,11 @@ create_button :: proc(text : string, rec : rl.Rectangle, on_click : On_Click, da
         f_color = rl.BEIGE,
         p_color = rl.VIOLET,
         state = .None,
-        data = data,
         on_click = on_click,
     }
+    b.storage = 0
+    ((^T) (&b.storage))^ = data
+    b.data = any{&b.storage, typeid_of(T)}
+    return b
 }
 

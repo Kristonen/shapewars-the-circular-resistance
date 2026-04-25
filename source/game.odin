@@ -1,5 +1,6 @@
 package game
 
+import "core:mem/virtual"
 import "core:mem"
 import rl "vendor:raylib"
 import m "map"
@@ -41,5 +42,6 @@ Game_State :: struct{
     tooltip : ui.UI_ToolTip,
     tooltip_timer : f32,
 
+    arena : virtual.Arena,
     map_allocator : mem.Allocator
 }
