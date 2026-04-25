@@ -188,12 +188,12 @@ on_hit :: proc(e : ^Enemy, dmg : f32){
 on_death :: proc(e : Enemy, idx : i32){
     game.shake = 100
     count := rand.int32_range(3, 7)
-    loot.spawn_shards(&game.current_level.loot, count, e.origin)
+    loot.spawn_shards(&game.level.loot, count, e.origin)
     if spawner := (^Spawner)(e.spawner); spawner != nil{
         spawner.count -= 1
     }
-    create_fragments_death(&game.current_level.enemy_fragments ,e)
-    unordered_remove(&game.current_level.enemies, idx)
+    create_fragments_death(&game.level.enemy_fragments ,e)
+    unordered_remove(&game.level.enemies, idx)
 }
 
 create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){
@@ -254,7 +254,7 @@ distance_enemy_behavior :: proc(e : ^Enemy, data : ^Distance_Data, g : ^Game_Sta
         b.pos = pos
         dir := g.player.pos - {e.rec.x, e.rec.y}
         b.dir = rl.Vector2Normalize(dir)
-        append(&g.current_level.enemy_bullets, b)
+        append(&g.level.enemy_bullets, b)
     }
 }
 

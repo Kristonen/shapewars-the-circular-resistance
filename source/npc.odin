@@ -10,20 +10,37 @@ NPC :: struct{
     interactable : Interactable,
 }
 
-create_test_npc :: proc(pos : rl.Vector2) -> NPC{
+create_gunsmith_npc :: proc(pos : rl.Vector2) -> NPC{
     n := NPC {
         pos = pos,
         radius = 30,
         texture = rl.BEIGE,
     }
     n.interactable = {
-        text = "E - Interact",
+        text = "E - Gunsmith",
         collider = {
             pos = n.pos,
             radius = n.radius * 2
         },
-        action = test_interact,
+        action = gunsmith_interact,
     }
     
+    return n
+}
+
+create_commander_npc :: proc(pos : rl.Vector2) -> NPC{
+    n := NPC{
+        pos = pos,
+        radius = 36,
+        texture = rl.BLACK,
+    }
+    n.interactable = {
+        text = "E - Commander",
+        collider = {
+            pos = pos,
+            radius = n.radius * 2
+        },
+        action = commander_interact,
+    }
     return n
 }

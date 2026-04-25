@@ -27,7 +27,7 @@ create_hit_particles :: proc(pos : rl.Vector2){
             size = f32(rl.GetRandomValue(5, 9)),
             alive = true
         }
-        append(&game.current_level.particles, p)
+        append(&game.level.particles, p)
     }
 }
 
@@ -44,7 +44,7 @@ create_destroy_bullet_particle :: proc(pos : rl.Vector2){
             size = f32(rl.GetRandomValue(2, 5)),
             alive = true
         }
-        append(&game.current_level.particles, p)
+        append(&game.level.particles, p)
     }
 }
 
@@ -72,7 +72,7 @@ create_poison_particle :: proc(pos : rl.Vector2){
                 size = f32(rl.GetRandomValue(3, 9)),
                 alive = true
             }
-            append(&game.current_level.particles, p)
+            append(&game.level.particles, p)
         }
     }
 }
@@ -93,10 +93,10 @@ create_fire_particle :: proc(pos : rl.Vector2){
             size = f32(rl.GetRandomValue(1, 7)),
             alive = true,
         }
-        append(&game.current_level.particles, p)
+        append(&game.level.particles, p)
         smoke_p := p
         smoke_p.pos.y -= 20
         smoke_p.color = {65, 65, 65, 255}
-        append(&game.current_level.particles, smoke_p)
+        append(&game.level.particles, smoke_p)
     }
 }

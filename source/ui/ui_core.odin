@@ -15,7 +15,7 @@ UI_Element :: union{
 //Structs
 //UI_Menu
 Menu_Type :: enum{
-    Pause, Main, Options, Gunsmith, Skilltree
+    Pause, Main, Options, Gunsmith, Skilltree, ChooseLevel
 }
 
 UI_Menu :: struct{
@@ -44,6 +44,8 @@ UI_Button :: struct{
     rec : rl.Rectangle,
     state : Button_State,
     type : Button_Type,
+    data : any,
+    on_click : On_Click,
 }
 
 //UI Skill Tree

@@ -1,5 +1,6 @@
 package game
 
+import "core:reflect"
 import "core:mem/virtual"
 import "core:strings"
 import rl "vendor:raylib"
@@ -28,6 +29,7 @@ main :: proc(){
     arena : virtual.Arena
     err := virtual.arena_init_growing(&arena)
     map_allocator := virtual.arena_allocator(&arena)
+    game.map_allocator = map_allocator
 
     defer{
         for _, entry in track.allocation_map{
@@ -47,7 +49,12 @@ main :: proc(){
         },
         helper_activated = false,
         current_menu = .Pause,
-        create_hit_particle = create_hit_particles
+        create_hit_particle = create_hit_particles,
+        current_level = .HQ,
+    }
+    for idx in 0..<len(Level_Type){
+        type := Level_Type(idx)
+        append(&game.levels, type)
     }
     sync_menu()
 
@@ -66,34 +73,34 @@ main :: proc(){
 
     defer{
         
-        delete(game.current_level.player_bullets)
-        delete(game.current_level.enemy_bullets)
-        delete(game.current_level.enemy_fragments)
-        delete(game.current_level.loot)
-        delete(game.current_level.upgrade_pool)
-        delete(game.current_level.available_upgrades)
-        delete(game.current_level.particles)
-        delete(game.current_level.level_visual.tilesets)
-        delete(game.current_level.level_visual.layers)
-        delete(game.current_level.ui_elements)
-        delete(game.current_level.skilltree.lines)
-        delete(game.current_level.skilltree.nodes)
+        delete(game.level.player_bullets)
+        delete(game.level.enemy_bullets)
+        delete(game.level.enemy_fragments)
+        delete(game.level.loot)
+        delete(game.level.upgrade_pool)
+        delete(game.level.available_upgrades)
+        delete(game.level.particles)
+        delete(game.level.level_visual.tilesets)
+        delete(game.level.level_visual.layers)
+        delete(game.level.ui_elements)
+        delete(game.level.skilltree.lines)
+        delete(game.level.skilltree.nodes)
 
-        delete(game.level_data)
+        delete(game.levels)
         delete(game.menu.elements)
         delete(game.player.statuses)
         delete(game.player.weapon.bullet.applied_status)
-        for &e in game.current_level.enemies{
+        for &e in game.level.enemies{
             delete(e.statuses)
         }
-        for &s in game.current_level.spawner{
+        for &s in game.level.spawner{
             delete(s.enemy.applied_status)
         }
-        delete(game.current_level.enemies)
-        delete(game.current_level.npcs)
-        delete(game.current_level.spawner)
+        delete(game.level.enemies)
+        delete(game.level.npcs)
+        delete(game.level.spawner)
         delete(game.tooltips)
-        for &element in game.current_level.ui_elements{
+        for &element in game.level.ui_elements{
             switch &e in &element{
                 case ui.UI_Cooldown:
                 case ui.UI_Button:
@@ -114,48 +121,46 @@ main :: proc(){
     if tooltips, ok := get_tooltips(map_allocator); ok{
         game.tooltips = tooltips
     }
+    create_level(game.current_level, map_allocator)
     
     if level_visual, ok := m.load_map("assets/test_map.json", map_allocator); ok{
         game.player = create_player()
         game.player.pos = m.get_player_spawn_pos(level_visual)
         game.camera.target = game.player.pos
-        level := create_start_level()
-        level.level_visual = level_visual
+        game.level.level_visual = level_visual
         //Test Spawner
-        spawner := create_spawner(1, 1, 1, 100)
-        spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
-        append(&level.spawner, spawner)
+        // spawner := create_spawner(1, 1, 1, 100)
+        // spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
+        // append(&game.level.spawner, spawner)
 
-        spawner = create_spawner(2, 2, 1, 500)
-        spawner.enemy = create_second_enemy()
-        append(&level.spawner, spawner)
+        // spawner = create_spawner(2, 2, 1, 500)
+        // spawner.enemy = create_second_enemy()
+        // append(&game.level.spawner, spawner)
 
-        spawner = create_spawner(1, 1, 1, 500)
-        spawner.enemy = create_third_enemy()
-        append(&level.spawner, spawner)
+        // spawner = create_spawner(1, 1, 1, 500)
+        // spawner.enemy = create_third_enemy()
+        // append(&game.level.spawner, spawner)
 
-        spawner = create_spawner(10, 0.1, 0)
-        spawner.enemy = create_dummy_enemy()
-        status := create_poison_status()
-        status.strength = 0.2
-        append(&spawner.enemy.applied_status, status)
-        status = create_fire_status()
-        status.strength = 0.2
-        append(&spawner.enemy.applied_status, status)
-        append(&level.spawner, spawner)
+        // spawner = create_spawner(10, 0.1, 0)
+        // spawner.enemy = create_dummy_enemy()
+        // status := create_poison_status()
+        // status.strength = 0.2
+        // append(&spawner.enemy.applied_status, status)
+        // status = create_fire_status()
+        // status.strength = 0.2
+        // append(&spawner.enemy.applied_status, status)
+        // append(&game.level.spawner, spawner)
 
-        append(&game.level_data, level)
+        // append(&game.levels, game.level)
         //Test Status
-        status = create_poison_status()
-        append(&game.player.weapon.bullet.applied_status, status)
-        status = create_fire_status()
-        append(&game.player.weapon.bullet.applied_status, status)
+        // status = create_poison_status()
+        // append(&game.player.weapon.bullet.applied_status, status)
+        // status = create_fire_status()
+        // append(&game.player.weapon.bullet.applied_status, status)
         //Test NPC
-        test_npc := create_test_npc({100, 100})
-        append(&level.npcs, test_npc)
-
-        game.current_level = level
-        level_up_spawner_update()
+        // test_npc := create_gunsmith_npc({100, 100})
+        // append(&game.level.npcs, test_npc)
+        // level_up_spawner_update()
         
         rect := rl.Rectangle {
             x = 50,
@@ -189,7 +194,7 @@ main :: proc(){
             interactable = nil,
         }
 
-        game.current_level.interact = interact
+        game.level.interact = interact
 
         ability_test := Radial_Liberation{   
             count = 8,
@@ -202,21 +207,21 @@ main :: proc(){
             cast_rate = 5,
         }
         //TODO -> Make ability cd part of the ability instead of player
-        game.player.ability = ability_test
-        game.player.ability_cd = ability_cd
-        get_upgrade_target(&game.player)
-        create_upgrades(&game.current_level.upgrade_pool)
-        fill_available_upgrades(&game)
-        game.player.h_bar = p_bar
-        game.player.v_bar = v_bar
+        // game.player.ability = ability_test
+        // game.player.ability_cd = ability_cd
+        // get_upgrade_target(&game.player)
+        create_upgrades(&game.level.upgrade_pool)
+        // fill_available_upgrades(&game)
+        // game.player.h_bar = p_bar
+        // game.player.v_bar = v_bar
 
         pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
         status_bar := ui.create_ui_status_bar(pos)
 
-        append(&game.current_level.ui_elements, cooldown)
-        append(&game.current_level.ui_elements, game.player.h_bar)
-        append(&game.current_level.ui_elements, game.player.v_bar)
-        append(&game.current_level.ui_elements, status_bar)
+        // append(&game.level.ui_elements, cooldown)
+        // append(&game.level.ui_elements, game.player.h_bar)
+        // append(&game.level.ui_elements, game.player.v_bar)
+        // append(&game.level.ui_elements, status_bar)
     } else{
         panic("Could not load the level!")
     }
@@ -236,7 +241,7 @@ main :: proc(){
 update_game :: proc(dt : f32) {
     update_helper()
     update_handler(dt)
-    if !game.is_paused && !game.current_level.power_level_up{
+    if !game.is_paused && !game.level.power_level_up{
         game.play_time += dt
         update_player(dt)
         update_player_interact(dt)
@@ -252,7 +257,7 @@ update_game :: proc(dt : f32) {
         update_particle(dt)
         update_in_game_ui(dt)
         update_tooltip(dt)
-    } else if game.current_level.power_level_up{
+    } else if game.level.power_level_up{
         update_upgrade(dt)
     } else{
         update_menu()
@@ -260,7 +265,7 @@ update_game :: proc(dt : f32) {
 }
 
 check_collisions :: proc(){
-    if !game.is_paused && !game.current_level.power_level_up{
+    if !game.is_paused && !game.level.power_level_up{
         check_enemy_player()
         check_bullet()
         check_bullet_player()
@@ -268,7 +273,7 @@ check_collisions :: proc(){
         check_collisions_pickup_loot()
         check_player_interact()
         check_in_game_ui_tooltip()
-    } else if game.current_level.power_level_up{
+    } else if game.level.power_level_up{
         check_collision_upgrade_slot()
     } else{
         check_collision_menu()
@@ -294,7 +299,7 @@ draw_game :: proc(){
     draw_tooltip()
     if game.is_paused{
         draw_menu()
-    } else if game.current_level.power_level_up{
+    } else if game.level.power_level_up{
         draw_upgrade()
     }
     rl.EndDrawing()
@@ -303,25 +308,9 @@ draw_game :: proc(){
 cast_ability :: proc(g : ^Game_State){
     switch &a in g.player.ability{
         case Radial_Liberation:
-            cast_radial_liberation(a, &g.current_level.player_bullets, g.player.pos)
+            cast_radial_liberation(a, &g.level.player_bullets, g.player.pos)
         case Dash:
 
-    }
-}
-
-check_which_btn_was_pressed :: proc(b : ^ui.UI_Button){
-    b.state = .None
-    switch b.type{
-        case .Continue:
-            on_click_continue()
-        case .Options:
-            on_click_options()
-        case .Back:
-            on_click_back()
-        case .Exit:
-            on_click_quit()
-        case .Skilltree:
-            on_click_btn_skilltree()
     }
 }
 
@@ -329,27 +318,32 @@ sync_menu :: proc(){
     clear(&game.menu.elements)
     switch game.current_menu{
         case .Pause:
-            width : f32 = 500
-            height : f32 = 100
-            pos_x := f32(rl.GetScreenWidth()) / 2 - width/2
-            pos_y := f32(rl.GetScreenHeight()) * 0.25
-            btn := ui.create_button("Continue", {pos_x, pos_y}, {width, height})
+            rec := rl.Rectangle{
+                x = f32(rl.GetScreenWidth()) / 2 - 500/2,
+                y = f32(rl.GetScreenHeight()) * 0.25,
+                width = 500,
+                height = 100,
+            }
+            btn := ui.create_button("Continue", rec, on_click_continue)
             btn.type = .Continue
             append(&game.menu.elements, btn)
-            pos_y += btn.rec.height * 2 + 50 
-            btn = ui.create_button("Options", {pos_x, pos_y}, {width, height})
+            rec.y += btn.rec.height * 2 + 50 
+            btn = ui.create_button("Options", rec, on_click_options)
             btn.type = .Options
             append(&game.menu.elements, btn)
-            pos_y += btn.rec.height * 2 + 50 
-            btn = ui.create_button("Exit", {pos_x, pos_y}, {width, height})
+            rec.y += btn.rec.height * 2 + 50 
+            btn = ui.create_button("Exit", rec, on_click_quit)
             btn.type = .Exit
             append(&game.menu.elements, btn)
         case .Options:
-            width : f32 = 500
-            height : f32 = 100
-            pos_x := f32(rl.GetScreenWidth()) / 2 - width /2
-            pos_y := f32(rl.GetScreenHeight()) * 0.85
-            btn := ui.create_button("Back", {pos_x, pos_y}, {width, height})
+            rec := rl.Rectangle{
+                width = 500,
+                height = 100,
+                x = f32(rl.GetScreenWidth()) / 2 - 500 /2,
+                y = f32(rl.GetScreenHeight()) * 0.85
+            }
+            
+            btn := ui.create_button("Back", rec, on_click_back)
             btn.type = .Back
             append(&game.menu.elements, btn)
 
@@ -360,9 +354,13 @@ sync_menu :: proc(){
             append(&game.menu.elements, slider)
         case.Main:
         case .Gunsmith:
-            x := f32(rl.GetScreenWidth() / 2 - 50)
-            y := f32(100)
-            first_gun := ui.create_button("Test", {x, y}, {180, 80})
+            rec := rl.Rectangle{
+                x = f32(rl.GetScreenWidth() / 2 - 50),
+                y = f32(100),
+                width = 180,
+                height = 80,
+            }
+            first_gun := ui.create_button("Test", rec, on_click_btn_skilltree)
             first_gun.text.font_size = 30
             first_gun.type = .Skilltree
             append(&game.menu.elements, first_gun)
@@ -370,18 +368,38 @@ sync_menu :: proc(){
             close_btn.text.content = "Close"
             close_btn.rec.y += 100
             close_btn.type = .Continue
+            close_btn.on_click = on_click_continue
             append(&game.menu.elements, close_btn)
         case .Skilltree:
-            clear(&game.current_level.skilltree.lines)
-            clear(&game.current_level.skilltree.nodes)
-            x := f32(rl.GetScreenWidth() - 55)
-            y : f32 = 5
-            back_btn := ui.create_button("X", {x, y}, {50, 50})
+            clear(&game.level.skilltree.lines)
+            clear(&game.level.skilltree.nodes)
+            rec := rl.Rectangle{
+                x = f32(rl.GetScreenWidth() - 55),
+                y = 5,
+                width = 50,
+                height = 50,
+            }
+            
+            back_btn := ui.create_button("X", rec, on_click_back)
             back_btn.text.font_size = 15
             back_btn.type = .Back
             append(&game.menu.elements, back_btn)
-            ui.create_test_skilltree(&game.current_level.skilltree)
-            append(&game.menu.elements, game.current_level.skilltree)
+            ui.create_test_skilltree(&game.level.skilltree)
+            append(&game.menu.elements, game.level.skilltree)
+        case .ChooseLevel:
+            clear(&game.menu.elements)
+            rec := rl.Rectangle{
+                x = 100,
+                y = 100,
+                width = 400,
+                height = 100,
+            }
+            for type in game.levels{
+                // if type == .HQ do continue
+                btn := create_choose_level(rec, type)
+                append(&game.menu.elements, btn)
+                rec.y += 105
+            }
     }
 }
 
@@ -391,11 +409,11 @@ fill_available_upgrades :: proc(g : ^Game_State){
     rare : i32
     epic : i32
     legendary : i32
-    for u in g.current_level.upgrade_pool{
+    for u in g.level.upgrade_pool{
         if u.target == .Player{
-            append(&g.current_level.available_upgrades, u)
+            append(&g.level.available_upgrades, u)
         } else if g.player.target_ability == u.target{
-            append(&g.current_level.available_upgrades, u)
+            append(&g.level.available_upgrades, u)
         }
         switch u.rarity{
             case .Common: common += 1

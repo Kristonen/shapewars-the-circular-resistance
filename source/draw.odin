@@ -16,7 +16,7 @@ draw_player :: proc(){
 }
 
 draw_npc :: proc(){
-    for n in game.current_level.npcs{
+    for n in game.level.npcs{
         rl.DrawCircleV(n.pos, n.radius, n.texture)
         if game.helper_activated{
             draw_collider_circle(n.interactable.collider)
@@ -25,32 +25,32 @@ draw_npc :: proc(){
 }
 
 draw_map :: proc(){
-    tileset_name := game.current_level.level_visual.tilesets[0].image
+    tileset_name := game.level.level_visual.tilesets[0].image
     tileset_path := fmt.tprintf("assets/%s", tileset_name)
     // texture := rl.LoadTexture(rl.TextFormat("%s", tileset_path))
-    texture := game.current_level.level_visual.texture//rl.LoadTexture("assets/simple_tilemap_test.png")
-    tiles_per_row := texture.width / i32(game.current_level.level_visual.tilewidth)
+    texture := game.level.level_visual.texture//rl.LoadTexture("assets/simple_tilemap_test.png")
+    tiles_per_row := texture.width / i32(game.level.level_visual.tilewidth)
 
-    for layer in game.current_level.level_visual.layers{
+    for layer in game.level.level_visual.layers{
         if !layer.visible do continue
 
         if layer.type == "tilelayer"{
-            for pos_y in 0..<game.current_level.level_visual.height{
-                for pos_x in 0..<game.current_level.level_visual.width{
-                    gid := layer.data[pos_y * game.current_level.level_visual.width + pos_x]
+            for pos_y in 0..<game.level.level_visual.height{
+                for pos_x in 0..<game.level.level_visual.width{
+                    gid := layer.data[pos_y * game.level.level_visual.width + pos_x]
                     if gid == 0 do continue
                     id := i32(gid - 1)
                     
                     source := rl.Rectangle{
-                        x = f32((id % tiles_per_row) * i32(game.current_level.level_visual.tilewidth)),
-                        y = f32((id / tiles_per_row) * i32(game.current_level.level_visual.tileheight)),
-                        width = f32(game.current_level.level_visual.tilewidth),
-                        height = f32(game.current_level.level_visual.tileheight),
+                        x = f32((id % tiles_per_row) * i32(game.level.level_visual.tilewidth)),
+                        y = f32((id / tiles_per_row) * i32(game.level.level_visual.tileheight)),
+                        width = f32(game.level.level_visual.tilewidth),
+                        height = f32(game.level.level_visual.tileheight),
                     }
 
                     dest : rl.Vector2
-                    dest.x = f32(pos_x * game.current_level.level_visual.tilewidth)
-                    dest.y = f32(pos_y * game.current_level.level_visual.tileheight)
+                    dest.x = f32(pos_x * game.level.level_visual.tilewidth)
+                    dest.y = f32(pos_y * game.level.level_visual.tileheight)
 
                     rl.DrawTextureRec(texture, source, dest, rl.WHITE)
                 }
@@ -72,14 +72,14 @@ draw_map :: proc(){
 }
 
 draw_bullet :: proc(){
-    for b in game.current_level.player_bullets{
+    for b in game.level.player_bullets{
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if game.helper_activated{
             draw_collider_circle(b.collider)
         }
     }
 
-    for b in game.current_level.enemy_bullets{
+    for b in game.level.enemy_bullets{
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if game.helper_activated{
             draw_collider_circle(b.collider)
@@ -88,7 +88,7 @@ draw_bullet :: proc(){
 }
 
 draw_enemies :: proc(){
-    for e in game.current_level.enemies{
+    for e in game.level.enemies{
         width := e.rec.width * e.visual_scale.x
         height := e.rec.height * e.visual_scale.y
         pos : rl.Vector2 = {e.rec.x, e.rec.y}
@@ -105,13 +105,13 @@ draw_enemies :: proc(){
 }
 
 draw_fragments :: proc(){
-    for f in game.current_level.enemy_fragments{
+    for f in game.level.enemy_fragments{
         rl.DrawRectangleV({f.pos.x, f.pos.y}, {f.width, f.height}, f.color)
     }
 }
 
 draw_loot :: proc(){
-    for l in game.current_level.loot{
+    for l in game.level.loot{
         rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
         // rl.DrawRectangleRec(l.rec, l.color)
         if game.helper_activated{
@@ -122,7 +122,7 @@ draw_loot :: proc(){
 }
 
 draw_particles :: proc(){
-    for p in game.current_level.particles{
+    for p in game.level.particles{
         alpha := 1.0 - (p.life/p.max_life)
         color := p.color
         color.a = u8(alpha*255)
@@ -131,8 +131,8 @@ draw_particles :: proc(){
 }
 
 draw_upgrade :: proc(){
-    rl.DrawRectangleV({}, {game.current_level.upgrade_menu.width, game.current_level.upgrade_menu.height}, {0, 0, 0, 200})
-    for slot in game.current_level.upgrade_menu.upgrades{
+    rl.DrawRectangleV({}, {game.level.upgrade_menu.width, game.level.upgrade_menu.height}, {0, 0, 0, 200})
+    for slot in game.level.upgrade_menu.upgrades{
         gray := rl.GRAY
         gray.a = 150
         if slot.state == .Focused{
@@ -182,7 +182,7 @@ draw_upgrade :: proc(){
 }
 
 draw_in_game_ui :: proc(){
-    for element in game.current_level.ui_elements{
+    for element in game.level.ui_elements{
         switch e in element{
             case ui.UI_Progress_Bar:
                 if e.type == .Health{
@@ -207,8 +207,8 @@ draw_in_game_ui :: proc(){
 }
 
 draw_interact :: proc(){
-    if game.current_level.interact.interactable == nil do return
-    draw_better_text(game.current_level.interact.text, game.current_level.interact.rec)
+    if game.level.interact.interactable == nil do return
+    draw_better_text(game.level.interact.text, game.level.interact.rec)
 }
 
 draw_progress_bar :: proc(bar : ui.UI_Progress_Bar){

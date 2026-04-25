@@ -27,8 +27,8 @@ update_handler :: proc(dt : f32){
     }
 
     if rl.IsKeyPressed(.U){
-        game.current_level.power_level_up = true
-        create_upgrade_menu(&game.current_level.upgrade_menu, game.current_level.available_upgrades, game.player.target_ability)
+        game.level.power_level_up = true
+        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades, game.player.target_ability)
     }
 }
 
@@ -99,13 +99,13 @@ update_player_status :: proc(dt : f32){
 }
 
 update_npc :: proc(dt : f32){
-    for &n in game.current_level.npcs{
+    for &n in game.level.npcs{
         n.interactable.collider.pos = n.pos
     }
 }
 
 update_player_bullets :: proc(dt :f32){
-    for &b, idx in game.current_level.player_bullets{
+    for &b, idx in game.level.player_bullets{
         b.vel = b.dir * b.speed
         b.pos += b.vel * dt
         b.collider.pos = b.pos
@@ -115,13 +115,13 @@ update_player_bullets :: proc(dt :f32){
         if !b.is_active{
             delete(b.hitted_enemies)
             clear(&b.applied_status)
-            unordered_remove(&game.current_level.player_bullets, idx)
+            unordered_remove(&game.level.player_bullets, idx)
         }
     }
 }
 
 update_enemy_bullets :: proc(dt : f32){
-    for &b, idx in game.current_level.enemy_bullets{
+    for &b, idx in game.level.enemy_bullets{
         b.vel = b.dir * b.speed
         b.pos += b.vel * dt
         b.collider.pos = b.pos
@@ -130,7 +130,7 @@ update_enemy_bullets :: proc(dt : f32){
         }
         if !b.is_active{
             delete(b.hitted_enemies)
-            unordered_remove(&game.current_level.enemy_bullets, idx)
+            unordered_remove(&game.level.enemy_bullets, idx)
         }
     }
 }
@@ -160,7 +160,7 @@ update_player_shooting :: proc(dt : f32){
             b := game.player.weapon.bullet
             b.dir = dir
             b.pos = game.player.pos
-            append(&game.current_level.player_bullets, b)
+            append(&game.level.player_bullets, b)
         }
     }
 }
@@ -177,10 +177,10 @@ update_player_casting :: proc(dt : f32){
 }
 
 update_player_interact :: proc(dt : f32){
-    if game.current_level.interact.interactable == nil do return
+    if game.level.interact.interactable == nil do return
 
     if rl.IsKeyPressed(.E){
-        switch &e in game.current_level.interact.interactable{
+        switch &e in game.level.interact.interactable{
             case NPC:
                 e.interactable.action()
         }
@@ -188,7 +188,7 @@ update_player_interact :: proc(dt : f32){
 }
 
 update_spawner :: proc(dt : f32){
-    for &s in game.current_level.spawner{
+    for &s in game.level.spawner{
         if !s.is_active do continue
         if s.count >= s.max_count do continue
         if s.spawn_timer > 0{
@@ -211,12 +211,12 @@ update_spawner :: proc(dt : f32){
         new_e.spawner = &s
         s.count += 1
         s.spawn_timer = s.spawn_time
-        append(&game.current_level.enemies, new_e)
+        append(&game.level.enemies, new_e)
     }
 }
 
 update_enemy :: proc(dt : f32){
-    for &e, idx in game.current_level.enemies{
+    for &e, idx in game.level.enemies{
         if e.health.is_dead{
             delete(e.statuses)
             e.on_death(e, i32(idx))
@@ -269,22 +269,22 @@ update_enemy_status :: proc(e : ^Enemy, dt : f32){
 }
 
 update_fragement :: proc(dt : f32){
-    for &f, idx in game.current_level.enemy_fragments{
+    for &f, idx in game.level.enemy_fragments{
         f.life_time -= dt
         if f.move_time > 0{
             f.pos += f.vel * f.speed * dt
             f.move_time -= dt
         }
         if f.life_time <= 0{
-            unordered_remove(&game.current_level.enemy_fragments, idx)
+            unordered_remove(&game.level.enemy_fragments, idx)
         }
     }
 }
 
 update_particle :: proc(dt : f32){
-    for &p, idx in game.current_level.particles{
+    for &p, idx in game.level.particles{
         if !p.alive{
-            unordered_remove(&game.current_level.particles, idx)
+            unordered_remove(&game.level.particles, idx)
         }
         p.life += dt
         p.pos += p.vel * dt
@@ -295,7 +295,7 @@ update_particle :: proc(dt : f32){
 }
 
 update_loot :: proc(dt : f32){
-    for &l in game.current_level.loot{
+    for &l in game.level.loot{
         if !l.is_active{
             l.time -= dt
             if l.time <= 0{
@@ -324,25 +324,25 @@ update_loot :: proc(dt : f32){
 }
 
 update_upgrade :: proc(dt : f32){
-    game.current_level.upgrade_menu.width = f32(rl.GetScreenWidth())
-    game.current_level.upgrade_menu.height = f32(rl.GetScreenHeight())
+    game.level.upgrade_menu.width = f32(rl.GetScreenWidth())
+    game.level.upgrade_menu.height = f32(rl.GetScreenHeight())
     for i in 0..<3{
-        slot := game.current_level.upgrade_menu.upgrades[i]
-        slot.rect.x = game.current_level.upgrade_menu.width * 0.1 + slot.rect.width * f32(i) + 50 * f32(i)
-        slot.rect.width = game.current_level.upgrade_menu.width * 0.25
-        slot.rect.height = game.current_level.upgrade_menu.height * 0.75
-        game.current_level.upgrade_menu.upgrades[i] = slot
+        slot := game.level.upgrade_menu.upgrades[i]
+        slot.rect.x = game.level.upgrade_menu.width * 0.1 + slot.rect.width * f32(i) + 50 * f32(i)
+        slot.rect.width = game.level.upgrade_menu.width * 0.25
+        slot.rect.height = game.level.upgrade_menu.height * 0.75
+        game.level.upgrade_menu.upgrades[i] = slot
     }
-    for &slot in game.current_level.upgrade_menu.upgrades{
+    for &slot in game.level.upgrade_menu.upgrades{
         if slot.state == .Selected{
             on_upgrade(slot.upgrade)
-            game.current_level.power_level_up = false
+            game.level.power_level_up = false
         }
     }
 }
 
 update_in_game_ui :: proc(dt : f32){
-    for &element in game.current_level.ui_elements{
+    for &element in game.level.ui_elements{
         switch &e in element{
             case ui.UI_Progress_Bar:
                 if e.type == .Health{
@@ -365,10 +365,10 @@ update_in_game_ui :: proc(dt : f32){
 }
 
 update_interact :: proc(){
-    if game.current_level.interact.interactable == nil do return
-    switch &e in game.current_level.interact.interactable{
+    if game.level.interact.interactable == nil do return
+    switch &e in game.level.interact.interactable{
         case NPC: 
-            game.current_level.interact.text.content = e.interactable.text
+            game.level.interact.text.content = e.interactable.text
     }
 }
 
@@ -383,7 +383,8 @@ update_menu :: proc(){
             case ui.UI_Button:
                 update_button(&e)
                 if e.state == .Pressed{
-                    check_which_btn_was_pressed(&e)
+                    e->on_click()
+                    // check_which_btn_was_pressed(&e)
                 }
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:

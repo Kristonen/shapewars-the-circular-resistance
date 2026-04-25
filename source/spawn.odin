@@ -21,7 +21,7 @@ create_spawner :: proc(max_count : i32, spawn_time : f32, increase : i32, cond :
 }
 
 level_up_spawner_update :: proc(){
-    for &s in game.current_level.spawner{
+    for &s in game.level.spawner{
         if s.level_cond == game.player.loot_bag.level{
             s.is_active = true
             continue
