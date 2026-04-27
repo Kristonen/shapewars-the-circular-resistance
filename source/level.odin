@@ -75,21 +75,11 @@ create_start_level :: proc(){
 }
 
 create_first_test_level :: proc(){
-    spawner := create_spawner(5, 3, 2)
+    spawner := create_spawner(5, 0.5, 2)
     spawner.enemy = create_start_enemy({0, 0, 50, 40}, 200, rl.RED)
     append(&game.level.spawner, spawner)
     game.player.pos = {0, 0}
-    a_cd := ui.UI_Cooldown{
-        rec = {
-            x = game.player.h_bar.rec.x + game.player.h_bar.rec.width + 5,
-            y = game.player.h_bar.rec.y,
-            width = game.player.h_bar.rec.height,
-            height = game.player.h_bar.rec.height,
-        },
-    }
-    append(&game.level.ui_elements, game.player.h_bar)
-    append(&game.level.ui_elements, game.player.v_bar)
-    append(&game.level.ui_elements, a_cd)
+    create_battle_ui()
     level_up_spawner_update()
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
         game.player.ability = Radial_Liberation{
@@ -106,6 +96,42 @@ create_first_test_level :: proc(){
     } else{
         panic("Map could not load")
     }
+}
+
+create_battle_ui :: proc(){
+    rect := rl.Rectangle {
+        x = 50,
+        y = f32(rl.GetScreenHeight() - 100),
+        width = f32(rl.GetScreenWidth()) * 0.25,
+        height = 50,
+    }
+    p_bar := ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
+    p_bar.show_text = true
+    p_bar.min = 0
+    p_bar.type = .Health
+
+    v_bar := p_bar
+    v_bar.rec.x += p_bar.rec.width + 60
+    v_bar.fill_color = rl.BLUE
+    v_bar.type = .Value
+    append(&game.level.ui_elements, p_bar)
+    append(&game.level.ui_elements, v_bar)
+
+    a_cd := ui.UI_Cooldown{
+        rec = {
+            x = p_bar.rec.x + p_bar.rec.width + 5,
+            y = p_bar.rec.y,
+            width = p_bar.rec.height,
+            height = p_bar.rec.height,
+        },
+    }
+    append(&game.level.ui_elements, a_cd)
+
+
+
+    pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
+    status_bar := ui.create_ui_status_bar(pos)
+    append(&game.level.ui_elements, status_bar)
 }
 
 create_choose_level :: proc(rec : rl.Rectangle, type : ^Level_Type) -> ui.UI_Button{
