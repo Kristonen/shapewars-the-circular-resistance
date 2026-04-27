@@ -77,8 +77,8 @@ main :: proc(){
 
     defer{
 
-        save_skilltree()
-        save_player()
+
+        save_game()
         
         delete(game.level.player_bullets)
         delete(game.level.enemy_bullets)
@@ -129,13 +129,8 @@ main :: proc(){
         // }
         rl.CloseWindow()
     }
-    
-    if tooltips, ok := load_tooltips(); ok{
-        game.tooltips = tooltips
-    }
     init_game()
-    load_player()
-    // load_skilltree()
+    load_game()
     create_level(game.current_level)
         
     rect := rl.Rectangle {
@@ -178,6 +173,7 @@ main :: proc(){
 
     pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
     status_bar := ui.create_ui_status_bar(pos)
+    append(&game.level.ui_elements, status_bar)
     
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
@@ -196,7 +192,14 @@ init_game :: proc(){
 }
 
 load_game :: proc(){
-    
+    load_player()
+    load_skilltree()
+    load_tooltips()
+}
+
+save_game :: proc(){
+    save_player()
+    save_skilltree()
 }
 
 update_game :: proc(dt : f32) {

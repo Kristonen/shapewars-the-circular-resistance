@@ -108,6 +108,7 @@ create_dummy_enemy :: proc() -> Enemy{
 
 create_start_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
     e := create_enemy(rect, speed, color)
+    append(&e.applied_status, create_poison_status())
     e.health = {
         current = 25,
         max = 25,
