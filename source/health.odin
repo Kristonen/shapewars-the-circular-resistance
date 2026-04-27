@@ -17,8 +17,8 @@ Health :: struct{
     min : f32,
     is_dead : bool,
     invincible_timer : f32,
-    take_dmg : proc(h : ^Health, dmg : f32),
-    heal : proc(h : ^Health, heal : f32),
+    take_dmg : proc(h : ^Health, dmg : f32) `json:"-"`,
+    heal : proc(h : ^Health, heal : f32) `json:"-"`,
     heal_amount : f32,
 }
 

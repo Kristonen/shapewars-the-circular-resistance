@@ -38,9 +38,9 @@ Level_Data :: struct{
 
 create_level :: proc(type : Level_Type){
     rl.UnloadTexture(game.level.level_visual.texture)
-    virtual.arena_destroy(&game.arena)
-    err := virtual.arena_init_growing(&game.arena)
-    game.map_allocator = virtual.arena_allocator(&game.arena)
+    virtual.arena_destroy(&game.map_arena)
+    err := virtual.arena_init_growing(&game.map_arena)
+    game.map_allocator = virtual.arena_allocator(&game.map_arena)
     refresh_level()
     game.current_level = type
     switch type{

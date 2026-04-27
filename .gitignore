@@ -13,3 +13,7 @@ build
 #Ignore personal stuff
 git-helper.txt
 todo.txt
+
+#Test stuff
+assets/skilltrees.json
+assets/player.json

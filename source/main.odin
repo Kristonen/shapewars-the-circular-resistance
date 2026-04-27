@@ -32,7 +32,7 @@ main :: proc(){
     err := virtual.arena_init_growing(&arena)
     map_allocator := virtual.arena_allocator(&arena)
     game.map_allocator = map_allocator
-    game.arena = arena
+    game.map_arena = arena
 
     defer{
         for _, entry in track.allocation_map{
@@ -76,6 +76,9 @@ main :: proc(){
     // append(&game.ui_elements, p_bar)
 
     defer{
+
+        save_skilltree()
+        save_player()
         
         delete(game.level.player_bullets)
         delete(game.level.enemy_bullets)
@@ -127,50 +130,13 @@ main :: proc(){
         rl.CloseWindow()
     }
     
-    if tooltips, ok := get_tooltips(map_allocator); ok{
+    if tooltips, ok := load_tooltips(); ok{
         game.tooltips = tooltips
     }
-    // create_upgrades(&game.level.upgrade_pool)
+    init_game()
+    load_player()
+    // load_skilltree()
     create_level(game.current_level)
-    
-    // if level_visual, ok := m.load_map("assets/test_map.json", map_allocator); ok{
-    //     game.player = create_player()
-    //     game.player.pos = m.get_player_spawn_pos(level_visual)
-    //     game.camera.target = game.player.pos
-    //     game.level.level_visual = level_visual
-        //Test Spawner
-        // spawner := create_spawner(1, 1, 1, 100)
-        // spawner.enemy = create_start_enemy({width = 48, height = 32, x = 0, y = 0}, 200, rl.RED)
-        // append(&game.level.spawner, spawner)
-
-        // spawner = create_spawner(2, 2, 1, 500)
-        // spawner.enemy = create_second_enemy()
-        // append(&game.level.spawner, spawner)
-
-        // spawner = create_spawner(1, 1, 1, 500)
-        // spawner.enemy = create_third_enemy()
-        // append(&game.level.spawner, spawner)
-
-        // spawner = create_spawner(10, 0.1, 0)
-        // spawner.enemy = create_dummy_enemy()
-        // status := create_poison_status()
-        // status.strength = 0.2
-        // append(&spawner.enemy.applied_status, status)
-        // status = create_fire_status()
-        // status.strength = 0.2
-        // append(&spawner.enemy.applied_status, status)
-        // append(&game.level.spawner, spawner)
-
-        // append(&game.levels, game.level)
-        //Test Status
-        // status = create_poison_status()
-        // append(&game.player.weapon.bullet.applied_status, status)
-        // status = create_fire_status()
-        // append(&game.player.weapon.bullet.applied_status, status)
-        //Test NPC
-        // test_npc := create_gunsmith_npc({100, 100})
-        // append(&game.level.npcs, test_npc)
-        // level_up_spawner_update()
         
     rect := rl.Rectangle {
         x = 50,
@@ -208,34 +174,11 @@ main :: proc(){
     }
 
     game.level.interact = interact
-
-        // ability_test := Radial_Liberation{   
-        //     count = 8,
-        //     damage = 5,
-        // }
-        // ability_test := ab.Dash{
-
-        // }
-        // ability_cd := Ability_Cooldown{
-        //     cast_rate = 5,
-        // }
-        //TODO -> Make ability cd part of the ability instead of player
-        // game.player.ability = ability_test
-        // game.player.ability_cd = ability_cd
-        // get_upgrade_target(&game.player)
     create_upgrades(&game.level.upgrade_pool)
-        // fill_available_upgrades(&game)
-        // game.player.h_bar = p_bar
-        // game.player.v_bar = v_bar
 
     pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
     status_bar := ui.create_ui_status_bar(pos)
-
-        // append(&game.level.ui_elements, cooldown)
-        // append(&game.level.ui_elements, game.player.h_bar)
-        // append(&game.level.ui_elements, game.player.v_bar)
-        // append(&game.level.ui_elements, status_bar)
-    init_game()
+    
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         update_camera(dt)
@@ -250,6 +193,10 @@ main :: proc(){
 }
 init_game :: proc(){
     init_skilltrees()
+}
+
+load_game :: proc(){
+    
 }
 
 update_game :: proc(dt : f32) {

@@ -39,7 +39,7 @@ Player :: struct {
     statuses : [dynamic]Status_Effect,
 
     loot_bag : Loot_Bag,
-    increase_value : proc(b : ^Loot_Bag, value : f32) -> bool,
+    increase_value : proc(b : ^Loot_Bag, value : f32) `json:"-"`, 
 
     hurt_collider : cl.Collider_Circle,
     collector : cl.Collider_Circle,
@@ -85,15 +85,14 @@ create_player :: proc() -> Player{
     return p
 }
 
-increase_value :: proc(bag : ^Loot_Bag, value : f32) -> bool{
+increase_value :: proc(bag : ^Loot_Bag, value : f32){
     bag.value += value * bag.mul
     if bag.value >= bag.max_value{
         bag.level += 1
         bag.value -= bag.max_value
         bag.max_value += bag.level_increase
-        return true
+        game.level.power_level_up = true
     }
-    return false
 }
 
 apply_lifesteal :: proc(p : ^Player, dmg : f32){

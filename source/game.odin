@@ -50,6 +50,9 @@ Game_State :: struct{
     skilltrees : map[string]UI_Skill_Tree,
     active_skilltree : Skilltree_Type,
 
-    arena : virtual.Arena,
-    map_allocator : mem.Allocator
+    map_arena : virtual.Arena,
+    map_allocator : mem.Allocator,
+
+    skill_arena : virtual.Arena,
+    skill_allocator : mem.Allocator
 }

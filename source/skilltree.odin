@@ -12,6 +12,7 @@ UI_Skill_Tree :: struct{
     nodes : [dynamic]UI_Skill_Node,
     lines : [dynamic]UI_Skill_Line,
     type : Skilltree_Type,
+    // texture : rl.Texture `json:"-"`,
     unlocked : bool,
 }
 
@@ -22,7 +23,7 @@ UI_Skill_Node :: struct{
     pos : rl.Vector2,
     radius : f32,
     state : UI_Node_State,
-    apply : proc(n : ^UI_Skill_Node),
+    apply : proc(n : ^UI_Skill_Node) `json:"-"`,
     count : i32,
     max_count : i32,
     needed_count : i32,
