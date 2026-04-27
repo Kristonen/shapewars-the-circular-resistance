@@ -203,6 +203,21 @@ draw_in_game_ui :: proc(){
     if !game.is_paused{
         draw_interact()
     }
+    if game.current_level == .HQ do return
+    rec := rl.Rectangle{
+        x = f32(rl.GetScreenWidth() - 105),
+        y = f32(rl.GetScreenHeight()) - 65,
+        width = 100,
+        height = 60,
+    }
+    text := ui.UI_Text{
+        content = fmt.tprintf("Level: %i", game.player.loot_bag.level),
+        font_size = 20,
+        text_color = rl.WHITE,
+        halign = .Center,
+        valign = .Center,
+    }
+    draw_better_text(text, rec)
 }
 
 draw_interact :: proc(){
@@ -348,7 +363,7 @@ draw_menu :: proc(){
 
 draw_skilltree :: proc(){
     type := fmt.tprintf("%v", game.active_skilltree)
-    
+
     for l in game.skilltrees[type].lines{
         from := game.skilltrees[type].nodes[l.from_idx]
         to := game.skilltrees[type].nodes[l.to_idx]

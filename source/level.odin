@@ -42,6 +42,7 @@ create_level :: proc(type : Level_Type){
     err := virtual.arena_init_growing(&game.arena)
     game.map_allocator = virtual.arena_allocator(&game.arena)
     refresh_level()
+    game.current_level = type
     switch type{
         case .HQ:
             create_start_level()     
