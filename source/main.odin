@@ -54,6 +54,7 @@ main :: proc(){
         current_menu = .Pause,
         create_hit_particle = create_hit_particles,
         current_level = .HQ,
+        skill_points = 100,
     }
     for idx in 0..<len(Level_Type){
         type := Level_Type(idx)
@@ -61,15 +62,15 @@ main :: proc(){
     }
     sync_menu()
 
-    cooldown := ui.UI_Cooldown{
-        rec = {
-            x = 550,
-            y = f32(rl.GetScreenHeight() - 100),
-            width = 64,
-            height = 64,
-        },
-        icon = rl.LoadTexture("assets/igel.png")
-    }
+    // cooldown := ui.UI_Cooldown{
+    //     rec = {
+    //         x = 550,
+    //         y = f32(rl.GetScreenHeight() - 100),
+    //         width = 64,
+    //         height = 64,
+    //     },
+    //     icon = rl.LoadTexture("assets/igel.png")
+    // }
     
 
     // append(&game.ui_elements, p_bar)
@@ -86,8 +87,6 @@ main :: proc(){
         delete(game.level.level_visual.tilesets)
         delete(game.level.level_visual.layers)
         delete(game.level.ui_elements)
-        delete(game.level.skilltree.lines)
-        delete(game.level.skilltree.nodes)
 
         delete(game.levels)
         delete(game.menu.elements)
@@ -113,11 +112,18 @@ main :: proc(){
                 case ui.UI_Slider:
                 case ui.UI_Status_Bar:
                     delete(e.slots)
-                case ui.UI_Skill_Tree:
-                    delete(e.lines)
-                    delete(e.nodes)
             }
         }
+
+        for k, &v in game.skilltrees{
+            delete(v.lines)
+            delete(v.nodes)
+        }
+        delete(game.skilltrees)
+        // for k, &v in game.level.skilltrees{
+        //     delete(v.lines)
+        //     delete(v.nodes)
+        // }
         rl.CloseWindow()
     }
     
@@ -229,7 +235,7 @@ main :: proc(){
         // append(&game.level.ui_elements, game.player.h_bar)
         // append(&game.level.ui_elements, game.player.v_bar)
         // append(&game.level.ui_elements, status_bar)
-
+    init_game()
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         update_camera(dt)
@@ -241,6 +247,9 @@ main :: proc(){
             break
         }
     }
+}
+init_game :: proc(){
+    init_skilltrees()
 }
 
 update_game :: proc(dt : f32) {
@@ -264,6 +273,9 @@ update_game :: proc(dt : f32) {
         update_tooltip(dt)
     } else if game.level.power_level_up{
         update_upgrade(dt)
+    } else if game.current_menu == .Skilltree{
+        update_menu()
+        update_skilltree()
     } else{
         update_menu()
     }
@@ -282,6 +294,9 @@ check_collisions :: proc(){
         check_collision_upgrade_slot()
     } else{
         check_collision_menu()
+    }
+    if game.current_menu == .Skilltree{
+        check_skill_node()
     }
 }
 
@@ -306,6 +321,9 @@ draw_game :: proc(){
         draw_menu()
     } else if game.level.power_level_up{
         draw_upgrade()
+    }
+    if game.current_menu == .Skilltree{
+        draw_skilltree()
     }
     rl.EndDrawing()
 }
@@ -351,8 +369,8 @@ sync_menu :: proc(){
             btn := ui.create_button("Back", rec, on_click_back, -1)
             btn.type = .Back
             append(&game.menu.elements, btn)
-
-            label := ui.create_label("Test dauwildjwaj wdajaidwjaidj  wdjaidjaiod:", {100, 100}, {500, 100})
+            rec = rl.Rectangle {x = 100, y = 100, width = 500, height = 100}
+            label := ui.create_label("Test dauwildjwaj wdajaidwjaidj  wdjaidjaiod:", rec)
             append(&game.menu.elements, label)
 
             slider := ui.create_slider({700, 100}, {1000, 100})
@@ -365,19 +383,20 @@ sync_menu :: proc(){
                 width = 180,
                 height = 80,
             }
-            first_gun := ui.create_button("Test", rec, on_click_skilltree, -1)
-            first_gun.text.font_size = 30
-            first_gun.type = .Skilltree
-            append(&game.menu.elements, first_gun)
-            close_btn := first_gun
+            btn : ui.UI_Button
+            for type in ui.UI_Skill_Tree_Type{
+                btn = ui.create_button("Test", rec, on_click_skilltree, type)
+                btn.text.font_size = 30
+                btn.type = .Skilltree
+            }
+            append(&game.menu.elements, btn)
+            close_btn := btn
             close_btn.text.content = "Close"
             close_btn.rec.y += 100
             close_btn.type = .Continue
             close_btn.on_click = on_click_continue
             append(&game.menu.elements, close_btn)
         case .Skilltree:
-            clear(&game.level.skilltree.lines)
-            clear(&game.level.skilltree.nodes)
             rec := rl.Rectangle{
                 x = f32(rl.GetScreenWidth() - 55),
                 y = 5,
@@ -388,9 +407,8 @@ sync_menu :: proc(){
             back_btn := ui.create_button("X", rec, on_click_back, -1)
             back_btn.text.font_size = 15
             back_btn.type = .Back
+            game.active_skilltree = .NormalBullet
             append(&game.menu.elements, back_btn)
-            ui.create_test_skilltree(&game.level.skilltree)
-            append(&game.menu.elements, game.level.skilltree)
         case .ChooseLevel:
             clear(&game.menu.elements)
             rec := rl.Rectangle{
@@ -449,7 +467,6 @@ refresh_ui_pointers :: proc(){
             case ui.UI_Label:
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
-            case ui.UI_Skill_Tree:
         }
     }
 }

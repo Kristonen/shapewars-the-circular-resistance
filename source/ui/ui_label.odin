@@ -2,7 +2,7 @@ package ui
 
 import rl "vendor:raylib"
 
-create_label :: proc(text : string, pos : rl.Vector2, size : rl.Vector2) -> UI_Label{
+create_label :: proc(text : string, rec : rl.Rectangle) -> UI_Label{
     return {
         text = {
             content = text,
@@ -11,12 +11,7 @@ create_label :: proc(text : string, pos : rl.Vector2, size : rl.Vector2) -> UI_L
             halign = .Center,
             valign = .Center,
         },
-        rec = {
-            x = pos.x,
-            y = pos.y,
-            width = size.x,
-            height = size.y,
-        },
+        rec = rec,
         color = rl.GRAY,
     }
 }

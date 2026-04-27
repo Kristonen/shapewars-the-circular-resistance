@@ -3,7 +3,13 @@ package ui
 import rl "vendor:raylib"
 import "core:fmt"
 
-create_test_skilltree :: proc(st : ^UI_Skill_Tree){
+create_skill_tree :: proc(type : UI_Skill_Tree_Type, a : ^map[string]UI_Skill_Tree){
+    create_test_skilltree(type, a)
+}
+
+create_test_skilltree :: proc(type : UI_Skill_Tree_Type, a : ^map[string]UI_Skill_Tree){
+    st : UI_Skill_Tree
+    st.type = type
     mid := rl.Vector2{f32(rl.GetScreenWidth()/2), f32(rl.GetScreenHeight()/2)}
     node_one := UI_Skill_Node{
         name = {
@@ -66,6 +72,8 @@ create_test_skilltree :: proc(st : ^UI_Skill_Tree){
     append(&st.lines, line)
     append(&st.lines, line_two)
     append(&st.lines, line_three)
+    text := fmt.tprintf("%v", type)
+    a[text] = st
 }
 
 apply_skill_node :: proc(n : ^UI_Skill_Node){

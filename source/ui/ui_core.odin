@@ -10,7 +10,6 @@ UI_Element :: union{
     UI_Label,
     UI_Slider,
     UI_Status_Bar,
-    UI_Skill_Tree,
 }
 //Structs
 //UI_Menu
@@ -53,10 +52,12 @@ UI_Button :: struct{
 
 //UI Skill Tree
 UI_Node_State :: enum{None, Focussed, Pressed}
+UI_Skill_Tree_Type :: enum {NormalBullet}
 
 UI_Skill_Tree :: struct{
     nodes : [dynamic]UI_Skill_Node,
     lines : [dynamic]UI_Skill_Line,
+    type : UI_Skill_Tree_Type,
 }
 
 UI_Skill_Node :: struct{

@@ -198,7 +198,6 @@ draw_in_game_ui :: proc(){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 draw_status_bar(e)
-            case ui.UI_Skill_Tree:
         }
     }
     if !game.is_paused{
@@ -343,16 +342,16 @@ draw_menu :: proc(){
             case ui.UI_Slider:
                 draw_slider(e)
             case ui.UI_Status_Bar:
-            case ui.UI_Skill_Tree:
-                draw_skilltree(e)
         } 
     }
 }
 
-draw_skilltree :: proc(st : ui.UI_Skill_Tree){
-    for l in st.lines{
-        from := st.nodes[l.from_idx]
-        to := st.nodes[l.to_idx]
+draw_skilltree :: proc(){
+    type := fmt.tprintf("%v", game.active_skilltree)
+    
+    for l in game.skilltrees[type].lines{
+        from := game.skilltrees[type].nodes[l.from_idx]
+        to := game.skilltrees[type].nodes[l.to_idx]
         pos := from.pos
         if from.count != 0{
             progress := f32(from.count)/f32(to.needed_count)
@@ -369,7 +368,7 @@ draw_skilltree :: proc(st : ui.UI_Skill_Tree){
         rl.DrawLineEx(from.pos, pos, 2.5, {255, 255, 255, 255})
     }
     
-    for n in st.nodes{
+    for n in game.skilltrees[type].nodes{
         color : rl.Color
         r : f32
         pos := rl.Vector2 {n.pos.x, n.pos.y}
@@ -395,6 +394,21 @@ draw_skilltree :: proc(st : ui.UI_Skill_Tree){
             draw_skilltree_desc(n.name, n.desc)
         }
     }
+
+    rec := rl.Rectangle{
+        x = f32(rl.GetScreenWidth()/2 - 250),
+        y = 5,
+        width = 500,
+        height = 100,
+    }
+    text := ui.UI_Text{
+        content = fmt.tprintf("Available skill points: %i", game.skill_points),
+        font_size = 30,
+        text_color = rl.WHITE,
+        halign = .Center,
+        valign = .Center,
+    }
+    draw_better_text(text, rec)
 }
 
 draw_skilltree_desc :: proc(n : ui.UI_Text, desc : ui.UI_Text){

@@ -365,7 +365,6 @@ update_in_game_ui :: proc(dt : f32){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 update_status_bar(&e)
-            case ui.UI_Skill_Tree:
         }
     }
     update_interact()
@@ -392,7 +391,6 @@ update_menu :: proc(){
                 update_button(&e)
                 if e.state == .Pressed{
                     e->on_click()
-                    // check_which_btn_was_pressed(&e)
                 }
             case ui.UI_Menu:
             case ui.UI_Progress_Bar:
@@ -400,27 +398,32 @@ update_menu :: proc(){
             case ui.UI_Slider:
                 update_slider(&e)
             case ui.UI_Status_Bar:
-            case ui.UI_Skill_Tree:
-                for &n in e.nodes{
-                    update_skill_nodes(&n)
-                }
-                for &l in e.lines{
-                    update_skill_lines(&l, &e.nodes)
-                }
         } 
+    }
+}
+
+update_skilltree :: proc(){
+    type := fmt.tprintf("%v", game.active_skilltree)
+    for &n in game.skilltrees[type].nodes{
+        update_skill_nodes(&n)
+    }
+    for &l in game.skilltrees[type].lines{
+        update_skill_lines(&l)
     }
 }
 
 update_skill_nodes :: proc(n : ^ui.UI_Skill_Node){
     n.used.content = fmt.tprintf("%i/%i", n.count, n.max_count)
     if n.state == .Pressed{
+        game.skill_points -= 1
         n->apply()
     }
 }
 
-update_skill_lines :: proc(l : ^ui.UI_Skill_Line, nodes : ^[dynamic]ui.UI_Skill_Node){
-    from := &nodes[l.from_idx]
-    to := &nodes[l.to_idx]
+update_skill_lines :: proc(l : ^ui.UI_Skill_Line){
+    type := fmt.tprintf("%v", game.active_skilltree)
+    from := &game.skilltrees[type].nodes[l.from_idx]
+    to := &game.skilltrees[type].nodes[l.to_idx]
     if from.count >= to.needed_count{
         to.is_active = true
     }

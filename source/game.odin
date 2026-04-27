@@ -15,9 +15,10 @@ Entity :: union {Player, Enemy}
 
 Game_State :: struct{
     player : Player,
-    spawn_player : rl.Vector2,
     camera : rl.Camera2D,
+
     shake : f32,
+
     is_paused : bool,
     play_time : f32,
 
@@ -30,8 +31,12 @@ Game_State :: struct{
     levels : [dynamic]Level_Type,
     current_level : Level_Type,
     level : Level_Data,
-    
 
+    skill_points : i32,
+    rank : i32,
+    current_xp : f32,
+    max_xp : f32,
+    
     helper_activated : bool,
     map_drawing : bool,
     should_close : bool,
@@ -41,6 +46,9 @@ Game_State :: struct{
     tooltip_pos : rl.Vector2,
     tooltip : ui.UI_ToolTip,
     tooltip_timer : f32,
+
+    skilltrees : map[string]ui.UI_Skill_Tree,
+    active_skilltree : ui.UI_Skill_Tree_Type,
 
     arena : virtual.Arena,
     map_allocator : mem.Allocator
