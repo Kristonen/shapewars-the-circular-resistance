@@ -412,7 +412,7 @@ update_skilltree :: proc(){
     }
 }
 
-update_skill_nodes :: proc(n : ^ui.UI_Skill_Node){
+update_skill_nodes :: proc(n : ^UI_Skill_Node){
     n.used.content = fmt.tprintf("%i/%i", n.count, n.max_count)
     if n.state == .Pressed{
         game.skill_points -= 1
@@ -420,7 +420,7 @@ update_skill_nodes :: proc(n : ^ui.UI_Skill_Node){
     }
 }
 
-update_skill_lines :: proc(l : ^ui.UI_Skill_Line){
+update_skill_lines :: proc(l : ^UI_Skill_Line){
     type := fmt.tprintf("%v", game.active_skilltree)
     from := &game.skilltrees[type].nodes[l.from_idx]
     to := &game.skilltrees[type].nodes[l.to_idx]

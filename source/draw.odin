@@ -442,7 +442,11 @@ draw_skilltree_desc :: proc(n : ui.UI_Text, desc : ui.UI_Text){
 }
 
 draw_button :: proc(b : ui.UI_Button){
-    rl.DrawRectangleV({b.rec.x, b.rec.y}, {b.rec.width, b.rec.height}, b.color)
+    if b.disabled{
+        rl.DrawRectangleRec(b.rec, {50, 50, 50, 255})
+    } else{
+        rl.DrawRectangleV({b.rec.x, b.rec.y}, {b.rec.width, b.rec.height}, b.color)
+    }
     rl.DrawRectangleLinesEx(b.rec, 5, rl.BLACK)
     draw_better_text(b.text, b.rec)
 }

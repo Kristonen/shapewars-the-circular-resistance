@@ -20,6 +20,7 @@ create_button :: proc(text : string, rec : rl.Rectangle, on_click : On_Click, da
         p_color = rl.VIOLET,
         state = .None,
         on_click = on_click,
+        disabled = false,
     }
     b.storage = 0
     ((^T) (&b.storage))^ = data

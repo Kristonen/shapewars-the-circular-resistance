@@ -231,6 +231,7 @@ check_skill_node :: proc(){
 }
 
 check_collision_button :: proc(b : ^ui.UI_Button){
+    if b.disabled do return
     mouse_pos := rl.GetMousePosition()
 
     if rl.CheckCollisionPointRec(mouse_pos, b.rec){

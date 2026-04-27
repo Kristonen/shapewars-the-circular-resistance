@@ -380,21 +380,28 @@ sync_menu :: proc(){
             rec := rl.Rectangle{
                 x = f32(rl.GetScreenWidth() / 2 - 50),
                 y = f32(100),
-                width = 180,
-                height = 80,
+                width = 250,
+                height = 100,
             }
             btn : ui.UI_Button
-            for type in ui.UI_Skill_Tree_Type{
-                btn = ui.create_button("Test", rec, on_click_skilltree, type)
+            for type in Skilltree_Type{
+                text := fmt.tprintf("%v", type)
+                btn = ui.create_button(text, rec, on_click_skilltree, type)
                 btn.text.font_size = 30
                 btn.type = .Skilltree
+                if !game.skilltrees[text].unlocked{
+                    btn = ui.create_button("???", rec, on_click_skilltree, type)
+                    btn.text.font_size = 30
+                    btn.type = .Skilltree
+                    btn.disabled = true
+                }
+                append(&game.menu.elements, btn)
+                rec.y += 105
             }
-            append(&game.menu.elements, btn)
-            close_btn := btn
-            close_btn.text.content = "Close"
-            close_btn.rec.y += 100
-            close_btn.type = .Continue
+            btn.disabled = false
+            close_btn := ui.create_button("Close", rec, on_click_continue, -1)
             close_btn.on_click = on_click_continue
+            close_btn.text.font_size = 30
             append(&game.menu.elements, close_btn)
         case .Skilltree:
             rec := rl.Rectangle{

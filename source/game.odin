@@ -47,8 +47,8 @@ Game_State :: struct{
     tooltip : ui.UI_ToolTip,
     tooltip_timer : f32,
 
-    skilltrees : map[string]ui.UI_Skill_Tree,
-    active_skilltree : ui.UI_Skill_Tree_Type,
+    skilltrees : map[string]UI_Skill_Tree,
+    active_skilltree : Skilltree_Type,
 
     arena : virtual.Arena,
     map_allocator : mem.Allocator

@@ -48,35 +48,8 @@ UI_Button :: struct{
     data : any,
 
     on_click : On_Click,
-}
 
-//UI Skill Tree
-UI_Node_State :: enum{None, Focussed, Pressed}
-UI_Skill_Tree_Type :: enum {NormalBullet}
-
-UI_Skill_Tree :: struct{
-    nodes : [dynamic]UI_Skill_Node,
-    lines : [dynamic]UI_Skill_Line,
-    type : UI_Skill_Tree_Type,
-}
-
-UI_Skill_Node :: struct{
-    name : UI_Text,
-    desc : UI_Text,
-    used : UI_Text,
-    pos : rl.Vector2,
-    radius : f32,
-    state : UI_Node_State,
-    apply : proc(n : ^UI_Skill_Node),
-    count : i32,
-    max_count : i32,
-    needed_count : i32,
-    is_active : bool,
-}
-
-UI_Skill_Line :: struct{
-    from_idx : i32,
-    to_idx : i32,
+    disabled : bool,
 }
 
 //UI Cooldown
