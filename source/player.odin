@@ -57,7 +57,7 @@ create_player :: proc() -> Player{
             amount = 1,
         },
         health = {
-          current = 50,
+          current = 100,
           max = 100, 
           take_dmg = take_damage,
           heal = heal,

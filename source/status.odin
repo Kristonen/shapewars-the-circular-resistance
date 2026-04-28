@@ -34,12 +34,12 @@ create_poison_status :: proc() -> Status_Effect{
     }
 }
 
-create_fire_status :: proc() -> Status_Effect{
+create_fire_status :: proc(strength : f32, tick : f32, duration : f32) -> Status_Effect{
     return {
         type = .Burn,
-        strength = 5,
-        tick = 0.25,
-        duration = 2,
+        strength = strength,
+        tick = tick,
+        duration = duration,
         apply = apply_fire,
         texture = rl.RED,
         create_particle = create_fire_particle,

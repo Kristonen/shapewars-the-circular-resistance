@@ -50,6 +50,7 @@ main :: proc(){
             zoom = 1,
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
+        player = create_player(),
         helper_activated = false,
         current_menu = .Pause,
         create_hit_particle = create_hit_particles,
@@ -62,22 +63,7 @@ main :: proc(){
     }
     sync_menu()
 
-    // cooldown := ui.UI_Cooldown{
-    //     rec = {
-    //         x = 550,
-    //         y = f32(rl.GetScreenHeight() - 100),
-    //         width = 64,
-    //         height = 64,
-    //     },
-    //     icon = rl.LoadTexture("assets/igel.png")
-    // }
-    
-
-    // append(&game.ui_elements, p_bar)
-
     defer{
-
-
         save_game()
         
         delete(game.level.player_bullets)
@@ -123,36 +109,12 @@ main :: proc(){
             delete(v.nodes)
         }
         delete(game.skilltrees)
-        // for k, &v in game.level.skilltrees{
-        //     delete(v.lines)
-        //     delete(v.nodes)
-        // }
         rl.CloseWindow()
     }
     init_game()
     load_game()
     create_level(game.current_level)
-        
-    rect := rl.Rectangle {
-        x = 50,
-        y = f32(rl.GetScreenHeight() - 100),
-        width = f32(rl.GetScreenWidth()) * 0.25,
-        height = 50,
-    }
-    p_bar := ui.create_progress_bar(rect, rl.BLACK, rl.GRAY, rl.RED)
-    p_bar.show_text = true
-    p_bar.min = 0
-    p_bar.type = .Health
-
-    v_bar := p_bar
-    v_bar.rec.x += p_bar.rec.width + 60
-    v_bar.fill_color = rl.BLUE
-    v_bar.type = .Value
-
-    game.player.h_bar = p_bar
-    game.player.v_bar = v_bar
-
-    interact := ui.UI_Interact{
+    game.level.interact = {
         rec = {
             x = f32(rl.GetScreenWidth()/2 - 400),
             y = 50,
@@ -167,14 +129,8 @@ main :: proc(){
         },
         interactable = nil,
     }
-
-    game.level.interact = interact
     create_upgrades(&game.level.upgrade_pool)
-
-    pos : rl.Vector2 = {p_bar.rec.x, p_bar.rec.y - 25}
-    status_bar := ui.create_ui_status_bar(pos)
-    append(&game.level.ui_elements, status_bar)
-    
+    fmt.println(game.player.weapon.bullet.damage)
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         update_camera(dt)

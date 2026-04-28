@@ -9,7 +9,7 @@ import "ui"
 import m "map"
 
 Level_Type :: enum{
-    HQ, Battlefield, Forest
+    HQ, Battlefield, Forest, Test
 }
 
 Level_Data :: struct{
@@ -49,6 +49,9 @@ create_level :: proc(type : Level_Type){
         case .Battlefield:
             create_first_test_level()
         case .Forest:
+        case .Test:
+            create_test_level()
+
     }
 }
 
@@ -58,7 +61,6 @@ create_start_level :: proc(){
     npc = create_commander_npc({0, 500})
     append(&game.level.npcs, npc)
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
-        game.player = create_player()
         game.player.pos = m.get_player_spawn_pos(level_visual)
         game.player.ability = Radial_Liberation{
             damage = 5,
@@ -82,13 +84,6 @@ create_first_test_level :: proc(){
     create_battle_ui()
     level_up_spawner_update()
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
-        game.player.ability = Radial_Liberation{
-            damage = 5,
-            count = 8,
-            ability_cd = {
-                cast_rate = 5,
-            }
-        }
         get_upgrade_target()
         fill_available_upgrades()
         game.camera.target = game.player.pos
@@ -96,6 +91,19 @@ create_first_test_level :: proc(){
     } else{
         panic("Map could not load")
     }
+}
+
+create_test_level :: proc(){
+    spawner := create_spawner(100, 0.1, 0)
+    spawner.enemy = create_dummy_enemy()
+    append(&game.level.spawner, spawner)
+    game.player.pos = {0,0}
+    level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
+    game.level.level_visual = level_visual
+    create_battle_ui()
+    level_up_spawner_update()
+    get_upgrade_target()
+    fill_available_upgrades()
 }
 
 create_battle_ui :: proc(){

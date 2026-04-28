@@ -23,7 +23,7 @@ UI_Skill_Node :: struct{
     pos : rl.Vector2,
     radius : f32,
     state : UI_Node_State,
-    apply : proc(n : ^UI_Skill_Node) `json:"-"`,
+    apply : proc(n : ^UI_Skill_Node, is_counting : bool = true) `json:"-"`,
     count : i32,
     max_count : i32,
     needed_count : i32,
@@ -54,52 +54,28 @@ create_normal_bullet_skilltree :: proc(type : Skilltree_Type, a : ^map[string]UI
     st.type = type
     
     mid := rl.Vector2{f32(rl.GetScreenWidth()/2), f32(rl.GetScreenHeight()/2)}
-    node_one := UI_Skill_Node{
-        name = {
-            content = "Test",
-            font_size = 30,
-            text_color = rl.WHITE,
-            halign = .Center,
-            valign = .Center,
-        },
-        desc = {
-            content = "Add something",
-            font_size = 25,
-            text_color = rl.WHITE,
-            halign = .Top,
-            valign = .Center,
-        },
-        used = {
-            font_size = 20,
-            text_color = rl.WHITE,
-            halign = .Center,
-            valign = .Center,
-        },
-        max_count = 5,
-        pos = {mid.x + 200, mid.y + 200},
-        radius = 20,
-        apply = apply_dmg_node,
-        is_active = true
-    }
-    node_two := node_one
-    node_two.pos.x += 200
-    node_two.needed_count = 2
-    node_two.name.content = "Krasser Skill"
-    node_two.is_active = false
-    node_three := node_two
-    node_three.name.content = "Ultimatives Super Teil"
-    node_three.pos.x += 150
-    node_three.pos.y -= 150
-    node_three.needed_count = 4
-    node_four := node_one
-    node_four.pos.y -= 300
-    node_four.pos.x += 50
-    node_four.needed_count = 3
-    node_four.is_active = false
-    append(&st.nodes, node_one)
-    append(&st.nodes, node_two)
-    append(&st.nodes, node_three)
-    append(&st.nodes, node_four)
+
+    n_one := create_skill_node("More Damage", "Increase your start damage by 5.", 6, {mid.x + 200, mid.y + 200})
+    n_one.is_active = true
+    n_one.apply = apply_node_dmg
+
+    n_two := create_skill_node("Fire Bullets", "Add the burn buff to your bullet.", 1, {n_one.pos.x + 200, n_one.pos.y})
+    n_two.needed_count = 4
+    n_two.apply = apply_node_burn_status
+
+    n_three := create_skill_node("Stronger Burn", "Increase the burn damage by 2.", 4, {n_two.pos.x + 150, n_two.pos.y - 150})
+    n_three.needed_count = 1
+    n_three.apply = apply_node_burn_dmg
+
+    n_four := create_skill_node("Poison Bullets", "Add the poison buff to your bullet.", 1, {n_one.pos.x + 50, n_one.pos.y - 300})
+    n_four.needed_count = 4
+    n_four.apply = apply_node_poison_status
+
+    append(&st.nodes, n_one)
+    append(&st.nodes, n_two)
+    append(&st.nodes, n_three)
+    append(&st.nodes, n_four)
+
     line := UI_Skill_Line{
         to_idx = 1,
         from_idx = 0,
@@ -115,10 +91,7 @@ create_normal_bullet_skilltree :: proc(type : Skilltree_Type, a : ^map[string]UI
     append(&st.lines, line)
     append(&st.lines, line_two)
     append(&st.lines, line_three)
+
     text := fmt.tprintf("%v", type)
     a[text] = st
 }
-
-// apply_dmg_skill_node :: proc(n : ^UI_Skill_Node){
-//     n.count += 1
-// }

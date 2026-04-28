@@ -47,9 +47,11 @@ load_skilltree :: proc(){
         for node, node_idx in tree.nodes{
             n := &game.skilltrees[tree.name].nodes[node_idx]
             n.count = node.count
+            for _ in 0..<n.count{
+                n->apply(false)
+            }
         }
     }
-    fmt.println(game.skilltrees["NormalBullet"].nodes[0])
 }
 
 save_skilltree :: proc(){
