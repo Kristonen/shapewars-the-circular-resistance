@@ -20,6 +20,7 @@ import "ui"
 
 on_click_continue :: proc(b : ui.UI_Button){
     game.is_paused = !game.is_paused
+    game.current_menu = .Play
 }
 
 on_click_options :: proc(b : ui.UI_Button){

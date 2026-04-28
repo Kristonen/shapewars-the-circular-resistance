@@ -52,7 +52,7 @@ main :: proc(){
         },
         player = create_player(),
         helper_activated = false,
-        current_menu = .Pause,
+        current_menu = .Play,
         create_hit_particle = create_hit_particles,
         current_level = .HQ,
         skill_points = 100,
@@ -130,7 +130,6 @@ main :: proc(){
         interactable = nil,
     }
     create_upgrades(&game.level.upgrade_pool)
-    fmt.println(game.player.weapon.bullet.damage)
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         update_camera(dt)
@@ -246,7 +245,9 @@ cast_ability :: proc(g : ^Game_State){
 sync_menu :: proc(){
     clear(&game.menu.elements)
     switch game.current_menu{
+        case .Play:
         case .Pause:
+            ui.create_menu(&game.menu)
             rec := rl.Rectangle{
                 x = f32(rl.GetScreenWidth()) / 2 - 500/2,
                 y = f32(rl.GetScreenHeight()) * 0.25,
@@ -331,7 +332,7 @@ sync_menu :: proc(){
                 height = 100,
             }
             for &type in game.levels{
-                // if type == .HQ do continue
+                if type == .HQ do continue
                 btn := create_choose_level(rec, &type)
                 append(&game.menu.elements, btn)
                 refresh_ui_pointers()

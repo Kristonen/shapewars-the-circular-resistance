@@ -11,15 +11,36 @@ import "core:math"
 
 update_handler :: proc(dt : f32){
     if rl.IsKeyPressed(.ESCAPE){
-        game.is_paused = !game.is_paused
         clear(&game.menu.elements)
-        ui.create_menu(&game.menu)
-        if game.is_paused{
-            game.current_menu = .Pause
-            sync_menu()
-        } else{
-            clear(&game.menu.elements)
+        switch game.current_menu{
+            case .Play:
+                game.is_paused = true
+                game.current_menu = .Pause
+            case .Pause:
+                game.is_paused = false
+                game.current_menu = .Play
+            case .Main:
+            case .Options:
+                game.current_menu = game.last_menu
+            case .Gunsmith:
+                game.is_paused = false
+                game.current_menu = .Play
+            case .Skilltree:
+                game.current_menu = game.last_menu
+            case .ChooseLevel:
+                game.is_paused = false
+                game.current_menu = .Play
         }
+        sync_menu()
+        // game.is_paused = !game.is_paused
+        // clear(&game.menu.elements)
+        // ui.create_menu(&game.menu)
+        // if game.is_paused{
+        //     game.current_menu = .Pause
+        //     sync_menu()
+        // } else{
+        //     clear(&game.menu.elements)
+        // }
     }
 
     if rl.IsKeyPressed(.Q){
