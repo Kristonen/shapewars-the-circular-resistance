@@ -44,3 +44,20 @@ create_commander_npc :: proc(pos : rl.Vector2) -> NPC{
     }
     return n
 }
+
+create_catalyst_npc :: proc(pos: rl.Vector2) -> NPC{
+    n := NPC{
+        pos = pos,
+        radius = 26,
+        texture = rl.DARKGREEN,
+    }
+    n.interactable = {
+        text = "E - Catalyst",
+        collider = {
+            pos = pos,
+            radius = n.radius * 2,
+        },
+        action = catalyst_interact
+    }
+    return n
+}

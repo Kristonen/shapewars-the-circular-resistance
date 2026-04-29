@@ -30,17 +30,11 @@ update_handler :: proc(dt : f32){
             case .ChooseLevel:
                 game.is_paused = false
                 game.current_menu = .Play
+            case .Catalyst:
+                game.is_paused = false
+                game.current_menu = .Play
         }
         sync_menu()
-        // game.is_paused = !game.is_paused
-        // clear(&game.menu.elements)
-        // ui.create_menu(&game.menu)
-        // if game.is_paused{
-        //     game.current_menu = .Pause
-        //     sync_menu()
-        // } else{
-        //     clear(&game.menu.elements)
-        // }
     }
 
     if rl.IsKeyPressed(.Q){

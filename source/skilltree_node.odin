@@ -39,6 +39,15 @@ apply_node_dmg :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
     stat^ += 5
 }
 
+apply_node_rl_cd :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
+    if is_counting{
+        n.count += 1
+    }
+    a := &game.player.ability.(Radial_Liberation)
+    stat := &a.ability_cd.cast_rate
+    stat^ *= 0.96
+}
+
 apply_node_burn_status :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
     if is_counting{
         n.count += 1

@@ -60,6 +60,8 @@ create_start_level :: proc(){
     append(&game.level.npcs, npc)
     npc = create_commander_npc({0, 500})
     append(&game.level.npcs, npc)
+    npc = create_catalyst_npc({400, -200})
+    append(&game.level.npcs, npc)
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
         game.player.pos = m.get_player_spawn_pos(level_visual)
         game.player.ability = Radial_Liberation{
@@ -143,9 +145,18 @@ create_battle_ui :: proc(){
 }
 
 create_choose_level :: proc(rec : rl.Rectangle, type : ^Level_Type) -> ui.UI_Button{
-    test : ui.UI_Button
     text := fmt.tprintf("%v", type^)
     return ui.create_button(text, rec, on_click_change_level, type)
+}
+
+create_choose_ability_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Ability_Type) -> ui.UI_Button{
+    text := fmt.tprintf("%v", type^)
+    return ui.create_button(text, rec, on_click_skilltree, type)
+}
+
+create_choose_bullet_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Bullet_Type) -> ui.UI_Button{
+    text := fmt.tprintf("%v", type^)
+    return ui.create_button(text, rec, on_click_skilltree, type)
 }
 
 refresh_level :: proc(){

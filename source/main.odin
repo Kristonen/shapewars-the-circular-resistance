@@ -61,6 +61,17 @@ main :: proc(){
         type := Level_Type(idx)
         append(&game.levels, type)
     }
+
+    for idx in 0..<len(Skilltree_Ability_Type){
+        type := Skilltree_Ability_Type(idx)
+        append(&game.all_abilities, type)
+    }
+
+    for idx in 0..<len(Skilltree_Bullet_Type){
+        type := Skilltree_Bullet_Type(idx)
+        append(&game.all_bullets, type)
+    }
+
     sync_menu()
 
     defer{
@@ -109,6 +120,8 @@ main :: proc(){
             delete(v.nodes)
         }
         delete(game.skilltrees)
+        delete(game.all_abilities)
+        delete(game.all_bullets)
         rl.CloseWindow()
     }
     init_game()
@@ -291,26 +304,49 @@ sync_menu :: proc(){
                 height = 100,
             }
             btn : ui.UI_Button
-            for type in Skilltree_Type{
+            for &type in game.all_bullets{
                 text := fmt.tprintf("%v", type)
-                btn = ui.create_button(text, rec, on_click_skilltree, type)
+                btn = create_choose_bullet_skilltree(rec, &type)
                 btn.text.font_size = 30
                 btn.type = .Skilltree
                 if !game.skilltrees[text].unlocked{
-                    btn = ui.create_button("???", rec, on_click_skilltree, type)
-                    btn.text.font_size = 30
-                    btn.type = .Skilltree
                     btn.disabled = true
+                    btn.text.content = "???"
                 }
                 append(&game.menu.elements, btn)
+                refresh_ui_pointers()
                 rec.y += 105
             }
             btn.disabled = false
             close_btn := ui.create_button("Close", rec, on_click_continue, -1)
-            close_btn.on_click = on_click_continue
+            close_btn.text.font_size = 30
+            append(&game.menu.elements, close_btn)
+        case .Catalyst:
+            rec := rl.Rectangle{
+                x = f32(rl.GetScreenWidth() / 2 - 50),
+                y = f32(100),
+                width = 300,
+                height = 100,
+            }
+            for &type in game.all_abilities{
+                text := fmt.tprintf("%v", type)
+                btn := create_choose_ability_skilltree(rec, &type)
+                btn.type = .Skilltree
+                btn.text.font_size = 30
+                if !game.skilltrees[text].unlocked{
+                    btn.disabled = true
+                    btn.text.content = "???"
+                }
+                append(&game.menu.elements, btn)
+                refresh_ui_pointers()
+                rec.y += 105
+            }
+            close_btn := ui.create_button("Close", rec, on_click_continue, -1)
+            close_btn.type = .Continue
             close_btn.text.font_size = 30
             append(&game.menu.elements, close_btn)
         case .Skilltree:
+            test := game.active_skilltree
             rec := rl.Rectangle{
                 x = f32(rl.GetScreenWidth() - 55),
                 y = 5,
@@ -321,7 +357,6 @@ sync_menu :: proc(){
             back_btn := ui.create_button("X", rec, on_click_back, -1)
             back_btn.text.font_size = 15
             back_btn.type = .Back
-            game.active_skilltree = .NormalBullet
             append(&game.menu.elements, back_btn)
         case .ChooseLevel:
             clear(&game.menu.elements)

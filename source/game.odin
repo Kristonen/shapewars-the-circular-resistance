@@ -54,5 +54,11 @@ Game_State :: struct{
     map_allocator : mem.Allocator,
 
     skill_arena : virtual.Arena,
-    skill_allocator : mem.Allocator
+    skill_allocator : mem.Allocator,
+
+    all_bullets : [dynamic]Skilltree_Bullet_Type,
+    unlocked_bullets : [dynamic]Skilltree_Bullet_Type,
+
+    all_abilities : [dynamic]Skilltree_Ability_Type,
+    unlocked_abilities : [dynamic]Skilltree_Ability_Type,
 }

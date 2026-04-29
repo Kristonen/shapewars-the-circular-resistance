@@ -41,6 +41,13 @@ on_click_quit :: proc(b : ui.UI_Button){
 
 on_click_skilltree :: proc(b : ui.UI_Button){
     game.last_menu = game.current_menu
+    if game.current_menu == .Catalyst{
+        test := b.data.(^Skilltree_Ability_Type)
+        game.active_skilltree = test^
+    } else{
+        test := b.data.(^Skilltree_Bullet_Type)
+        game.active_skilltree = test^
+    }
     game.current_menu = .Skilltree
     sync_menu()
 }

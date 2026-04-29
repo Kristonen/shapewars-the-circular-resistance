@@ -6,7 +6,10 @@ import "ui"
 
 //UI Skill Tree
 UI_Node_State :: enum{None, Focussed, Pressed}
-Skilltree_Type :: enum {NormalBullet, BetterBullet}
+Skilltree_Type :: union {Skilltree_Bullet_Type, Skilltree_Ability_Type}
+
+Skilltree_Bullet_Type :: enum{NormalBullet, BetterBUllet}
+Skilltree_Ability_Type :: enum {Radial_Liberation}
 
 UI_Skill_Tree :: struct{
     nodes : [dynamic]UI_Skill_Node,
@@ -39,9 +42,25 @@ create_skill_tree :: proc(type : Skilltree_Type, a : ^map[string]UI_Skill_Tree){
     switch type{
         case .NormalBullet:
             create_normal_bullet_skilltree(type, a)
-        case .BetterBullet:
+        case .Radial_Liberation:
+            create_rl_skilltree(type)
     }
     
+}
+
+create_rl_skilltree :: proc(type : Skilltree_Type){
+    st : UI_Skill_Tree
+    st.unlocked = true
+    st.type = type
+    mid := rl.Vector2{f32(rl.GetScreenWidth()/2), f32(rl.GetScreenHeight()/2)}
+    n_one := create_skill_node("Power among us", "Decrease the cd of Radial Liberation by 4%.", 4, {mid.x - 150, mid.y + 150})
+    n_one.is_active = true
+    n_one.apply = apply_node_rl_cd
+    append(&st.nodes, n_one)
+
+    text := fmt.tprintf("%v", type)
+    game.skilltrees[text] = st
+    fmt.println(game.skilltrees[text].unlocked)
 }
 
 create_normal_bullet_skilltree :: proc(type : Skilltree_Type, a : ^map[string]UI_Skill_Tree){
