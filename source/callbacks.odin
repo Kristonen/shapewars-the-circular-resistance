@@ -55,6 +55,7 @@ on_click_skilltree :: proc(b : ui.UI_Button){
 on_click_change_level :: proc(b : ui.UI_Button){
     clear(&game.menu.elements)
     game.is_paused = !game.is_paused
+    game.current_menu = .Play
     type := b.data.(^Level_Type)
     create_level(type^)
 }

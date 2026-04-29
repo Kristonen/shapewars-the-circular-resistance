@@ -143,6 +143,7 @@ main :: proc(){
         interactable = nil,
     }
     create_upgrades(&game.level.upgrade_pool)
+    
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
         update_camera(dt)
