@@ -61,4 +61,9 @@ Game_State :: struct{
 
     all_abilities : [dynamic]Skilltree_Ability_Type,
     unlocked_abilities : [dynamic]Skilltree_Ability_Type,
+
+    //Test
+    fbo : rl.RenderTexture,
+    glow_shader : rl.Shader,
+    intensity_loc : i32,
 }

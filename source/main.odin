@@ -144,8 +144,20 @@ main :: proc(){
     }
     create_upgrades(&game.level.upgrade_pool)
     
+    game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
+    game.glow_shader = rl.LoadShader(nil, "assets/shaders/glow.glsl")
+    game.intensity_loc = rl.GetShaderLocation(game.glow_shader, "intensity")
+
+
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
+
+        rl.BeginTextureMode(game.fbo)
+            rl.ClearBackground(rl.BLANK)
+            rl.DrawRectangle(200, 200, 500, 500, rl.GOLD)
+        rl.EndTextureMode()
+
+
         update_camera(dt)
         check_collisions()
         update_game(dt)
@@ -222,7 +234,7 @@ check_collisions :: proc(){
 
 draw_game :: proc(){
     rl.BeginDrawing()
-    rl.ClearBackground(rl.BLUE)
+    rl.ClearBackground(rl.BLACK)
     rl.BeginMode2D(game.camera)
     if game.map_drawing{
         draw_map()
@@ -245,6 +257,17 @@ draw_game :: proc(){
     if game.current_menu == .Skilltree{
         draw_skilltree()
     }
+
+    rl.BeginShaderMode(game.glow_shader)
+        intensity : f32 = 300.0
+        rl.SetShaderValue(game.glow_shader, game.intensity_loc, &intensity, .FLOAT)
+        source := rl.Rectangle{0, 0, f32(game.fbo.texture.width), -f32(game.fbo.texture.height)}
+        dest := rl.Rectangle{0, 0, f32(rl.GetScreenWidth()), f32(rl.GetScreenHeight())}
+        rl.DrawTexturePro(game.fbo.texture, source, dest, {0,0}, 0, rl.GRAY)
+        rl.DrawRectangle(200, 200, 500, 500, rl.GRAY)
+    rl.EndShaderMode()
+
+
     rl.EndDrawing()
 }
 
