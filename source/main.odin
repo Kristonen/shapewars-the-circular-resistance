@@ -202,6 +202,7 @@ update_game :: proc(dt : f32) {
 
 check_collisions :: proc(){
     if !game.is_paused && !game.level.power_level_up{
+        check_enemy()
         check_enemy_player()
         check_bullet()
         check_bullet_player()

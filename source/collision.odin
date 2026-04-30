@@ -115,6 +115,33 @@ check_enemy_player :: proc(){
     }
 }
 
+check_enemy :: proc(){
+    for &e in game.level.enemies{
+        check_enemy_enemy(&e)
+    }
+}
+
+check_enemy_enemy :: proc(e : ^Enemy){
+    for &enemy in game.level.enemies{
+        if &enemy == e do continue
+        if rl.CheckCollisionRecs(e.rec, enemy.rec){
+            dir := e.origin - enemy.origin
+            dist := rl.Vector2Length(dir)
+
+            if dist == 0 { dist = 0.1}
+            push_force : f32 = 0.5
+            push := (dir/dist) * push_force
+            e.rec.x += push.x
+            e.rec.y += push.y
+
+            enemy.rec.x -= push.x
+            enemy.rec.y -= push.y
+        }
+    }
+}
+
+
+
 add_enemy_status_to_player :: proc(e : Enemy, p : ^Player){
     for s in e.applied_status{
 
