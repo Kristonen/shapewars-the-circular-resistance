@@ -143,10 +143,12 @@ main :: proc(){
         interactable = nil,
     }
     create_upgrades(&game.level.upgrade_pool)
+    fill_available_upgrades()
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
     game.glow_shader = rl.LoadShader(nil, "assets/shaders/glow.glsl")
     game.intensity_loc = rl.GetShaderLocation(game.glow_shader, "intensity")
+    // game.raster_loc = rl.GetShaderLocation(game.glow_shader, "raster")
 
 
     for !rl.WindowShouldClose(){
@@ -154,7 +156,15 @@ main :: proc(){
 
         rl.BeginTextureMode(game.fbo)
             rl.ClearBackground(rl.BLANK)
-            rl.DrawRectangle(200, 200, 500, 500, rl.GOLD)
+            for slot in game.level.upgrade_menu.upgrades{
+                if slot.state == .Focused{
+                    // rl.DrawRectangleLinesEx(slot.rect, 5, slot.color)
+                    
+                }
+                rl.DrawRectangleRoundedLinesEx(slot.rect, 0.01, 1, 2, slot.color)
+                
+                // rl.DrawRectangleRec(slot.rect, slot.color)
+            }
         rl.EndTextureMode()
 
 
@@ -234,19 +244,20 @@ check_collisions :: proc(){
 
 draw_game :: proc(){
     rl.BeginDrawing()
-    rl.ClearBackground(rl.BLACK)
+    rl.ClearBackground(rl.BLUE)
     rl.BeginMode2D(game.camera)
-    if game.map_drawing{
-        draw_map()
-    }
-    draw_fragments()
-    draw_player()
-    draw_npc()
-    draw_loot()
-    draw_bullet()
-    draw_enemies()
-    draw_particles()
+        if game.map_drawing{
+            draw_map()
+        }
+        draw_fragments()
+        draw_player()
+        draw_npc()
+        draw_loot()
+        draw_bullet()
+        draw_enemies()
+        draw_particles()
     rl.EndMode2D()
+    // draw_shader()
     draw_in_game_ui()
     draw_tooltip()
     if game.is_paused{
@@ -257,17 +268,7 @@ draw_game :: proc(){
     if game.current_menu == .Skilltree{
         draw_skilltree()
     }
-
-    rl.BeginShaderMode(game.glow_shader)
-        intensity : f32 = 300.0
-        rl.SetShaderValue(game.glow_shader, game.intensity_loc, &intensity, .FLOAT)
-        source := rl.Rectangle{0, 0, f32(game.fbo.texture.width), -f32(game.fbo.texture.height)}
-        dest := rl.Rectangle{0, 0, f32(rl.GetScreenWidth()), f32(rl.GetScreenHeight())}
-        rl.DrawTexturePro(game.fbo.texture, source, dest, {0,0}, 0, rl.GRAY)
-        rl.DrawRectangle(200, 200, 500, 500, rl.GRAY)
-    rl.EndShaderMode()
-
-
+    rl.DrawFPS(25, 25)
     rl.EndDrawing()
 }
 

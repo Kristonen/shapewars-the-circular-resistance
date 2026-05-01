@@ -138,13 +138,24 @@ create_upgrade_slot :: proc(u : ^Upgrade, mul : f32) -> UI_Upgrade_Slot{
 
 get_upgrade_color :: proc(r : Rarity) -> rl.Color{
     switch r{
-        case .Common: return rl.SKYBLUE
-        case .Uncommon: return rl.DARKBLUE
-        case .Rare: return rl.GREEN
-        case .Epic: return rl.VIOLET
-        case .Legendary: return rl.ORANGE
+        case .Common: return {180, 180, 255, 175}
+        case .Uncommon: return {90, 90, 255, 195}
+        case .Rare: return {0, 255, 0, 215}
+        case .Epic: return {158, 90, 253, 235}
+        case .Legendary: return {255, 165, 0, 255}
     }
     return rl.WHITE
+}
+
+get_upgrade_raster :: proc(r : Rarity) -> i32{
+    switch r{
+        case .Common: return 5
+        case .Uncommon: return 7
+        case .Rare: return 9
+        case .Epic: return 11
+        case .Legendary: return 15
+    }
+    return 5
 }
 
 apply_normal_upgrade :: proc(type : Upgrade_Type, stat : ^f32, v : f32){

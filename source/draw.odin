@@ -1,5 +1,6 @@
 package game
 
+import "core:math"
 import "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
@@ -132,6 +133,7 @@ draw_particles :: proc(){
 
 draw_upgrade :: proc(){
     rl.DrawRectangleV({}, {game.level.upgrade_menu.width, game.level.upgrade_menu.height}, {0, 0, 0, 200})
+    
     for slot in game.level.upgrade_menu.upgrades{
         gray := rl.GRAY
         gray.a = 150
@@ -139,8 +141,10 @@ draw_upgrade :: proc(){
             gray = {180, 180, 180, 150}
         }
         //Draw whole upgrade rec
+        draw_upgrade_shader(slot.upgrade.rarity)
         rl.DrawRectangleV({slot.rect.x, slot.rect.y}, {slot.rect.width, slot.rect.height}, gray)
-        rl.DrawRectangleLinesEx(slot.rect, 5, slot.color)
+        rl.DrawRectangleLinesEx(slot.rect, 1.5, slot.color)
+        // draw_upgrade_shader()
         //Draw head of upgrade (name)
         rec := rl.Rectangle {slot.rect.x + 25, slot.rect.y + 100, slot.rect.width - 50, 50}
         rl.DrawRectangleV({rec.x, rec.y}, {rec.width, rec.height}, rl.BLACK)
@@ -179,6 +183,23 @@ draw_upgrade :: proc(){
         draw_better_text(rarity_text, rec)
         // draw_text(r_string, rec, 20, slot.color)
     }
+}
+
+draw_upgrade_shader :: proc(r : Rarity){
+    rl.BeginBlendMode(.ADDITIVE)
+        rl.BeginShaderMode(game.glow_shader)
+            time := rl.GetTime()
+            current_glow_intensity : f32
+            current_glow_intensity = MIN_GLOW * f32(math.sin(time * GLOW_PULSE_SPEED)) * GLOW_AMPLITUDE
+            raster := get_upgrade_raster(r)
+            // intensity : f32 = 0.1
+            rl.SetShaderValue(game.glow_shader, game.intensity_loc, &current_glow_intensity, .FLOAT)
+            rl.SetShaderValue(game.glow_shader, game.raster_loc, &raster, .INT)
+            source := rl.Rectangle{0, 0, f32(game.fbo.texture.width), -f32(game.fbo.texture.height)}
+            dest := rl.Rectangle{0, 0, f32(rl.GetScreenWidth()), f32(rl.GetScreenHeight())}
+            rl.DrawTexturePro(game.fbo.texture, source, dest, {0,0}, 0, rl.WHITE)
+        rl.EndShaderMode()
+    rl.EndBlendMode()
 }
 
 draw_in_game_ui :: proc(){
