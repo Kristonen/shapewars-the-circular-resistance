@@ -186,12 +186,12 @@ draw_upgrade :: proc(){
 
 draw_upgrade_shader :: proc(){
     rl.BeginBlendMode(.ADDITIVE)
-        rl.BeginShaderMode(game.glow_shader)
+        rl.BeginShaderMode(game.glow.shader)
             time := rl.GetTime()
             current_glow_intensity : f32
             current_glow_intensity = MIN_GLOW * f32(math.sin(time * GLOW_PULSE_SPEED)) * GLOW_AMPLITUDE
             // intensity : f32 = 0.1
-            rl.SetShaderValue(game.glow_shader, game.intensity_loc, &current_glow_intensity, .FLOAT)
+            rl.SetShaderValue(game.glow.shader, game.glow.intensity_loc, &current_glow_intensity, .FLOAT)
             source := rl.Rectangle{0, 0, f32(game.fbo.texture.width), -f32(game.fbo.texture.height)}
             dest := rl.Rectangle{0, 0, f32(rl.GetScreenWidth()), f32(rl.GetScreenHeight())}
             rl.DrawTexturePro(game.fbo.texture, source, dest, {0,0}, 0, rl.WHITE)

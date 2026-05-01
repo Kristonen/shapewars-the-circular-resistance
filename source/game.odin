@@ -64,7 +64,7 @@ Game_State :: struct{
 
     //Test
     fbo : rl.RenderTexture,
-    glow_shader : rl.Shader,
-    intensity_loc : i32,
-    raster_loc : i32,
+    glow : Glow_Shader,
+    // glow_shader : rl.Shader,
+    // intensity_loc : i32,
 }

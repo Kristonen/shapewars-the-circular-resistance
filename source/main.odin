@@ -146,8 +146,7 @@ main :: proc(){
     fill_available_upgrades()
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
-    game.glow_shader = rl.LoadShader(nil, "assets/shaders/glow.glsl")
-    game.intensity_loc = rl.GetShaderLocation(game.glow_shader, "intensity")
+    // game.intensity_loc = rl.GetShaderLocation(game.glow_shader, "intensity")
     // game.raster_loc = rl.GetShaderLocation(game.glow_shader, "raster")
 
 
@@ -180,6 +179,7 @@ main :: proc(){
 }
 init_game :: proc(){
     init_skilltrees()
+    init_shaders()
 }
 
 load_game :: proc(){
