@@ -6,6 +6,8 @@ import cl "collider"
 import "ui"
 import "loot"
 
+Enemy_Hit_Time :: 0.1
+
 Behavior :: #type proc(e : ^Enemy, $T : typeid)
 On_Hit :: #type proc(e : ^Enemy, dmg : f32)
 On_Death :: #type proc(e : Enemy, idx : i32)
@@ -54,6 +56,8 @@ Enemy :: struct {
     statuses : [dynamic]Status_Effect,
 
     spawner : rawptr,
+
+    hit_timer : f32,
 
     on_hit : On_Hit,
     on_death : On_Death,
@@ -184,6 +188,7 @@ on_hit :: proc(e : ^Enemy, dmg : f32){
     game.create_hit_particle(e.origin)
     e.knocback->apply(game.player.pos, &e.rec)
     e.health->take_dmg(dmg)
+    e.hit_timer = Enemy_Hit_Time
 }
 
 on_death :: proc(e : Enemy, idx : i32){

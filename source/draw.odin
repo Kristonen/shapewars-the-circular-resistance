@@ -97,7 +97,11 @@ draw_enemies :: proc(){
             pos.x -= (width - e.rec.width) / 2
             pos.y += (height - e.rec.height) / 2 
         }
-        rl.DrawRectangleV(pos, {width, height}, e.color)
+        if e.hit_timer > 0{
+            rl.DrawRectangleV(pos, {width, height}, rl.WHITE)
+        } else{
+                rl.DrawRectangleV(pos, {width, height}, e.color)
+        }
         draw_progress_bar(e.health_bar)
         if game.helper_activated{
             draw_collider_rect(e.collidor)
@@ -133,7 +137,7 @@ draw_particles :: proc(){
 
 draw_upgrade :: proc(){
     rl.DrawRectangleV({}, {game.level.upgrade_menu.width, game.level.upgrade_menu.height}, {0, 0, 0, 200})
-    draw_upgrade_shader()
+    draw_glow_shader()
     for slot in game.level.upgrade_menu.upgrades{
         gray := rl.GRAY
         gray.a = 150
@@ -180,11 +184,10 @@ draw_upgrade :: proc(){
             text_color = slot.color
         }
         draw_better_text(rarity_text, rec)
-        // draw_text(r_string, rec, 20, slot.color)
     }
 }
 
-draw_upgrade_shader :: proc(){
+draw_glow_shader :: proc(){
     rl.BeginBlendMode(.ADDITIVE)
         rl.BeginShaderMode(game.glow.shader)
             time := rl.GetTime()

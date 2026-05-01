@@ -243,6 +243,9 @@ update_enemy :: proc(dt : f32){
             e.on_death(e, i32(idx))
             continue
         }
+        if e.hit_timer > 0{
+            e.hit_timer -= dt
+        }
         kb_speed := rl.Vector2Length(e.knocback.vel)
         if kb_speed > e.knocback.threshold{
             pos : rl.Vector2 = {e.rec.x, e.rec.y}

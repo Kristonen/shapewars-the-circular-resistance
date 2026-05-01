@@ -153,20 +153,6 @@ main :: proc(){
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
 
-        rl.BeginTextureMode(game.fbo)
-            rl.ClearBackground(rl.BLANK)
-            for slot in game.level.upgrade_menu.upgrades{
-                if slot.state == .Focused{
-                    // rl.DrawRectangleLinesEx(slot.rect, 5, slot.color)
-                    
-                }
-                rl.DrawRectangleRoundedLinesEx(slot.rect, 0.01, 1, 2, slot.color)
-                
-                // rl.DrawRectangleRec(slot.rect, slot.color)
-            }
-        rl.EndTextureMode()
-
-
         update_camera(dt)
         check_collisions()
         update_game(dt)
@@ -243,6 +229,14 @@ check_collisions :: proc(){
 }
 
 draw_game :: proc(){
+
+    rl.BeginTextureMode(game.fbo)
+            rl.ClearBackground(rl.BLANK)
+            for s in game.level.upgrade_menu.upgrades{
+                rl.DrawRectangleRoundedLinesEx(s.rect, 0.01, 1, 2, s.color)
+            }
+    rl.EndTextureMode()
+    
     rl.BeginDrawing()
     rl.ClearBackground(rl.BLUE)
     rl.BeginMode2D(game.camera)
@@ -257,7 +251,7 @@ draw_game :: proc(){
         draw_enemies()
         draw_particles()
     rl.EndMode2D()
-    // draw_shader()
+    
     draw_in_game_ui()
     draw_tooltip()
     if game.is_paused{
