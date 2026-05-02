@@ -292,6 +292,16 @@ update_enemy_status :: proc(e : ^Enemy, dt : f32){
     }
 }
 
+update_area_effect :: proc(dt : f32){
+    for &a, idx in game.level.area_effects{
+        if a.duration > 0{
+            a.duration -= dt
+        } else{
+            unordered_remove(&game.level.area_effects, idx)
+        }
+    }
+}
+
 update_fragement :: proc(dt : f32){
     for &f, idx in game.level.enemy_fragments{
         f.life_time -= dt

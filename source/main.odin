@@ -192,6 +192,7 @@ update_game :: proc(dt : f32) {
         update_player_casting(dt)
         update_spawner(dt)
         update_enemy(dt)
+        update_area_effect(dt)
         update_fragement(dt)
         update_loot(dt)
         update_particle(dt)
