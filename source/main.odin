@@ -76,10 +76,13 @@ main :: proc(){
 
     defer{
         save_game()
-        
+        for &b in game.level.player_bullets{
+            delete(b.hitted_enemies)
+        }
         delete(game.level.player_bullets)
         delete(game.level.enemy_bullets)
         delete(game.level.enemy_fragments)
+        delete(game.level.area_effects)
         delete(game.level.loot)
         delete(game.level.upgrade_pool)
         delete(game.level.available_upgrades)
@@ -146,10 +149,6 @@ main :: proc(){
     fill_available_upgrades()
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
-    // game.intensity_loc = rl.GetShaderLocation(game.glow_shader, "intensity")
-    // game.raster_loc = rl.GetShaderLocation(game.glow_shader, "raster")
-
-
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
 
@@ -216,6 +215,7 @@ check_collisions :: proc(){
         check_bullet_player()
         check_collisions_detection_loot()
         check_collisions_pickup_loot()
+        check_player_area_effect()
         check_player_interact()
         check_in_game_ui_tooltip()
     } else if game.level.power_level_up{
@@ -243,6 +243,7 @@ draw_game :: proc(){
         if game.map_drawing{
             draw_map()
         }
+        draw_area_effects()
         draw_fragments()
         draw_player()
         draw_npc()
@@ -404,6 +405,7 @@ fill_available_upgrades :: proc(){
     rare : i32
     epic : i32
     legendary : i32
+    clear(&game.level.available_upgrades)
     for u in game.level.upgrade_pool{
         if u.target == .Player{
             append(&game.level.available_upgrades, u)

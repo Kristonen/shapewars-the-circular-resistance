@@ -27,6 +27,16 @@ check_player_wall :: proc(pos_player : rl.Vector2, radius : f32) -> bool{
     return false
 }
 
+check_player_area_effect :: proc(){
+    for a in game.level.area_effects{
+        if rl.CheckCollisionCircles(a.pos, a.radius, game.player.hurt_collider.pos, game.player.hurt_collider.radius){
+            e : Entity = game.player
+            a->trigger(&e)
+            game.player = e.(Player)
+        }
+    }
+}
+
 check_player_npc :: proc(pos : rl.Vector2) -> bool{
     for n in game.level.npcs{
         if rl.CheckCollisionCircles(pos, game.player.physics_collider.radius, n.pos, n.radius){

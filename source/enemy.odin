@@ -1,5 +1,6 @@
 package game
 
+import "core:fmt"
 import "core:math/rand"
 import rl "vendor:raylib"
 import cl "collider"
@@ -128,6 +129,23 @@ create_start_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -
     return e
 }
 
+create_tank_soldier :: proc() -> Enemy{
+    rec := rl.Rectangle { width = 64, height = 52}
+    e := create_enemy(rec, 75, rl.DARKGRAY)
+    e.health ={
+        current = 80,
+        max = 80,
+        take_dmg = take_damage,
+    }
+    e.knocback = {
+        apply = apply_no_knockback,
+    }
+    e.behavior = Melee_Data{
+
+    }
+    return e
+}
+
 create_second_enemy :: proc() -> Enemy{
     rect := rl.Rectangle{width = 40, height = 24}
     e := create_enemy(rect, 100, rl.GOLD)
@@ -170,6 +188,26 @@ create_third_enemy :: proc() -> Enemy{
     return e
 }
 
+create_poison_moloch :: proc() -> Enemy{
+    rec := rl.Rectangle {width = 32, height = 26}
+    e := create_enemy(rec, 200, rl.LIME)
+    e.health = {
+        current = 40,
+        max = 40,
+        take_dmg = take_damage,
+    }
+    e.knocback = {
+        strength = 500,
+        friction = 0.8,
+        threshold = 10,
+        apply = apply_knockback,
+    }
+    e.behavior = Melee_Data{}
+    e.on_death = on_death_poison
+    append(&e.applied_status, create_poison_status())
+    return e
+}
+
 create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
     e := Enemy{
         rec = rec,
@@ -192,7 +230,7 @@ on_hit :: proc(e : ^Enemy, dmg : f32){
 }
 
 on_death :: proc(e : Enemy, idx : i32){
-    game.shake = 100
+    game.shake = 50
     count := rand.int32_range(3, 7)
     loot.spawn_shards(&game.level.loot, count, e.origin)
     if spawner := (^Spawner)(e.spawner); spawner != nil{
@@ -200,6 +238,21 @@ on_death :: proc(e : Enemy, idx : i32){
     }
     create_fragments_death(&game.level.enemy_fragments ,e)
     unordered_remove(&game.level.enemies, idx)
+}
+
+on_death_poison :: proc(e : Enemy, idx : i32){
+    game.shake = 50
+    if spawner := (^Spawner)(e.spawner); spawner != nil{
+        spawner.count -= 1
+    }
+    p_area := Area_Effect{
+        duration = 5,
+        radius = 120,
+        pos = e.origin,
+        trigger = on_area_poison_trigger,
+    }
+    unordered_remove(&game.level.enemies, idx)
+    append(&game.level.area_effects, p_area)
 }
 
 create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){

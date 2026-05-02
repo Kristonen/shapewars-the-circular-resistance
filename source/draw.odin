@@ -115,6 +115,12 @@ draw_fragments :: proc(){
     }
 }
 
+draw_area_effects :: proc(){
+    for a in game.level.area_effects{
+        rl.DrawCircleV(a.pos, a.radius, rl.LIME)
+    }
+}
+
 draw_loot :: proc(){
     for l in game.level.loot{
         rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)

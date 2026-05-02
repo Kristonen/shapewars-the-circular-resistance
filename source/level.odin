@@ -17,6 +17,7 @@ Level_Data :: struct{
     enemies : [dynamic]Enemy,
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
     enemy_bullets : [dynamic]Bullet,
+    area_effects : [dynamic]Area_Effect,
 
     particles : [dynamic]Particle,
 
@@ -98,6 +99,9 @@ create_first_test_level :: proc(){
 create_test_level :: proc(){
     spawner := create_spawner(100, 0.1, 0)
     spawner.enemy = create_dummy_enemy()
+    append(&game.level.spawner, spawner)
+    spawner = create_spawner(1, 1, 0)
+    spawner.enemy = create_poison_moloch()
     append(&game.level.spawner, spawner)
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
