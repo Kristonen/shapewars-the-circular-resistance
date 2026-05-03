@@ -2,22 +2,6 @@ package game
 
 import "ui"
 
-// check_which_btn_was_pressed :: proc(b : ^ui.UI_Button){
-//     b.state = .None
-//     switch b.type{
-//         case .Continue:
-//             on_click_continue(b^)
-//         case .Options:
-//             on_click_options(b^)
-//         case .Back:
-//             on_click_back(b^)
-//         case .Exit:
-//             on_click_quit(b^)
-//         case .Skilltree:
-//             on_click_btn_skilltree(b^)
-//     }
-// }
-
 on_click_continue :: proc(b : ui.UI_Button){
     game.is_paused = !game.is_paused
     game.current_menu = .Play

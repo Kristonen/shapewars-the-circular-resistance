@@ -317,14 +317,18 @@ update_fragement :: proc(dt : f32){
 
 update_particle :: proc(dt : f32){
     for &p, idx in game.level.particles{
-        if !p.alive{
-            unordered_remove(&game.level.particles, idx)
-        }
-        p.life += dt
-        p.pos += p.vel * dt
         if p.life >= p.max_life{
             p.alive = false
         }
+        if !p.alive{
+            unordered_remove(&game.level.particles, idx)
+            continue
+        }
+        if p.use_grav{
+            p.vel.y += Fake_Particle_Gravitiy
+        }
+        p.life += dt
+        p.pos += p.vel * dt
     }
 }
 

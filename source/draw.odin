@@ -117,7 +117,10 @@ draw_fragments :: proc(){
 
 draw_area_effects :: proc(){
     for a in game.level.area_effects{
-        rl.DrawCircleV(a.pos, a.radius, rl.LIME)
+        alpha := (a.duration/a.max_duration)
+        color := rl.LIME
+        color.a = u8(alpha*255)
+        rl.DrawCircleV(a.pos, a.radius, color)
     }
 }
 

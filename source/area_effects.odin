@@ -6,6 +6,7 @@ Area_Effect :: struct{
     pos : rl.Vector2,
     radius : f32,
     duration : f32,
+    max_duration : f32,
     trigger : proc(a : Area_Effect, e : ^Entity)
 }
 

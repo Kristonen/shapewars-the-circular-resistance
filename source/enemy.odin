@@ -245,8 +245,10 @@ on_death_poison :: proc(e : Enemy, idx : i32){
     if spawner := (^Spawner)(e.spawner); spawner != nil{
         spawner.count -= 1
     }
+    create_death_poison_particle(e.origin)
     p_area := Area_Effect{
         duration = 5,
+        max_duration = 5,
         radius = 120,
         pos = e.origin,
         trigger = on_area_poison_trigger,

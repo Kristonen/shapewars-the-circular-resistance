@@ -3,6 +3,8 @@ package game
 import "core:math"
 import rl "vendor:raylib"
 
+Fake_Particle_Gravitiy :: 2.5
+
 Particle :: struct{
     pos : rl.Vector2,
     entity_pos : rl.Vector2,
@@ -11,7 +13,8 @@ Particle :: struct{
     life : f32,
     max_life : f32,
     size : f32,
-    alive : bool
+    alive : bool,
+    use_grav : bool,
 }
 
 create_hit_particles :: proc(pos : rl.Vector2){
@@ -75,6 +78,26 @@ create_poison_particle :: proc(pos : rl.Vector2){
             append(&game.level.particles, p)
         }
     }
+}
+
+create_death_poison_particle :: proc(pos : rl.Vector2){
+    amount := rl.GetRandomValue(20, 40)
+    for _ in 0..<amount{
+        x := f32(rl.GetRandomValue(-250, 250))
+        y := f32(rl.GetRandomValue(-300, -200))
+        p := Particle{
+            pos = pos,
+            vel = {x, y},
+            max_life = f32(rl.GetRandomValue(3, 6))/10,
+            color = {0, 215, 0, 255},
+            size = f32(rl.GetRandomValue(3, 9)),
+            alive = true,
+            use_grav = true,
+        }
+
+        append(&game.level.particles, p)
+    }
+
 }
 
 create_fire_particle :: proc(pos : rl.Vector2){
