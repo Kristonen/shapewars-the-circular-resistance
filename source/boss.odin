@@ -18,9 +18,10 @@ Boss_Data :: struct{
 
 call_reinforcement :: proc(b : Enemy){
     e := create_start_enemy()
-    for _ in 0..<1{
-        e.rec.x = b.origin.x + 150
-        e.rec.y = b.origin.y + 150
+    directions := []rl.Vector2 {{b.rec.x - 150, b.rec.y - 150}, {b.rec.x + 150, b.rec.y - 150}, {b.rec.x + 150, b.rec.y + 150}, {b.rec.x - 150, b.rec.y + 150}}
+    for dir in directions{
+        e.rec.x = dir.x
+        e.rec.y = dir.y
         rec := rl.Rectangle{
             width = e.rec.width + 20,
             height = 10,
