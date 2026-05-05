@@ -9,7 +9,7 @@ import "loot"
 
 Enemy_Hit_Time :: 0.1
 
-Behavior :: #type proc(e : ^Enemy, $T : typeid)
+Behavior :: #type proc(e : ^Enemy, b : ^Behavior_Data, dt : f32)
 On_Hit :: #type proc(e : ^Enemy, dmg : f32)
 On_Death :: #type proc(e : Enemy, idx : i32)
 // Apply_Knockback :: #type proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
@@ -34,7 +34,7 @@ Charge_Data :: struct{
 }
 
 Behavior_Data :: union{
-    Melee_Data, Distance_Data, Charge_Data
+    Melee_Data, Distance_Data, Charge_Data, Boss_Data
 }
 
 Enemy :: struct {
@@ -48,9 +48,11 @@ Enemy :: struct {
     color : rl.Color,
     collidor : cl.Collider_Rectangle,
     behavior : Behavior_Data,
+    behave : Behavior,
 
     health : Health,
     health_bar : ui.UI_Progress_Bar,
+
     knocback : Knockback,
 
     applied_status : [dynamic]Status_Effect,
@@ -107,12 +109,14 @@ create_dummy_enemy :: proc() -> Enemy{
         // apply = apply_knockback,
         apply = apply_no_knockback,
     }
+    e.behave = melee_enemy_behavior
     e.behavior = Melee_Data{}
     return e
 }
 
-create_start_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
-    e := create_enemy(rect, speed, color)
+create_start_enemy :: proc() -> Enemy{
+    rec := rl.Rectangle{x = 0, y = 0, width = 50, height = 40}
+    e := create_enemy(rec, 200, rl.RED)
     append(&e.applied_status, create_poison_status())
     e.health = {
         current = 25,
@@ -125,6 +129,7 @@ create_start_enemy :: proc(rect : rl.Rectangle, speed : f32, color : rl.Color) -
         threshold = 10,
         apply = apply_knockback,
     }
+    e.behave = melee_enemy_behavior
     e.behavior = Melee_Data{}
     return e
 }
@@ -160,6 +165,7 @@ create_second_enemy :: proc() -> Enemy{
         threshold = 10,
         apply = apply_knockback,
     }
+    e.behave = distance_enemy_behavior
     e.behavior = Distance_Data{
         max_distance = 350,
         weapon = {
@@ -180,6 +186,7 @@ create_third_enemy :: proc() -> Enemy{
     e.knocback = {
         apply = apply_no_knockback,
     }
+    e.behave = charge_enemy_behavior
     e.behavior = Charge_Data{
         max_distance = 500,
         charge_time = 1,
@@ -202,6 +209,7 @@ create_poison_moloch :: proc() -> Enemy{
         threshold = 10,
         apply = apply_knockback,
     }
+    e.behave = melee_enemy_behavior
     e.behavior = Melee_Data{}
     e.on_death = on_death_poison
     append(&e.applied_status, create_poison_status())
@@ -230,7 +238,15 @@ create_test_boss :: proc() -> Enemy{
         take_dmg = take_damage,
     }
     e.knocback.apply = apply_no_knockback
-    e.behavior = Melee_Data{}
+    e.behave = test_boss_behavior
+    e.behavior = Boss_Data{
+        ability = {
+            cd = {
+                cast_rate = 10,
+            },
+            cast_time = 1,
+        }
+    }
     e.on_death = on_death_boss
     return e
 }
@@ -306,8 +322,9 @@ create_fragments_death :: proc(a : ^[dynamic]Enemy_Death_Fragment, e : Enemy){
     append(a, f)
 }
 
-melee_enemy_behavior :: proc(e : ^Enemy, data : Melee_Data, player_pos : rl.Vector2, dt : f32){
-    dir := player_pos - {e.rec.x, e.rec.y}
+melee_enemy_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
+    data := d.(Melee_Data)
+    dir := game.player.pos - {e.rec.x, e.rec.y}
     vel := rl.Vector2Normalize(dir) * e.speed
     new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
     new_pos += vel * dt
@@ -315,10 +332,11 @@ melee_enemy_behavior :: proc(e : ^Enemy, data : Melee_Data, player_pos : rl.Vect
     e.rec.y = new_pos.y
 }
 
-distance_enemy_behavior :: proc(e : ^Enemy, data : ^Distance_Data, g : ^Game_State, dt : f32){
-    dist := rl.Vector2Distance({e.rec.x, e.rec.y}, g.player.pos)
+distance_enemy_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
+    data := &d.(Distance_Data)
+    dist := rl.Vector2Distance({e.rec.x, e.rec.y}, game.player.pos)
     if data.max_distance <= dist{
-        dir := g.player.pos - {e.rec.x, e.rec.y}
+        dir := game.player.pos - {e.rec.x, e.rec.y}
         vel := rl.Vector2Normalize(dir) * e.speed
         new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
         new_pos += vel * dt
@@ -333,16 +351,17 @@ distance_enemy_behavior :: proc(e : ^Enemy, data : ^Distance_Data, g : ^Game_Sta
             e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2
         }
         b.pos = pos
-        dir := g.player.pos - {e.rec.x, e.rec.y}
+        dir := game.player.pos - {e.rec.x, e.rec.y}
         b.dir = rl.Vector2Normalize(dir)
-        append(&g.level.enemy_bullets, b)
+        append(&game.level.enemy_bullets, b)
     }
 }
 
-charge_enemy_behavior :: proc(e : ^Enemy, data : ^Charge_Data, g : ^Game_State, dt : f32){
-    dist := rl.Vector2Distance(g.player.pos, {e.rec.x, e.rec.y})
+charge_enemy_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
+    data := &d.(Charge_Data)
+    dist := rl.Vector2Distance(game.player.pos, {e.rec.x, e.rec.y})
     if data.max_distance <= dist && !data.is_charging{
-        dir := g.player.pos - {e.rec.x, e.rec.y}
+        dir := game.player.pos - {e.rec.x, e.rec.y}
         vel := rl.Vector2Normalize(dir) * e.speed
         new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
         new_pos += vel * dt
@@ -351,7 +370,7 @@ charge_enemy_behavior :: proc(e : ^Enemy, data : ^Charge_Data, g : ^Game_State, 
         return
     } else if !data.is_charging {
         data.is_charging = true
-        data.charge_pos = g.player.pos
+        data.charge_pos = game.player.pos
         data.charge_timer = data.charge_time
     }
 

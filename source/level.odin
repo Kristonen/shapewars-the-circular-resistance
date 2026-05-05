@@ -79,7 +79,7 @@ create_start_level :: proc(){
 
 create_first_test_level :: proc(){
     spawner := create_spawner(5, 0.5, 2)
-    spawner.enemy = create_start_enemy({0, 0, 50, 40}, 200, rl.RED)
+    spawner.enemy = create_start_enemy()
     append(&game.level.spawner, spawner)
     game.player.pos = {0, 0}
     create_battle_ui()
@@ -97,9 +97,13 @@ create_first_test_level :: proc(){
 create_test_level :: proc(){
     spawner := create_spawner(100, 0.1, 0)
     spawner.enemy = create_dummy_enemy()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
     spawner.enemy = create_poison_moloch()
+    // append(&game.level.spawner, spawner)
+    spawner.enemy = create_second_enemy()
+    append(&game.level.spawner, spawner)
+    spawner.enemy = create_third_enemy()
     append(&game.level.spawner, spawner)
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)

@@ -268,14 +268,7 @@ update_enemy :: proc(dt : f32){
             e.visual_scale.y = 1.0 - (kb_speed * 0.005)
         } else{
             e.visual_scale = {1, 1}
-            switch &d in e.behavior {
-                case Melee_Data:
-                    melee_enemy_behavior(&e, d, game.player.pos, dt)
-                case Distance_Data:
-                    distance_enemy_behavior(&e, &d, &game, dt)
-                case Charge_Data:
-                    charge_enemy_behavior(&e, &d, &game, dt)
-            }
+            e->behave(&e.behavior, dt)
         }
         
         e.origin = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
