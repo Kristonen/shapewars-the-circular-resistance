@@ -117,7 +117,6 @@ create_dummy_enemy :: proc() -> Enemy{
 create_start_enemy :: proc() -> Enemy{
     rec := rl.Rectangle{x = 0, y = 0, width = 50, height = 40}
     e := create_enemy(rec, 200, rl.RED)
-    append(&e.applied_status, create_poison_status())
     e.health = {
         current = 25,
         max = 25,

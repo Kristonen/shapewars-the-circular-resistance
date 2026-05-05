@@ -181,6 +181,10 @@ create_choose_bullet_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Bul
 refresh_level :: proc(){
     clear(&game.level.npcs)
     clear(&game.level.area_effects)
+    for &e in game.level.enemies{
+        clear(&e.applied_status)
+        clear(&e.statuses)
+    }
     clear(&game.level.enemies)
     clear(&game.level.player_bullets)
     clear(&game.level.enemies)
@@ -189,6 +193,10 @@ refresh_level :: proc(){
     clear(&game.level.ui_elements)
     clear(&game.level.loot)
     clear(&game.level.available_upgrades)
+    for &s in game.level.spawner{
+        clear(&s.enemy.applied_status)
+        clear(&s.enemy.statuses)
+    }
     clear(&game.level.spawner)
     clear(&game.level.particles)
 }
