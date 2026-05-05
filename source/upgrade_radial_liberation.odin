@@ -53,22 +53,22 @@ apply_rl_cd_upgrade :: proc(u : Upgrade){
 }
 
 apply_rl_dmg_upgrade :: proc(u : Upgrade){
-    ability := &game.player.ability.(Radial_Liberation)
-    stat := &ability.damage
+    data := &game.player.ability.data.(Radial_Liberation_Data)
+    stat := &data.dmg
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
 
 apply_rl_amount_upgrade :: proc(u : Upgrade){
-    ability := &game.player.ability.(Radial_Liberation)
-    stat := &ability.count
+    data := &game.player.ability.data.(Radial_Liberation_Data)
+    stat := &data.amount
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }
 
 apply_rl_lifesteal_upgrade :: proc(u : Upgrade){
-    ability := &game.player.ability.(Radial_Liberation)
-    stat := &ability.can_lifesteal
+    data := &game.player.ability.data.(Radial_Liberation_Data)
+    stat := &data.can_lifesteal
     v := u.value.(bool)
     apply_toogle_upgrade(stat, v)
 }

@@ -89,8 +89,10 @@ update_player :: proc(dt : f32){
     if rl.IsKeyDown(.A){
         game.player.vel.x = -check_direction_col({-1, 0}, dt)
     }
-
-    game.player.pos += game.player.vel * game.player.speed * dt
+    if !game.player.ignore_input{
+        game.player.pos += game.player.vel * game.player.speed * dt
+    }
+    
     //Update player colliders
     game.player.hurt_collider.pos = game.player.pos
     game.player.collector.pos = game.player.pos
@@ -186,14 +188,21 @@ update_player_casting :: proc(dt : f32){
         cd.cooldown -= dt
     }
 
-    if rl.IsKeyPressed(.SPACE) && cd.cooldown <= 0{
-        switch &a in game.player.ability{
-            case Radial_Liberation:
-                cd.cooldown = a.ability_cd.cast_rate
-            case Dash:
-                cd.cooldown = a.ability_cd.cast_rate
-        }
-        cast_player_ability()
+    if rl.IsKeyPressed(.SPACE) && cd.cooldown <= 0 && !game.player.ability.active{
+        // switch &a in game.player.ability{
+        //     case Radial_Liberation:
+        //         cd.cooldown = a.ability_cd.cast_rate
+        //     case Dash:
+        //         cd.cooldown = a.ability_cd.cast_rate
+        // }
+        game.player.ability.active = true
+        game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
+        game.player.ability.activate()
+        // cast_player_ability()
+    }
+
+    if game.player.ability.active{
+        game.player.ability.update(dt)
     }
 }
 

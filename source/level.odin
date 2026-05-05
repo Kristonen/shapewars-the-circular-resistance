@@ -65,13 +65,7 @@ create_start_level :: proc(){
     append(&game.level.npcs, npc)
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
         game.player.pos = m.get_player_spawn_pos(level_visual)
-        game.player.ability = Radial_Liberation{
-            damage = 5,
-            count = 8,
-            ability_cd = {
-                cast_rate = 5,
-            },
-        }
+        game.player.ability = create_standard_dash()
         game.camera.target = game.player.pos
         game.level.level_visual = level_visual
     } else{

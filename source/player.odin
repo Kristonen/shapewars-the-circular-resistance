@@ -45,6 +45,7 @@ Player :: struct {
     collector : cl.Collider_Circle,
     physics_collider : cl.Collider_Circle,
 
+    ignore_input : bool,
 }
 
 create_player :: proc() -> Player{
@@ -103,21 +104,14 @@ apply_lifesteal :: proc(p : ^Player, dmg : f32){
 }
 
 get_upgrade_target :: proc() {
-    switch a in game.player.ability{
-        case Radial_Liberation:
+    switch a in game.player.ability.data{
+        case Radial_Liberation_Data:
             game.player.target_ability = .Radial_Liberation
-        case Dash:
+        case Dash_Data:
             game.player.target_ability = .Dash
     }
 }
 
 get_ability_cd :: proc() -> ^Ability_Cooldown{
-    cd : ^Ability_Cooldown
-    switch &a in game.player.ability{
-        case Radial_Liberation:
-            cd = &a.ability_cd
-        case Dash:
-            cd = &a.ability_cd
-    }
-    return cd
+    return &game.player.ability.cd
 }
