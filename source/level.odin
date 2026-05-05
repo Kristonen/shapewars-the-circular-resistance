@@ -9,7 +9,7 @@ import "ui"
 import m "map"
 
 Level_Type :: enum{
-    HQ, Battlefield, Forest, Test
+    HQ, Battlefield, Forest, Test, Boss_Test
 }
 
 Level_Data :: struct{
@@ -26,6 +26,8 @@ Level_Data :: struct{
     player_bullets : [dynamic]Bullet,
 
     loot : [dynamic]loot.Shape_Shard,
+
+    portal : Portal,
 
     power_level_up : bool,
     upgrade_menu : UI_Upgrade_Menu,
@@ -52,6 +54,8 @@ create_level :: proc(type : Level_Type){
         case .Forest:
         case .Test:
             create_test_level()
+        case .Boss_Test:
+            create_boss_test_level()
 
     }
 }
@@ -100,6 +104,19 @@ create_test_level :: proc(){
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual
+    create_battle_ui()
+    level_up_spawner_update()
+    get_upgrade_target()
+    fill_available_upgrades()
+}
+
+create_boss_test_level :: proc(){
+    spawner := create_spawner(1, 1, 0)
+    spawner.enemy = create_test_boss()
+    append(&game.level.spawner, spawner)
+    level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
+    game.level.level_visual = level_visual
+    game.player.pos = {0, 0}
     create_battle_ui()
     level_up_spawner_update()
     get_upgrade_target()
@@ -159,4 +176,15 @@ create_choose_bullet_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Bul
 
 refresh_level :: proc(){
     clear(&game.level.npcs)
+    clear(&game.level.area_effects)
+    clear(&game.level.enemies)
+    clear(&game.level.player_bullets)
+    clear(&game.level.enemies)
+    clear(&game.level.enemy_bullets)
+    clear(&game.level.enemy_fragments)
+    clear(&game.level.ui_elements)
+    clear(&game.level.loot)
+    clear(&game.level.available_upgrades)
+    clear(&game.level.spawner)
+    clear(&game.level.particles)
 }

@@ -109,6 +109,15 @@ draw_enemies :: proc(){
     }
 }
 
+draw_portal :: proc(){
+    if !game.level.portal.active do return
+    // rl.DrawCircleV(game.level.portal.pos, game.level.portal.radius, rl.RED)
+    rl.DrawEllipse(i32(game.level.portal.pos.x), i32(game.level.portal.pos.y), game.level.portal.radius, game.level.portal.radius * 1.5, rl.RED)
+    if game.helper_activated{
+        draw_collider_circle(game.level.portal.interact.collider)
+    }
+}
+
 draw_fragments :: proc(){
     for f in game.level.enemy_fragments{
         rl.DrawRectangleV({f.pos.x, f.pos.y}, {f.width, f.height}, f.color)

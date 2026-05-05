@@ -10,6 +10,11 @@ Interactable :: struct{
     action : proc()
 }
 
+portal_interact :: proc(){
+    game.level.portal.active = false
+    create_level(.HQ)
+}
+
 gunsmith_interact :: proc(){
     game.is_paused = !game.is_paused
     clear(&game.menu.elements)

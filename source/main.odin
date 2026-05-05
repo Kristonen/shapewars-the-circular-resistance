@@ -244,6 +244,7 @@ draw_game :: proc(){
         if game.map_drawing{
             draw_map()
         }
+        draw_portal()
         draw_area_effects()
         draw_fragments()
         draw_player()

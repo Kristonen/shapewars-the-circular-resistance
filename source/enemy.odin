@@ -221,6 +221,20 @@ create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy
     return e
 }
 
+create_test_boss :: proc() -> Enemy{
+    rec := rl.Rectangle{x = 0, y = 0, width = 100, height = 80}
+    e := create_enemy(rec, 150, rl.BLACK)
+    e.health = {
+        current = 5,
+        max = 500,
+        take_dmg = take_damage,
+    }
+    e.knocback.apply = apply_no_knockback
+    e.behavior = Melee_Data{}
+    e.on_death = on_death_boss
+    return e
+}
+
 on_hit :: proc(e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
     game.create_hit_particle(e.origin)
@@ -237,6 +251,12 @@ on_death :: proc(e : Enemy, idx : i32){
         spawner.count -= 1
     }
     create_fragments_death(&game.level.enemy_fragments ,e)
+    unordered_remove(&game.level.enemies, idx)
+}
+
+on_death_boss :: proc(e : Enemy, idx : i32){
+    game.shake = 300
+    game.level.portal = create_portal(e.origin)
     unordered_remove(&game.level.enemies, idx)
 }
 

@@ -213,6 +213,8 @@ update_player_interact :: proc(dt : f32){
         switch &e in game.level.interact.interactable{
             case NPC:
                 e.interactable.action()
+            case Portal:
+                e.interact.action()
         }
     }
 }
@@ -416,6 +418,8 @@ update_interact :: proc(){
     switch &e in game.level.interact.interactable{
         case NPC: 
             game.level.interact.text.content = e.interactable.text
+        case Portal:
+            game.level.interact.text.content = e.interact.text
     }
 }
 

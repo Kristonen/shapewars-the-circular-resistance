@@ -72,6 +72,7 @@ dash_activate :: proc(){
         mouse_pos := rl.GetMousePosition()
         mouse_local_pos := rl.GetScreenToWorld2D(mouse_pos, game.camera)
         data.dir = rl.Vector2Normalize(mouse_local_pos - game.player.pos)
+        game.player.health.invincible_timer = 0.2
     }
     data.timer = 0.2
 }
