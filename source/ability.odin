@@ -107,6 +107,7 @@ radial_liberation_update :: proc(dt : f32){
 dash_update :: proc(dt : f32){
     data := &game.player.ability.data.(Dash_Data)
     if data.timer > 0{
+        create_dash_particle(game.player.pos, data.dir)
         game.player.pos += data.dir * data.speed * dt
         data.timer -= dt
     } else {

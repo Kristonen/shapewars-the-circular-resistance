@@ -1,5 +1,6 @@
 package game
 
+import "core:math/rand"
 import "core:math"
 import rl "vendor:raylib"
 
@@ -121,5 +122,39 @@ create_fire_particle :: proc(pos : rl.Vector2){
         smoke_p.pos.y -= 20
         smoke_p.color = {65, 65, 65, 255}
         append(&game.level.particles, smoke_p)
+    }
+}
+
+create_dash_particle :: proc(pos : rl.Vector2, dir : rl.Vector2){
+    amount : i32 = 2
+    directions := []rl.Vector2 {{dir.y, -dir.x}, {-dir.y, dir.x}}
+    for i in 0..<len(directions){
+        dir := directions[i]
+        for _ in 0..<amount{
+            gray := u8(rl.GetRandomValue(50, 175))
+            speed := f32(rl.GetRandomValue(50, 100))
+            p := Particle{
+                pos = pos,
+                vel = dir * speed,
+                color = {gray, gray, gray, 255},
+                max_life = f32(rl.GetRandomValue(1, 2)),
+                size = f32(rl.GetRandomValue(4, 6)),
+                alive = true,
+            }
+            append(&game.level.particles, p)
+        }
+    }
+    for _ in 0..<amount{
+        x := pos.x + rand.float32_range(5, 16)
+        y := pos.y + rand.float32_range(5, 16)
+        p := Particle{
+            pos = {x, y},
+            color = rl.BROWN,
+            max_life = f32(rl.GetRandomValue(2, 4)),
+            size = f32(rl.GetRandomValue(2, 5)),
+            alive = true,
+
+        }
+        append(&game.level.particles, p)
     }
 }
