@@ -5,6 +5,8 @@ import rl "vendor:raylib"
 import cl "collider"
 import "ui"
 
+Ghost_Time :: 0.025
+
 Weapon :: struct {
     fire_rate : f32,
     cooldown : f32,
@@ -19,6 +21,11 @@ Loot_Bag :: struct{
     level : i32,
     level_increase : f32,
     mul : f32,
+}
+
+Ghost_Image :: struct{
+    pos : rl.Vector2,
+    life : f32,
 }
 
 Player :: struct {
@@ -46,6 +53,9 @@ Player :: struct {
     physics_collider : cl.Collider_Circle,
 
     ignore_input : bool,
+
+    ghosts : [50]Ghost_Image,
+    ghost_timer : f32,
 }
 
 create_player :: proc() -> Player{

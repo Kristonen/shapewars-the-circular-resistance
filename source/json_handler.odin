@@ -88,7 +88,7 @@ save_skilltree :: proc(){
     }
 }
 
-load_player :: proc(){
+load_game_data :: proc(){
     refresh_skill_arena()
     data, ok := os.read_entire_file("assets/game.json", game.skill_allocator)
 
@@ -105,15 +105,15 @@ load_player :: proc(){
     game.player.target_ability = game_data.target_ability
 }
 
-save_player :: proc(){
-    player_data := Save_Game_Data{
+save_game_data :: proc(){
+    game_data := Save_Game_Data{
         skill_points = game.skill_points,
         rank = game.rank,
         current_xp = game.current_xp,
         max_xp = game.max_xp,
         target_ability = game.player.target_ability,
     }
-    json_data, err := json.marshal(player_data, {pretty = true}, context.temp_allocator)
+    json_data, err := json.marshal(game_data, {pretty = true}, context.temp_allocator)
     
     if err != json.Marshal_Data_Error.None{
         fmt.println("Could not parse into json format.")

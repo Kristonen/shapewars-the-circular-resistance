@@ -100,6 +100,12 @@ update_player :: proc(dt : f32){
     
     //Other player update stuff
     update_player_status(dt)
+
+    //Ghosts Updaten
+    for i in 0..<len(game.player.ghosts){
+        if game.player.ghosts[i].life <= 0 do continue
+        game.player.ghosts[i].life -= dt
+    }
 }
 
 update_player_status :: proc(dt : f32){
@@ -197,7 +203,7 @@ update_player_casting :: proc(dt : f32){
         // }
         game.player.ability.active = true
         game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
-        game.player.ability.activate()
+        game.player.ability.activate(dt)
         // cast_player_ability()
     }
 

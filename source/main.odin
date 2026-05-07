@@ -168,13 +168,13 @@ init_game :: proc(){
 }
 
 load_game :: proc(){
-    load_player()
+    load_game_data()
     load_skilltree()
     load_tooltips()
 }
 
 save_game :: proc(){
-    save_player()
+    save_game_data()
     save_skilltree()
 }
 

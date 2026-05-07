@@ -9,6 +9,16 @@ import "ui"
 
 draw_player :: proc(){
     rl.DrawCircleV(game.player.pos, game.player.radius, rl.VIOLET)
+    if game.player.ability.active && game.player.target_ability == .Dash{
+        rl.DrawCircleLinesV(game.player.pos, game.player.radius, rl.BLACK)
+    }
+    for i in 0..<len(game.player.ghosts){
+        if game.player.ghosts[i].life <= 0 do continue
+        black := rl.BLACK
+        alpha := (game.player.ghosts[i].life/0.6)
+        black.a = u8(alpha*255)
+        rl.DrawCircleLinesV(game.player.ghosts[i].pos, game.player.radius, black)
+    }
     if game.helper_activated{
         draw_collider_circle(game.player.physics_collider)
         draw_collider_circle(game.player.hurt_collider)

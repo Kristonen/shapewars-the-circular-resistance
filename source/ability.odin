@@ -20,13 +20,15 @@ Dash_Data :: struct{
 }
 
 Ability_Update :: #type proc(dt : f32)
-Ability_Activate :: #type proc()
+Ability_Activate :: #type proc(dt : f32)
+Ability_Finish :: #type proc(dt : f32)
 
 Ability :: struct{
     cd : Ability_Cooldown,
     active : bool,
     activate : Ability_Activate,
     update : Ability_Update,
+    finish : Ability_Finish,
     data : Ability_Data,
 }
 
@@ -41,8 +43,9 @@ create_standard_radial_liberation :: proc() -> Ability{
         cd = {
             cast_rate = 5,
         },
-        activate = no_activate,
-        update = radial_liberation_update,
+        activate = radial_liberation_activate,
+        update = no_update,
+        finish = no_finish,
         data = Radial_Liberation_Data{
             amount = 8,
             dmg = 5,
@@ -57,15 +60,18 @@ create_standard_dash :: proc() -> Ability{
         },
         activate = dash_activate,
         update = dash_update,
+        finish = dash_finish,
         data = Dash_Data{
             speed = 3000,
         },
     }
 }
 
-no_activate :: proc(){}
+no_activate :: proc(dt : f32){}
+no_update :: proc(dt : f32){}
+no_finish :: proc(dt : f32){}
 
-dash_activate :: proc(){
+dash_activate :: proc(dt : f32){
     data := &game.player.ability.data.(Dash_Data)
     data.dir = game.player.vel
     if data.dir.x == 0 && data.dir.y == 0{
@@ -77,7 +83,35 @@ dash_activate :: proc(){
     data.timer = 0.2
 }
 
-radial_liberation_update :: proc(dt : f32){
+dash_update :: proc(dt : f32){
+    data := &game.player.ability.data.(Dash_Data)
+    if data.timer > 0{
+        create_dash_particle(game.player.pos, data.dir)
+        game.player.pos += data.dir * data.speed * dt
+        data.timer -= dt
+        if game.player.ghost_timer > 0{
+            game.player.ghost_timer -= dt
+        } else{
+            game.player.ghost_timer = Ghost_Time
+            for i in 0..<len(game.player.ghosts){
+                if game.player.ghosts[i].life > 0 do continue
+                game.player.ghosts[i].pos = game.player.pos
+                game.player.ghosts[i].life = 0.6
+                break
+            }
+        }
+    } else {
+        game.player.ability.active = false
+        dash_finish(dt)
+    }
+}
+
+dash_finish :: proc(dt : f32){
+    game.shake = 50
+
+}
+
+radial_liberation_activate :: proc(dt : f32){
     data := game.player.ability.data.(Radial_Liberation_Data)
     for i in 0..<data.amount{
         angle := f32(i) * (rl.PI * 2.0 / f32(data.amount))
@@ -102,15 +136,4 @@ radial_liberation_update :: proc(dt : f32){
         append(&game.level.player_bullets, b)
     }
     game.player.ability.active = false
-}
-
-dash_update :: proc(dt : f32){
-    data := &game.player.ability.data.(Dash_Data)
-    if data.timer > 0{
-        create_dash_particle(game.player.pos, data.dir)
-        game.player.pos += data.dir * data.speed * dt
-        data.timer -= dt
-    } else {
-        game.player.ability.active = false
-    }
 }
