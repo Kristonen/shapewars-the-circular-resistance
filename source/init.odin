@@ -20,7 +20,7 @@ init_shaders :: proc(){
 init_unlockables :: proc(){
     //Bullet
     create_unlockable(0, "Normal Bullet", .NormalBullet, .Weapon, true)
-    create_unlockable(1, "Bloddy Pain", .PierceBullet, .Weapon)
+    create_unlockable(1, "Bloddy Pain", .PierceBullet, .Weapon, true)
     create_unlockable(2, "", .NormalBullet, .Weapon)
     create_unlockable(3, "", .NormalBullet, .Weapon)
     create_unlockable(4, "", .NormalBullet, .Weapon)

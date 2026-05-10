@@ -60,7 +60,11 @@ on_equip :: proc(b : ui.UI_Button){
     a := b.data.(Unlocked_Data_Type)
     switch a{
         case .NormalBullet:
+            game.player.weapon = create_normal_weapon()
+            game.player.current_weapon = .NormalBullet
         case .PierceBullet:
+            game.player.weapon = create_pierce_weapon()
+            game.player.current_weapon = .PierceBullet
         case .Dash:
             game.player.ability = create_standard_dash()
             game.player.target_ability = .Dash

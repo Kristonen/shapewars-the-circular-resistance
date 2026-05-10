@@ -29,6 +29,7 @@ Player :: struct {
 
     ability : Ability,
     target_ability : Upgrade_Target,
+    current_weapon : Unlocked_Data_Type,
 
     health : Health,
     h_bar : ui.UI_Progress_Bar,
@@ -54,6 +55,7 @@ create_player :: proc() -> Player{
         speed = 400,
         radius = 32,
         weapon = create_normal_weapon(),
+        current_weapon = .NormalBullet,
         health = {
           current = 100,
           max = 100, 

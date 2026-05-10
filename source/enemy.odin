@@ -197,6 +197,7 @@ create_third_enemy :: proc() -> Enemy{
 create_poison_moloch :: proc() -> Enemy{
     rec := rl.Rectangle {width = 32, height = 26}
     e := create_enemy(rec, 200, rl.LIME)
+    defer clear(&e.applied_status)
     e.health = {
         current = 40,
         max = 40,

@@ -15,6 +15,7 @@ Save_Game_Data :: struct{
     current_xp : f32,
     max_xp : f32,
     target_ability : Upgrade_Target,
+    weapon : Unlocked_Data_Type,
 }
 
 Save_Skilltree_Data :: struct{
@@ -103,6 +104,8 @@ load_game_data :: proc(){
     game.max_xp = game_data.max_xp
     game.skill_points = game_data.skill_points
     game.player.target_ability = game_data.target_ability
+    game.player.current_weapon = game_data.weapon
+    switch_weapon()
 }
 
 save_game_data :: proc(){
@@ -112,6 +115,7 @@ save_game_data :: proc(){
         current_xp = game.current_xp,
         max_xp = game.max_xp,
         target_ability = game.player.target_ability,
+        weapon = game.player.current_weapon,
     }
     json_data, err := json.marshal(game_data, {pretty = true}, context.temp_allocator)
     
