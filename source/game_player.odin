@@ -1,19 +1,10 @@
 package game
 
-import "core:fmt"
 import rl "vendor:raylib"
 import cl "collider"
 import "ui"
 
 Ghost_Time :: 0.025
-
-Weapon :: struct {
-    fire_rate : f32,
-    cooldown : f32,
-    bullet : Bullet,
-    lifesteal : f32,
-    amount : f32,
-}
 
 Loot_Bag :: struct{
     value : f32,
@@ -62,11 +53,7 @@ create_player :: proc() -> Player{
     p := Player{
         speed = 400,
         radius = 32,
-        weapon = {
-            fire_rate = 0.5,
-            bullet = create_bullet(8, 700, 10),
-            amount = 1,
-        },
+        weapon = create_normal_weapon(),
         health = {
           current = 100,
           max = 100, 

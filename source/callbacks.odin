@@ -1,5 +1,6 @@
 package game
 
+import "core:fmt"
 import "ui"
 
 on_click_continue :: proc(b : ui.UI_Button){
@@ -42,6 +43,31 @@ on_click_change_level :: proc(b : ui.UI_Button){
     game.current_menu = .Play
     type := b.data.(^Level_Type)
     create_level(type^)
+}
+
+on_click_equiptment_menu :: proc(b : ui.UI_Button){
+    game.last_menu = game.current_menu
+    type := b.data.(Unlocked_Type)
+    if type == .Weapon{
+        game.current_menu = .EquiptmentBullet
+    } else{
+        game.current_menu = .EquiptmentAbility
+    }
+    sync_menu()
+}
+
+on_equip :: proc(b : ui.UI_Button){
+    a := b.data.(Unlocked_Data_Type)
+    switch a{
+        case .NormalBullet:
+        case .PierceBullet:
+        case .Dash:
+            game.player.ability = create_standard_dash()
+            game.player.target_ability = .Dash
+        case .RadialLiberation:
+            game.player.ability = create_standard_radial_liberation()
+            game.player.target_ability = .Radial_Liberation
+    }
 }
 
 on_upgrade :: proc(u : ^Upgrade){

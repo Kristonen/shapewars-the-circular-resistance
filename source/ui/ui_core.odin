@@ -14,7 +14,8 @@ UI_Element :: union{
 //Structs
 //UI_Menu
 Menu_Type :: enum{
-    Play, Pause, Main, Options, Gunsmith, Catalyst, Skilltree, ChooseLevel
+    Play, Pause, Main, Options, Gunsmith, Catalyst, Skilltree, ChooseLevel, Quartermaster, 
+    EquiptmentBullet, EquiptmentAbility
 }
 
 UI_Menu :: struct{

@@ -165,6 +165,7 @@ main :: proc(){
 init_game :: proc(){
     init_skilltrees()
     init_shaders()
+    init_unlockables()
 }
 
 load_game :: proc(){
@@ -369,7 +370,6 @@ sync_menu :: proc(){
             close_btn.text.font_size = 30
             append(&game.menu.elements, close_btn)
         case .Skilltree:
-            test := game.active_skilltree
             rec := rl.Rectangle{
                 x = f32(rl.GetScreenWidth() - 55),
                 y = 5,
@@ -398,7 +398,59 @@ sync_menu :: proc(){
             }
             btn := ui.create_button("Back", rec, on_click_continue, -1)
             append(&game.menu.elements, btn)
+        case .Quartermaster:
+            rec := rl.Rectangle{
+                x = f32(rl.GetScreenWidth()/2) - 450,
+                y = f32(rl.GetScreenHeight()/2) - 250,
+                width = 400,
+                height = 200,
+            }
+            type : Unlocked_Type = .Weapon
+            weapon_btn := ui.create_button("Weapons", rec, on_click_equiptment_menu, type)
+            append(&game.menu.elements, weapon_btn)
+            rec.x = f32(rl.GetScreenWidth()/2 + 50)
+            type = .Ability
+            ability_btn := ui.create_button("Abilities", rec, on_click_equiptment_menu, type)
+            append(&game.menu.elements, ability_btn)
+            rec.x = f32(rl.GetScreenWidth()/2 - 200)
+            rec.y = f32(rl.GetScreenHeight() - 300)
+            back_btn := ui.create_button("Close", rec, on_click_continue, -1)
+            append(&game.menu.elements, back_btn)
+            refresh_ui_pointers()
+        case .EquiptmentBullet:
+            create_equiptment_menu(.Weapon)
+        case .EquiptmentAbility:
+            create_equiptment_menu(.Ability)
     }
+}
+
+create_equiptment_menu :: proc(type : Unlocked_Type){
+            start_x := f32(rl.GetScreenWidth())*0.25-400
+            counter := 0
+            rec := rl.Rectangle{
+                x = start_x,
+                y = f32(rl.GetScreenHeight())/2 - 300,
+                width = 400,
+                height = 200,
+            }
+            for i in 0..<len(game.unlockables){
+                if game.unlockables[i].type != type do continue
+                if counter == 3{
+                    rec.x = start_x
+                    rec.y += 250
+                }
+                text := game.unlockables[i].unlocked ? game.unlockables[i].name : "???"
+                btn := ui.create_button(text, rec, on_equip, game.unlockables[i].data)
+                btn.disabled = !game.unlockables[i].unlocked
+                rec.x += 450
+                append(&game.menu.elements, btn)
+                counter += 1
+            }
+            rec.x -= (2*450)
+            rec.y += 250
+            back_btn := ui.create_button("Back", rec, on_click_back, -1)
+            append(&game.menu.elements, back_btn)
+            refresh_ui_pointers()
 }
 
 fill_available_upgrades :: proc(){

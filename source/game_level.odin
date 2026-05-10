@@ -67,6 +67,8 @@ create_start_level :: proc(){
     append(&game.level.npcs, npc)
     npc = create_catalyst_npc({400, -200})
     append(&game.level.npcs, npc)
+    npc = create_quartermaster_npc({400, 400})
+    append(&game.level.npcs, npc)
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
         game.player.pos = m.get_player_spawn_pos(level_visual)
         game.player.ability = create_standard_dash()

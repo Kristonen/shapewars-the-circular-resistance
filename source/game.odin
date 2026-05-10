@@ -12,11 +12,27 @@ game : Game_State
 Create_Hit_Particle :: #type proc(pos : rl.Vector2)
 
 Entity :: union {Player, Enemy}
+Unlocked_Type :: enum{Weapon, Ability}
+Unlocked_Data_Type :: enum{NormalBullet, PierceBullet, Dash, RadialLiberation}
+// Unlocked_Data :: union{Weapon, Ability}
+Unlocked :: struct{
+    name : string,
+    data : Unlocked_Data_Type,
+    type : Unlocked_Type,
+    unlocked : bool,
+}
+
+create_unlockable :: proc(idx : i32, name : string, data : Unlocked_Data_Type, type : Unlocked_Type, unlocked : bool = false){
+    game.unlockables[idx].name = name
+    game.unlockables[idx].data = data
+    game.unlockables[idx].type = type
+    game.unlockables[idx].unlocked = unlocked
+}
 
 Game_State :: struct{
     player : Player,
     camera : rl.Camera2D,
-
+    unlockables : [12]Unlocked,
     shake : f32,
 
     is_paused : bool,

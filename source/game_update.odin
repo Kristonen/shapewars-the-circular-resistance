@@ -33,6 +33,13 @@ update_handler :: proc(dt : f32){
             case .Catalyst:
                 game.is_paused = false
                 game.current_menu = .Play
+            case .Quartermaster:
+                game.is_paused = false
+                game.current_menu = .Play
+            case .EquiptmentBullet:
+                game.current_menu = game.last_menu
+            case .EquiptmentAbility:
+                game.current_menu = game.last_menu
         }
         sync_menu()
     }

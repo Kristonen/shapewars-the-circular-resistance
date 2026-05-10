@@ -9,7 +9,7 @@ UI_Node_State :: enum{None, Focussed, Pressed}
 Skilltree_Type :: union {Skilltree_Bullet_Type, Skilltree_Ability_Type}
 
 Skilltree_Bullet_Type :: enum{NormalBullet, BetterBUllet}
-Skilltree_Ability_Type :: enum {Radial_Liberation}
+Skilltree_Ability_Type :: enum {Radial_Liberation, Dash}
 
 UI_Skill_Tree :: struct{
     nodes : [dynamic]UI_Skill_Node,

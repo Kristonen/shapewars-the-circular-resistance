@@ -61,3 +61,20 @@ create_catalyst_npc :: proc(pos: rl.Vector2) -> NPC{
     }
     return n
 }
+
+create_quartermaster_npc :: proc(pos : rl.Vector2) -> NPC{
+    n := NPC{
+        pos = pos,
+        radius = 28,
+        texture = rl.RED,
+    }
+    n.interactable = {
+        text = "E - Quartermaster",
+        collider = {
+            pos = pos,
+            radius = n.radius * 2,
+        },
+        action = quartermaster_interact,
+    }
+    return n
+}
