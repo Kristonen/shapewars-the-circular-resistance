@@ -57,14 +57,15 @@ on_click_equiptment_menu :: proc(b : ui.UI_Button){
 }
 
 on_equip :: proc(b : ui.UI_Button){
-    a := b.data.(Unlocked_Data_Type)
-    switch a{
+    type := b.data.(Unlocked_Data_Type)
+    if type == game.player.current_weapon do return
+    switch type{
         case .NormalBullet:
-            game.player.weapon = create_normal_weapon()
-            game.player.current_weapon = .NormalBullet
+            game.player.current_weapon = type
+            switch_weapon()
         case .PierceBullet:
-            game.player.weapon = create_pierce_weapon()
-            game.player.current_weapon = .PierceBullet
+            game.player.current_weapon = type
+            switch_weapon()
         case .Dash:
             game.player.ability = create_standard_dash()
             game.player.target_ability = .Dash
