@@ -29,6 +29,21 @@ create_unlockable :: proc(idx : i32, name : string, data : Unlocked_Data_Type, t
     game.unlockables[idx].unlocked = unlocked
 }
 
+get_text_for_unlocked :: proc(type : Unlocked_Data_Type) -> string{
+    text := ""
+    switch type{
+        case .NormalBullet:
+            text = "Damage : 10\n Fire rate : 0.5\nSpeed : 700"
+        case .PierceBullet:
+            text = "Damage : 8\nFire rate : 1.0\nSpeed : 500\nThis weapon will make the enemy bleed."
+        case .Dash:
+            text = "Make a big movment to the position, where you are moving."
+        case .RadialLiberation:
+            text = "Create a wave of 8 bullets around the player.\nDamage : 5 (per bullet)"
+    }
+    return text
+}
+
 Game_State :: struct{
     player : Player,
     camera : rl.Camera2D,

@@ -498,6 +498,24 @@ draw_button :: proc(b : ui.UI_Button){
     }
     rl.DrawRectangleLinesEx(b.rec, 5, rl.BLACK)
     draw_better_text(b.text, b.rec)
+
+    if b.state == .Focus && (game.current_menu == .EquiptmentBullet || game.current_menu == .EquiptmentAbility){
+        switch type in b.data{
+            case Unlocked_Data_Type:
+                x := f32(rl.GetScreenWidth())*0.75
+                y : f32 = 0
+                rl.DrawLineEx({x, y}, {x, f32(rl.GetScreenHeight())}, 5, rl.WHITE)
+                text := ui.UI_Text{
+                    content = get_text_for_unlocked(type),
+                    font_size = 30,
+                    text_color = rl.WHITE,
+                    halign = .Top,
+                    valign = .Left,
+                }
+                rec := rl.Rectangle{x = x, y = y, width = f32(rl.GetScreenWidth()) - x, height = f32(rl.GetScreenHeight())}
+                draw_better_text(text, rec)
+        }
+    }
 }
 
 draw_label :: proc(l : ui.UI_Label){
