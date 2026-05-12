@@ -499,7 +499,7 @@ draw_button :: proc(b : ui.UI_Button){
     rl.DrawRectangleLinesEx(b.rec, 5, rl.BLACK)
     draw_better_text(b.text, b.rec)
 
-    if b.state == .Focus && (game.current_menu == .EquiptmentBullet || game.current_menu == .EquiptmentAbility){
+    if (b.state == .Focus || b.state == .Pressing || b.state == .Pressed) && (game.current_menu == .EquiptmentBullet || game.current_menu == .EquiptmentAbility){
         switch type in b.data{
             case Unlocked_Data_Type:
                 x := f32(rl.GetScreenWidth())*0.75
