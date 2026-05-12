@@ -18,13 +18,13 @@ Particle :: struct{
     use_grav : bool,
 }
 
-create_hit_particles :: proc(pos : rl.Vector2){
+create_hit_particles :: proc(area : rl.Rectangle){
     amount := rl.GetRandomValue(25, 40)
     for _ in 0..<amount{
         angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
         speed := f32(rl.GetRandomValue(20, 150))
         p : Particle = {
-            pos = pos,
+            pos = {area.x + area.width/2, area.y + area.height/2},
             vel = {math.cos(angle) * speed, math.sin(angle) * speed},
             color = rl.RED,
             max_life = f32(rl.GetRandomValue(5, 10)) / 10,
@@ -35,13 +35,36 @@ create_hit_particles :: proc(pos : rl.Vector2){
     }
 }
 
-create_destroy_bullet_particle :: proc(pos : rl.Vector2){
+create_bleeding_particle :: proc(area : rl.Rectangle){
+    for _ in 0..<3{
+        x := f32(rl.GetRandomValue(i32(area.x), i32(area.x + area.width)))
+        y := f32(rl.GetRandomValue(i32(area.y), i32(area.y + area.height)))
+        
+        amount := rl.GetRandomValue(5, 10)
+        for i in 0..<amount{
+            red := u8(rl.GetRandomValue(150, 255))
+            speed := f32(rl.GetRandomValue(30, 60))
+            angle := f32(rl.GetRandomValue(0, 360)) * (math.PI/100.0)
+            p : Particle = {
+                pos = {x, y},
+                vel = {math.cos(angle) * speed, math.sin(angle) * speed},
+                color = {red, 0, 0, 255},
+                max_life = f32(rl.GetRandomValue(2, 3))/10,
+                size = f32(rl.GetRandomValue(3, 5)),
+                alive = true,
+            }
+            append(&game.level.particles, p)
+        }
+    }
+}
+
+create_destroy_bullet_particle :: proc(area : rl.Rectangle){
     amount := rl.GetRandomValue(10, 20)
     for _ in 0..<amount{
         angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
         speed := f32(rl.GetRandomValue(25, 50))
         p : Particle = {
-            pos = pos,
+            pos = {area.x + area.width/2, area.y + area.height/2},
             vel = {math.cos(angle) * speed, math.sin(angle) * speed},
             color = rl.GRAY,
             max_life = f32(rl.GetRandomValue(3, 5)) / 10,
@@ -52,12 +75,12 @@ create_destroy_bullet_particle :: proc(pos : rl.Vector2){
     }
 }
 
-create_poison_particle :: proc(pos : rl.Vector2){
+create_poison_particle :: proc(area : rl.Rectangle){
     amount := rl.GetRandomValue(5, 10)
     directions := []rl.Vector2{{1,1}, {-1, -1}, {-1, 1}, {1, -1}}
     for i in 0..<4{
         dir := directions[i]
-        new_pos := pos + dir * 20
+        new_pos : rl.Vector2 = {area.x + area.width/2, area.y + area.height/2} + dir * 20
         speed := f32(rl.GetRandomValue(25, 50))
         for _ in 0..<amount{
             green_c : u8 = u8(rl.GetRandomValue(150, 200))
@@ -101,7 +124,7 @@ create_death_poison_particle :: proc(pos : rl.Vector2){
 
 }
 
-create_fire_particle :: proc(pos : rl.Vector2){
+create_fire_particle :: proc(area : rl.Rectangle){
     amount := rl.GetRandomValue(30, 50)
     dir := rl.Vector2 {0, -1}
     for _ in 0..<amount{
@@ -110,7 +133,7 @@ create_fire_particle :: proc(pos : rl.Vector2){
         x := f32(rl.GetRandomValue(-25, 25))
         y := f32(rl.GetRandomValue(-20, 20))
         p : Particle = {
-            pos = {pos.x + x, pos.y + y},
+            pos = {area.x + (area.width/2) + x, area.y + (area.height/2) + y},
             vel = dir * speed,
             color = {red, 0, 0, 255},
             max_life = f32(rl.GetRandomValue(5, 8)) / 10,

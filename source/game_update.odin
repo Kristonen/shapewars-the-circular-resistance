@@ -120,7 +120,13 @@ update_player_status :: proc(dt : f32){
         s.apply(&game.player, &s, dt)
         if s.state == .Applied{
             s.state = .None
-            s.create_particle(game.player.pos)
+            rec := rl.Rectangle {
+                x = game.player.pos.x - game.player.radius/2,
+                y = game.player.pos.y - game.player.radius/2,
+                width = game.player.radius,
+                height = game.player.radius,
+            }
+            s.create_particle(rec)
         }
         if !s.is_active{
             unordered_remove(&game.player.statuses, idx)
@@ -301,7 +307,7 @@ update_enemy_status :: proc(e : ^Enemy, dt : f32){
         s.apply(e, &s, dt)
         if s.state == .Applied{
             s.state = .None
-            s.create_particle(e.origin)
+            s.create_particle(e.rec)
         }
         if !s.is_active{
             unordered_remove(&e.statuses, idx)

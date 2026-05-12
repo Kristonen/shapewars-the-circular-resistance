@@ -191,7 +191,13 @@ check_bullet_wall :: proc(b : ^Bullet){
 
             if rl.CheckCollisionCircleRec(b.collider.pos, b.collider.radius, rect){
                 b.is_active = false
-                create_destroy_bullet_particle(b.pos)
+                rec := rl.Rectangle{
+                    x = b.pos.x - b.radius/2,
+                    y = b.pos.y - b.radius/2,
+                    width = b.radius,
+                    height = b.radius,
+                }
+                create_destroy_bullet_particle(rec)
             }
         }
     }

@@ -253,7 +253,7 @@ create_test_boss :: proc() -> Enemy{
 
 on_hit :: proc(e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
-    game.create_hit_particle(e.origin)
+    game.create_hit_particle(e.rec)
     e.knocback->apply(game.player.pos, &e.rec)
     e.health->take_dmg(dmg)
     e.hit_timer = Enemy_Hit_Time

@@ -3,7 +3,7 @@ package game
 import "core:fmt"
 import rl "vendor:raylib"
 
-Status_Type :: enum{Poison, Burn, Haste}
+Status_Type :: enum{Poison, Burn, Haste, Bleed}
 Status_State :: enum {None, Applied}
 
 Apply_Status :: #type proc(e : any, s : ^Status_Effect, dt : f32)
@@ -18,7 +18,7 @@ Status_Effect :: struct{
     state : Status_State,
     texture : rl.Color,
     is_active : bool,
-    create_particle : proc(pos : rl.Vector2)
+    create_particle : proc(area : rl.Rectangle)
 }
 
 create_poison_status :: proc() -> Status_Effect{
@@ -43,6 +43,19 @@ create_fire_status :: proc(strength : f32, tick : f32, duration : f32) -> Status
         apply = apply_fire,
         texture = rl.RED,
         create_particle = create_fire_particle,
+        is_active = true,
+    }
+}
+
+create_bleed_status :: proc(strength : f32, tick : f32, duration : f32) -> Status_Effect{
+    return {
+        type = .Bleed,
+        strength = strength,
+        tick = tick,
+        duration = duration,
+        apply = apply_bleed,
+        texture = rl.RED,
+        create_particle = create_bleeding_particle,
         is_active = true,
     }
 }
@@ -90,6 +103,29 @@ apply_fire :: proc(entity : any, fire : ^Status_Effect, dt : f32){
                 e.health->take_dmg(fire.strength)
             case ^Enemy:
                 e.health->take_dmg(fire.strength)
+        }
+    }
+}
+
+apply_bleed :: proc(entity : any, bleed : ^Status_Effect, dt : f32){
+    if bleed.duration <= 0{
+        bleed.is_active = false
+    }
+
+    if !bleed.is_active do return
+
+    bleed.duration -= dt
+
+    if bleed.current_tick > 0{
+        bleed.current_tick -= dt
+    } else{
+        bleed.current_tick = bleed.tick
+        bleed.state = .Applied
+        switch &e in entity{
+            case ^Player:
+                e.health->take_dmg(bleed.strength)
+            case ^Enemy:
+                e.health->take_dmg(bleed.strength)
         }
     }
 }

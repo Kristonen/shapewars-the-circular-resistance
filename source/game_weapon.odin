@@ -37,7 +37,7 @@ switch_weapon :: proc(){
             game.player.weapon = create_normal_weapon()
         case .PierceBullet:
             game.player.weapon = create_pierce_weapon()
-            append(&game.player.weapon.bullet.applied_status, create_fire_status(5, 0.5, 2))
+            append(&game.player.weapon.bullet.applied_status, create_bleed_status(5, 0.5, 2))
         case .Dash:
         case .RadialLiberation:
     }

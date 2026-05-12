@@ -9,7 +9,7 @@ import "ui"
 
 game : Game_State
 
-Create_Hit_Particle :: #type proc(pos : rl.Vector2)
+Create_Hit_Particle :: #type proc(area : rl.Rectangle)
 
 Entity :: union {Player, Enemy}
 Unlocked_Type :: enum{Weapon, Ability}
