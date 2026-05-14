@@ -221,7 +221,7 @@ check_collisions_pickup_loot :: proc(){
             game.player.increase_value(&game.player.loot_bag, l.value)
             if game.level.power_level_up{
                 level_up_spawner_update()
-                create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades, game.player.target_ability)
+                create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
             }
             unordered_remove(&game.level.loot, idx)
         }
@@ -249,6 +249,7 @@ check_collision_upgrade_slot :: proc(){
 check_collision_menu :: proc(){
     for &element in game.menu.elements{
         switch &e in element{
+            case ui.UI_Panel:
             case ui.UI_Cooldown:
             case ui.UI_Button:
                 check_collision_button(&e)
@@ -310,6 +311,7 @@ check_in_game_ui_tooltip :: proc(){
     game.tooltip_ptr = nil
     for &element in game.level.ui_elements{
         switch &e in element{
+            case ui.UI_Panel:
             case ui.UI_Cooldown:
             case ui.UI_Button:
             case ui.UI_Menu:

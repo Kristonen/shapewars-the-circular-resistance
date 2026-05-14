@@ -40,6 +40,9 @@ update_handler :: proc(dt : f32){
                 game.current_menu = game.last_menu
             case .EquiptmentAbility:
                 game.current_menu = game.last_menu
+            case .Stats:
+                game.is_paused = false
+                game.current_menu = .Play
         }
         sync_menu()
     }
@@ -50,7 +53,13 @@ update_handler :: proc(dt : f32){
 
     if rl.IsKeyPressed(.U){
         game.level.power_level_up = true
-        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades, game.player.target_ability)
+        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
+    }
+
+    if rl.IsKeyPressed(.TAB){
+        game.is_paused = !game.is_paused
+        game.current_menu = game.is_paused ? .Stats : .Play
+        sync_menu()
     }
 }
 
@@ -420,6 +429,7 @@ update_in_game_ui :: proc(dt : f32){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 update_status_bar(&e)
+            case ui.UI_Panel:
         }
     }
     update_interact()
@@ -441,6 +451,7 @@ update_menu :: proc(){
 
         }
         switch &e in element{
+            case ui.UI_Panel:
             case ui.UI_Cooldown:
                 cd := get_ability_cd()
                 update_cooldown(&e, cd.cooldown, cd.cast_rate)
@@ -473,6 +484,8 @@ update_skill_nodes :: proc(n : ^UI_Skill_Node){
     n.used.content = fmt.tprintf("%i/%i", n.count, n.max_count)
     if n.state == .Pressed{
         game.skill_points -= 1
+        n.count += 1
+        if game.active_skilltree != game.player.current_weapon && game.active_skilltree != game.player.current_ability do return
         n->apply()
     }
 }

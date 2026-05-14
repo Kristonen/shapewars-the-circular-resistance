@@ -107,6 +107,7 @@ main :: proc(){
         delete(game.tooltips)
         for &element in game.level.ui_elements{
             switch &e in &element{
+                case ui.UI_Panel:
                 case ui.UI_Cooldown:
                 case ui.UI_Button:
                 case ui.UI_Menu:
@@ -129,6 +130,8 @@ main :: proc(){
     }
     init_game()
     load_game()
+    switch_weapon()
+    switch_ability()
     create_level(game.current_level)
     game.level.interact = {
         rec = {
@@ -283,10 +286,36 @@ sync_menu :: proc(){
     clear(&game.menu.elements)
     switch game.current_menu{
         case .Play:
+        case .Main:
+        case .Stats:
+            ui.create_menu(&game.menu)
+            rec := rl.Rectangle{
+                x = f32(rl.GetScreenWidth()/2 - 500),
+                y = f32(rl.GetScreenHeight())*0.05,
+                width = 1000,
+                height = 800,
+            }
+            p := ui.create_panel(rec, rl.GRAY, 100)
+            append(&game.menu.elements, p)
+            rec.x += p.rec.width/2 - 125
+            rec.y += 5
+            rec.width = 250
+            rec.height = 100
+            l := ui.create_label(get_player_health_as_string(), rec)
+            l.text.font_size = 20
+            append(&game.menu.elements, l)
+            rec.y += 105
+            l = ui.create_label(get_player_damage_as_string(), rec)
+            l.text.font_size = 20
+            append(&game.menu.elements, l)
+            rec.y += 105
+            l = ui.create_label(get_player_attack_speed_as_string(), rec)
+            l.text.font_size = 20
+            append(&game.menu.elements, l)
         case .Pause:
             ui.create_menu(&game.menu)
             rec := rl.Rectangle{
-                x = f32(rl.GetScreenWidth()) / 2 - 500/2,
+                x = f32(rl.GetScreenWidth()) / 2 - 250,
                 y = f32(rl.GetScreenHeight()) * 0.25,
                 width = 500,
                 height = 100,
@@ -319,7 +348,6 @@ sync_menu :: proc(){
 
             slider := ui.create_slider({700, 100}, {1000, 100})
             append(&game.menu.elements, slider)
-        case.Main:
         case .Gunsmith:
             rec := rl.Rectangle{
                 x = f32(rl.GetScreenWidth() / 2 - 50),
@@ -328,12 +356,13 @@ sync_menu :: proc(){
                 height = 100,
             }
             btn : ui.UI_Button
-            for &type in game.all_bullets{
-                text := fmt.tprintf("%v", type)
-                btn = create_choose_bullet_skilltree(rec, &type)
+            for &u in game.unlockables{
+                if u.type == .Ability do continue
+                text := fmt.tprintf("%v", u.data)
+                btn = ui.create_button(text, rec, on_click_skilltree, u.data)
                 btn.text.font_size = 30
                 btn.type = .Skilltree
-                if !game.skilltrees[text].unlocked{
+                if !u.unlocked{
                     btn.disabled = true
                     btn.text.content = "???"
                 }
@@ -352,12 +381,13 @@ sync_menu :: proc(){
                 width = 300,
                 height = 100,
             }
-            for &type in game.all_abilities{
-                text := fmt.tprintf("%v", type)
-                btn := create_choose_ability_skilltree(rec, &type)
+            for &u in game.unlockables{
+                if u.type == .Weapon do continue
+                text := fmt.tprintf("%v", u.data)
+                btn := ui.create_button(text, rec, on_click_skilltree, u.data)
                 btn.type = .Skilltree
                 btn.text.font_size = 30
-                if !game.skilltrees[text].unlocked{
+                if !u.unlocked{
                     btn.disabled = true
                     btn.text.content = "???"
                 }
@@ -461,9 +491,11 @@ fill_available_upgrades :: proc(){
     legendary : i32
     clear(&game.level.available_upgrades)
     for u in game.level.upgrade_pool{
-        if u.target == .Player{
+        if u.target == .NormalBullet{
             append(&game.level.available_upgrades, u)
-        } else if game.player.target_ability == u.target{
+        } else if game.player.current_ability == u.target{
+            append(&game.level.available_upgrades, u)
+        } else if game.player.current_weapon == u.target{
             append(&game.level.available_upgrades, u)
         }
         switch u.rarity{
@@ -492,6 +524,7 @@ refresh_ui_pointers :: proc(){
             case ui.UI_Label:
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
+            case ui.UI_Panel:
         }
     }
 }

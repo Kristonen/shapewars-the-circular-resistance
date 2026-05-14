@@ -45,6 +45,7 @@ create_level :: proc(type : Level_Type){
     err := virtual.arena_init_growing(&game.map_arena)
     game.map_allocator = virtual.arena_allocator(&game.map_arena)
     refresh_level()
+    refresh_player()
     game.current_level = type
     switch type{
         case .HQ:
@@ -58,6 +59,11 @@ create_level :: proc(type : Level_Type){
             create_boss_test_level()
 
     }
+}
+
+refresh_player :: proc(){
+    switch_weapon()
+    switch_ability()
 }
 
 create_start_level :: proc(){
@@ -170,7 +176,7 @@ create_choose_level :: proc(rec : rl.Rectangle, type : ^Level_Type) -> ui.UI_But
     return ui.create_button(text, rec, on_click_change_level, type)
 }
 
-create_choose_ability_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Ability_Type) -> ui.UI_Button{
+create_choose_ability_skilltree :: proc(rec : rl.Rectangle, type : ^Unlocked_Data_Type) -> ui.UI_Button{
     text := fmt.tprintf("%v", type^)
     return ui.create_button(text, rec, on_click_skilltree, type)
 }

@@ -14,7 +14,7 @@ Save_Game_Data :: struct{
     rank : i32,
     current_xp : f32,
     max_xp : f32,
-    target_ability : Upgrade_Target,
+    target_ability : Unlocked_Data_Type,
     weapon : Unlocked_Data_Type,
 }
 
@@ -43,16 +43,18 @@ load_skilltree :: proc(){
     if ok != os.General_Error.None do return
     trees : []Save_Skilltree_Data
     err := json.unmarshal(data, &trees, allocator = game.skill_allocator)
-
+    
     for tree, tree_idx in trees{
         for node, node_idx in tree.nodes{
             n := &game.skilltrees[tree.name].nodes[node_idx]
             n.count = node.count
-            for _ in 0..<n.count{
-                n->apply(false)
-            }
+            // for _ in 0..<n.count{
+            //     n->apply(false)
+            // }
+            // apply_skilltree(game.skilltrees[tree.name].type)
         }
     }
+    
 }
 
 save_skilltree :: proc(){
@@ -103,9 +105,8 @@ load_game_data :: proc(){
     game.current_xp = game_data.current_xp
     game.max_xp = game_data.max_xp
     game.skill_points = game_data.skill_points
-    game.player.target_ability = game_data.target_ability
+    game.player.current_ability = game_data.target_ability
     game.player.current_weapon = game_data.weapon
-    switch_weapon()
 }
 
 save_game_data :: proc(){
@@ -114,7 +115,7 @@ save_game_data :: proc(){
         rank = game.rank,
         current_xp = game.current_xp,
         max_xp = game.max_xp,
-        target_ability = game.player.target_ability,
+        target_ability = game.player.current_ability,
         weapon = game.player.current_weapon,
     }
     json_data, err := json.marshal(game_data, {pretty = true}, context.temp_allocator)

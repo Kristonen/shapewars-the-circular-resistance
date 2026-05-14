@@ -4,10 +4,7 @@ import "core:fmt"
 import rl "vendor:raylib"
 
 init_skilltrees :: proc(){
-    for type in Skilltree_Bullet_Type{
-        create_skill_tree(type, &game.skilltrees)
-    }
-    for type in Skilltree_Ability_Type{
+    for type in Unlocked_Data_Type{
         create_skill_tree(type, &game.skilltrees)
     }
 }
@@ -27,7 +24,7 @@ init_unlockables :: proc(){
     create_unlockable(5, "", .NormalBullet, .Weapon)
     //Ability
     create_unlockable(6, "Dash", .Dash, .Ability, true)
-    create_unlockable(7, "Radial Liberation", .RadialLiberation, .Ability, true)
+    create_unlockable(7, "Radial Liberation", .Radial_Liberation, .Ability, true)
     create_unlockable(8, "", .NormalBullet, .Ability)
     create_unlockable(9, "", .NormalBullet, .Ability)
     create_unlockable(10, "", .NormalBullet, .Ability)

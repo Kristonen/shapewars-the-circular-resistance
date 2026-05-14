@@ -9,7 +9,7 @@ import "ui"
 
 draw_player :: proc(){
     rl.DrawCircleV(game.player.pos, game.player.radius, rl.VIOLET)
-    if game.player.ability.active && game.player.target_ability == .Dash{
+    if game.player.ability.active && game.player.current_ability == .Dash{
         rl.DrawCircleLinesV(game.player.pos, game.player.radius, rl.BLACK)
     }
     for i in 0..<len(game.player.ghosts){
@@ -247,6 +247,7 @@ draw_in_game_ui :: proc(){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 draw_status_bar(e)
+            case ui.UI_Panel:
         }
     }
     if !game.is_paused{
@@ -396,6 +397,8 @@ draw_menu :: proc(){
     rl.DrawRectangleV({0, 0}, {game.menu.width, game.menu.height}, game.menu.color)
     for element in game.menu.elements{
         switch e in element{
+            case ui.UI_Panel:
+                draw_panel(e)
             case ui.UI_Cooldown:
             case ui.UI_Button:
                 draw_button(e)
@@ -408,6 +411,10 @@ draw_menu :: proc(){
             case ui.UI_Status_Bar:
         } 
     }
+}
+
+draw_panel :: proc(p : ui.UI_Panel){
+    rl.DrawRectangleRec(p.rec, p.color)
 }
 
 draw_skilltree :: proc(){

@@ -30,7 +30,7 @@ create_dmg_upgrade :: proc(name : string, desc : string, value : f32, type : Upg
         value = value,
         texture = rl.BLACK,
         rarity = rarity,
-        target = .Player,
+        target = .NormalBullet,
         type = type,
         apply = apply_dmg_upgrade,
     }
@@ -55,7 +55,7 @@ create_ls_upgrade :: proc(name : string, desc : string, value : f32, type : Upgr
         value = value,
         texture = rl.BLACK,
         rarity = rarity,
-        target = .Player,
+        target = .NormalBullet,
         type = type,
         apply = apply_lifesteal_upgrade,
     }

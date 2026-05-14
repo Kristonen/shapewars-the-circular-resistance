@@ -137,3 +137,15 @@ radial_liberation_activate :: proc(dt : f32){
     }
     game.player.ability.active = false
 }
+
+switch_ability :: proc(){
+    switch game.player.current_ability{
+        case .NormalBullet:
+        case .PierceBullet:
+        case .Radial_Liberation:
+            game.player.ability = create_standard_radial_liberation()
+        case .Dash:
+            game.player.ability = create_standard_dash()
+    }
+    apply_skilltree(game.player.current_ability)
+}
