@@ -14,7 +14,6 @@ Create_Hit_Particle :: #type proc(area : rl.Rectangle)
 Entity :: union {Player, Enemy}
 Unlocked_Type :: enum{Weapon, Ability}
 Unlocked_Data_Type :: enum{NormalBullet, PierceBullet, Dash, Radial_Liberation, Bomb}
-// Unlocked_Data :: union{Weapon, Ability}
 Unlocked :: struct{
     name : string,
     data : Unlocked_Data_Type,
@@ -88,12 +87,6 @@ Game_State :: struct{
 
     skill_arena : virtual.Arena,
     skill_allocator : mem.Allocator,
-
-    all_bullets : [dynamic]Skilltree_Bullet_Type,
-    unlocked_bullets : [dynamic]Skilltree_Bullet_Type,
-
-    all_abilities : [dynamic]Skilltree_Ability_Type,
-    unlocked_abilities : [dynamic]Skilltree_Ability_Type,
 
     //Test
     fbo : rl.RenderTexture,

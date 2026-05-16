@@ -84,6 +84,8 @@ bomb_finish :: proc(dt : f32){
             e.health->take_dmg(data.damage)
         }
     }
+    rec := rl.Rectangle{data.pos.x, data.pos.y, data.radius*2, data.radius*2}
+    create_explosion_particles(rec)
 }
 
 bomb_draw :: proc(){

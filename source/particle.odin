@@ -6,6 +6,8 @@ import rl "vendor:raylib"
 
 Fake_Particle_Gravitiy :: 2.5
 
+Particle_Type :: enum{Normal, Line, Expanding}
+
 Particle :: struct{
     pos : rl.Vector2,
     entity_pos : rl.Vector2,
@@ -30,6 +32,24 @@ create_hit_particles :: proc(area : rl.Rectangle){
             max_life = f32(rl.GetRandomValue(5, 10)) / 10,
             size = f32(rl.GetRandomValue(5, 9)),
             alive = true
+        }
+        append(&game.level.particles, p)
+    }
+}
+
+create_explosion_particles :: proc(area : rl.Rectangle){
+    amount := rl.GetRandomValue(50, 60)
+
+    for _ in 0..<amount{
+        angle := f32(rl.GetRandomValue(0, 360)) * (math.PI/100.0)
+        speed := f32(rl.GetRandomValue(180, 220))
+        p : Particle = {
+            pos = {area.x, area.y},
+            vel = {math.cos(angle) * speed, math.sin(angle) * speed},
+            color = rl.RED,
+            max_life = f32(rl.GetRandomValue(10, 15)) / 10,
+            size = f32(rl.GetRandomValue(5, 8)),
+            alive = true,
         }
         append(&game.level.particles, p)
     }
@@ -180,4 +200,8 @@ create_dash_particle :: proc(pos : rl.Vector2, dir : rl.Vector2){
         }
         append(&game.level.particles, p)
     }
+}
+
+spawn_particle :: proc(){
+
 }

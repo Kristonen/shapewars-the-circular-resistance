@@ -62,16 +62,6 @@ main :: proc(){
         append(&game.levels, type)
     }
 
-    for idx in 0..<len(Skilltree_Ability_Type){
-        type := Skilltree_Ability_Type(idx)
-        append(&game.all_abilities, type)
-    }
-
-    for idx in 0..<len(Skilltree_Bullet_Type){
-        type := Skilltree_Bullet_Type(idx)
-        append(&game.all_bullets, type)
-    }
-
     sync_menu()
 
     defer{
@@ -124,8 +114,6 @@ main :: proc(){
             delete(v.nodes)
         }
         delete(game.skilltrees)
-        delete(game.all_abilities)
-        delete(game.all_bullets)
         rl.CloseWindow()
     }
     init_game()
