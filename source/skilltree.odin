@@ -58,6 +58,7 @@ create_skill_tree :: proc(type : Unlocked_Data_Type, a : ^map[string]UI_Skill_Tr
         case .Radial_Liberation:
             create_rl_skilltree(type)
         case .Dash:
+        case .Bomb:
     }
 }
 

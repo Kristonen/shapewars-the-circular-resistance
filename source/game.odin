@@ -13,7 +13,7 @@ Create_Hit_Particle :: #type proc(area : rl.Rectangle)
 
 Entity :: union {Player, Enemy}
 Unlocked_Type :: enum{Weapon, Ability}
-Unlocked_Data_Type :: enum{NormalBullet, PierceBullet, Dash, Radial_Liberation}
+Unlocked_Data_Type :: enum{NormalBullet, PierceBullet, Dash, Radial_Liberation, Bomb}
 // Unlocked_Data :: union{Weapon, Ability}
 Unlocked :: struct{
     name : string,
@@ -40,6 +40,8 @@ get_text_for_unlocked :: proc(type : Unlocked_Data_Type) -> string{
             text = "Make a big movment to the position, where you are moving."
         case .Radial_Liberation:
             text = "Create a wave of 8 bullets around the player.\nDamage : 5 (per bullet)"
+        case .Bomb:
+            text = "Throw a bomb that makes a lot of damage in a area."
     }
     return text
 }

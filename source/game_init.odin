@@ -25,7 +25,7 @@ init_unlockables :: proc(){
     //Ability
     create_unlockable(6, "Dash", .Dash, .Ability, true)
     create_unlockable(7, "Radial Liberation", .Radial_Liberation, .Ability, true)
-    create_unlockable(8, "", .NormalBullet, .Ability)
+    create_unlockable(8, "Bomb", .Bomb, .Ability, true)
     create_unlockable(9, "", .NormalBullet, .Ability)
     create_unlockable(10, "", .NormalBullet, .Ability)
     create_unlockable(11, "", .NormalBullet, .Ability)

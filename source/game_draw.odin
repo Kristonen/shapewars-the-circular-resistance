@@ -26,6 +26,15 @@ draw_player :: proc(){
     }
 }
 
+draw_player_indicator :: proc(){
+    if game.level.indicator == nil do return
+    switch i in game.level.indicator{
+        case AoE_Indicator:
+            rl.DrawCircleV(i.pos, i.radius, {0, 0, 0, 100})
+        case Line_Indicator:
+    }
+}
+
 draw_npc :: proc(){
     for n in game.level.npcs{
         rl.DrawCircleV(n.pos, n.radius, n.texture)

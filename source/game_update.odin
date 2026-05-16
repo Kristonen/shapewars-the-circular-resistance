@@ -11,6 +11,11 @@ import "core:math"
 
 update_handler :: proc(dt : f32){
     if rl.IsKeyPressed(.ESCAPE){
+        if game.player.ability.indicator_active{
+            game.player.ability.indicator_active = false
+            game.level.indicator = nil
+            return
+        }
         clear(&game.menu.elements)
         switch game.current_menu{
             case .Play:
@@ -181,6 +186,7 @@ update_enemy_bullets :: proc(dt : f32){
 }
 
 update_player_shooting :: proc(dt : f32){
+    if game.player.ability.indicator_active do return
     if game.player.weapon.cooldown > 0{
         game.player.weapon.cooldown -= dt
     }
@@ -216,21 +222,36 @@ update_player_casting :: proc(dt : f32){
         cd.cooldown -= dt
     }
 
+    if game.player.ability.indicator_active{
+        game.player.ability.indicator(dt)
+    }
+
     if rl.IsKeyPressed(.SPACE) && cd.cooldown <= 0 && !game.player.ability.active{
-        // switch &a in game.player.ability{
-        //     case Radial_Liberation:
-        //         cd.cooldown = a.ability_cd.cast_rate
-        //     case Dash:
-        //         cd.cooldown = a.ability_cd.cast_rate
-        // }
-        game.player.ability.active = true
+        // game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
+        // game.player.ability.activate(dt)
+        game.player.ability.indicator_active = true
+    }
+
+    if game.player.ability.activated{
+        game.player.ability.indicator_active = false
+        game.player.ability.activated = false
         game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
         game.player.ability.activate(dt)
-        // cast_player_ability()
+        game.level.indicator = nil
+        game.player.ability.active = true
     }
 
     if game.player.ability.active{
         game.player.ability.update(dt)
+    }
+}
+
+update_player_indicator :: proc(dt : f32){
+    if game.level.indicator == nil do return
+    switch &i in game.level.indicator{
+        case AoE_Indicator:
+            i.pos = rl.GetMousePosition()
+        case Line_Indicator:
     }
 }
 

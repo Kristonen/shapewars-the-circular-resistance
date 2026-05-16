@@ -130,8 +130,6 @@ main :: proc(){
     }
     init_game()
     load_game()
-    switch_weapon()
-    switch_ability()
     create_level(game.current_level)
     game.level.interact = {
         rec = {
@@ -191,9 +189,10 @@ update_game :: proc(dt : f32) {
         update_player_interact(dt)
         update_player_shooting(dt)
         update_player_bullets(dt)
+        update_player_indicator(dt)
+        update_player_casting(dt)
         update_npc(dt)
         update_enemy_bullets(dt)
-        update_player_casting(dt)
         update_spawner(dt)
         update_enemy(dt)
         update_area_effect(dt)
@@ -251,12 +250,16 @@ draw_game :: proc(){
         draw_portal()
         draw_area_effects()
         draw_fragments()
+        draw_player_indicator()
         draw_player()
         draw_npc()
         draw_loot()
         draw_bullet()
         draw_enemies()
         draw_particles()
+        if game.player.ability.active{
+            game.player.ability.draw()
+        }
     rl.EndMode2D()
     
     draw_in_game_ui()

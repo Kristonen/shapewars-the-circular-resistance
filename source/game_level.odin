@@ -18,6 +18,7 @@ Level_Data :: struct{
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
     enemy_bullets : [dynamic]Bullet,
     area_effects : [dynamic]Area_Effect,
+    indicator : Indicator,
 
     particles : [dynamic]Particle,
 
@@ -77,7 +78,6 @@ create_start_level :: proc(){
     append(&game.level.npcs, npc)
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
         game.player.pos = m.get_player_spawn_pos(level_visual)
-        game.player.ability = create_standard_dash()
         game.camera.target = game.player.pos
         game.level.level_visual = level_visual
     } else{
@@ -108,11 +108,11 @@ create_test_level :: proc(){
     append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
     spawner.enemy = create_poison_moloch()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     spawner.enemy = create_second_enemy()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     spawner.enemy = create_third_enemy()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual

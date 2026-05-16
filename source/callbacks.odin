@@ -63,6 +63,8 @@ on_equip :: proc(b : ui.UI_Button){
             game.player.current_ability = .Dash
         case .Radial_Liberation:
             game.player.current_ability = .Radial_Liberation
+        case .Bomb:
+            game.player.current_ability = .Bomb
     }
     switch_weapon()
     switch_ability()

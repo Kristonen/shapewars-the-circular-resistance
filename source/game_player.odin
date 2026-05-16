@@ -109,6 +109,8 @@ get_upgrade_target :: proc() {
             game.player.current_ability = .Radial_Liberation
         case Dash_Data:
             game.player.current_ability = .Dash
+        case Bomb_Data:
+            game.player.current_ability = .Bomb
     }
 }
 
