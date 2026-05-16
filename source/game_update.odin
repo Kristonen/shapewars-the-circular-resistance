@@ -369,19 +369,35 @@ update_fragement :: proc(dt : f32){
 }
 
 update_particle :: proc(dt : f32){
-    for &p, idx in game.level.particles{
+    for i := 0; i < len(game.level.particles);{
+        p := &game.level.particles[i]
         if p.life >= p.max_life{
             p.alive = false
         }
         if !p.alive{
-            unordered_remove(&game.level.particles, idx)
+            unordered_remove(&game.level.particles, i)
             continue
         }
         if p.use_grav{
             p.vel.y += Fake_Particle_Gravitiy
         }
         p.life += dt
-        p.pos += p.vel * dt
+        progress := p.life/p.max_life
+        switch p.type{
+            case .Normal:
+                p.pos += p.vel * dt
+            case .Line:
+                p.pos += p.vel * dt
+                p.vel *= 0.98
+                // p.size = (p.life/p.max_life)*15.0
+            case .Expanding:
+                p.size = progress * 130.0
+            case .PlasmaSmoke:
+                p.pos += p.vel * dt
+                p.vel *= 0.95
+                p.size = (1.0 - progress) * 16.0
+        }
+        i += 1  
     }
 }
 

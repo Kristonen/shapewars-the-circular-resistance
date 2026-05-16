@@ -165,10 +165,27 @@ draw_loot :: proc(){
 
 draw_particles :: proc(){
     for p in game.level.particles{
+
         alpha := 1.0 - (p.life/p.max_life)
         color := p.color
         color.a = u8(alpha*255)
-        rl.DrawCircleV(p.pos, p.size/2, color)
+
+        switch p.type{
+            case .Normal:
+                rl.DrawCircleV(p.pos, p.size/2, color)
+            case .Line:
+                if rl.Vector2Length(p.vel) > 0.1{
+                    line_end := p.pos - rl.Vector2Normalize(p.vel) * (p.size * 1.5)
+                    color = rl.ColorAlphaBlend(rl.GOLD, p.color, color)
+                    rl.DrawLineEx(p.pos, line_end, 3.0, color)
+                }
+            case .Expanding:
+                rl.DrawCircleV(p.pos, p.size, color)
+            case .PlasmaSmoke:
+                mid_color := rl.ColorAlphaBlend(rl.RED, rl.ORANGE, color)
+                final_color := rl.ColorAlphaBlend(rl.DARKGRAY, mid_color, color)
+                rl.DrawCircleV(p.pos, 15, final_color)
+        }
     }
 }
 
