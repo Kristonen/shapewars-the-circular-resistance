@@ -394,8 +394,8 @@ update_particle :: proc(dt : f32){
                 p.size = progress * 130.0
             case .PlasmaSmoke:
                 p.pos += p.vel * dt
-                p.vel *= 0.95
-                p.size = (1.0 - progress) * 16.0
+                p.vel *= 0.99
+                p.size = (1.0 - progress) * 18.0
         }
         i += 1  
     }

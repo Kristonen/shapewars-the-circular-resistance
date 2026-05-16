@@ -20,12 +20,12 @@ Particle :: struct{
     use_grav : bool,
     type : Particle_Type,
 }
-
-get_random_unit_vector :: proc() -> rl.Vector2{
+//Create a random direction as vector 2. (0 - 360 degrees)
+get_random_unit_vector :: proc(speed : f32 = 1.0) -> rl.Vector2{
     random_fraction := f32(rl.GetRandomValue(0, 1000))
-    angle := random_fraction * 2.0 * math.PI
+    angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
     return {
-        math.cos(angle), math.sin(angle)
+        math.cos(angle) * speed, math.sin(angle) * speed,
     }
 }
 
@@ -77,12 +77,13 @@ create_explosion_particles :: proc(area : rl.Rectangle){
     // }
 
     for _ in 0..<25{
-        dir := get_random_unit_vector()
+        
         speed := f32(rl.GetRandomValue(30, 100))
+        dir := get_random_unit_vector(speed)
         color := (rl.GetRandomValue(0, 1) == 0) ? rl.RED : rl.PURPLE
         p := Particle{
             pos = {area.x, area.y},
-            vel = dir * speed,
+            vel = dir,
             color = color,
             max_life = f32(rl.GetRandomValue(3, 6)) / 10,
             size = 16.0,
@@ -93,13 +94,14 @@ create_explosion_particles :: proc(area : rl.Rectangle){
     }
 
     for _ in 0..<50{
-        angle := f32(rl.GetRandomValue(0, 360)) * (math.PI/100.0)
+        // angle := f32(rl.GetRandomValue(0, 360)) * (math.PI/100.0)
         speed := f32(rl.GetRandomValue(400, 700))
+        dir := get_random_unit_vector(speed)
         rand := rl.GetRandomValue(1, 3)
         color := rand == 1 ? rl.RED : rand == 2 ? rl.ORANGE : rl.YELLOW
         p : Particle = {
             pos = {area.x, area.y},
-            vel = {math.cos(angle) * speed, math.sin(angle) * speed},
+            vel = dir,
             color = color,
             size = 15.0,
             max_life = 0.2,
