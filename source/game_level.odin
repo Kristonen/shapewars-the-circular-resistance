@@ -108,7 +108,7 @@ create_test_level :: proc(){
     append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
     spawner.enemy = create_poison_moloch()
-    // append(&game.level.spawner, spawner)
+    append(&game.level.spawner, spawner)
     spawner.enemy = create_second_enemy()
     // append(&game.level.spawner, spawner)
     spawner.enemy = create_third_enemy()

@@ -32,7 +32,7 @@ get_text_for_unlocked :: proc(type : Unlocked_Data_Type) -> string{
     text := ""
     switch type{
         case .NormalBullet:
-            text = "Damage : 10\n Fire rate : 0.5\nSpeed : 700"
+            text = "Damage : 10\nFire rate : 0.5\nSpeed : 700"
         case .PierceBullet:
             text = "Damage : 8\nFire rate : 1.0\nSpeed : 500\nThis weapon will make the enemy bleed."
         case .Dash:
