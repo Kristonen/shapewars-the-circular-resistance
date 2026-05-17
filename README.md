@@ -55,7 +55,7 @@ Since the game is actively in development, there are **no pre-compiled releases 
 
 ### Prerequisites
 
-* You need to have the [Odin Compiler](https://odin-lang.org/news/getting-started/) installed and added to your system's PATH.
+* You need to have the [Odin Compiler](https://odin-lang.org/docs/install/) installed and added to your system's PATH.
     * *If you need help setting up Odin, check out this excellent [Video Guide by Karl Zylinski](https://www.youtube.com/watch?v=yq5VabsGz_4)*
 * Raylib is bundled via Odin's vendor packages, so no extra setup is required.
 
