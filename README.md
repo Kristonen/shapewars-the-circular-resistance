@@ -1,5 +1,9 @@
 # Shapewars: The Circular Resistance
 
+> 📢 **Project Notice:** This repository contains the public development of the official **Demo** for *Shapewars: The Circular Resistance*. The full version of the game is planned for a commercial release on **Steam** and **Itch.io**. 
+> 
+> 📄 **License:** All rights reserved. The source code is public for educational, portfolio, and demo purposes only. Commercial redistribution or cloning is prohibited. (See LICENSE for details).
+
 ## Introduction
 
 This is a fast-paced rogue-lite shoot 'em up built with [Odin](https://odin-lang.org) and [Raylib](https://www.raylib.com). The game is inspired by [Vampire Survivors](https://store.steampowered.com/app/1794680/Vampire_Survivors), but instead of automatic attacking, the player has full control over shooting and unique abilities.
@@ -65,11 +69,11 @@ Clone this repository:
 git clone https://github.com/Kristonen/shapewars-the-circular-resistance.git
 ```
 Navigate to the source directory:
-```
+```bash
 cd shapewars-the-circular-resistance/source
 ```
 Run the game using the Odin compiler:
-```
+```bash
 odin run .
 ```
 
