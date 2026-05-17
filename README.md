@@ -2,7 +2,7 @@
 
 > 📢 **Project Notice:** This repository contains the public development of the official **Demo** for *Shapewars: The Circular Resistance*. The full version of the game is planned for a commercial release on **Steam** and **Itch.io**. 
 > 
-> 📄 **License:** All rights reserved. The source code is public for educational, portfolio, and demo purposes only. Commercial redistribution or cloning is prohibited. (See LICENSE for details).
+> 📄 **License:** All rights reserved. The source code is public solely for educational, portfolio, and personal evaluation purposes. Commercial redistribution, creating copycat versions, or selling the code is strictly prohibited. (See LICENSE for details).
 
 ## Introduction
 
