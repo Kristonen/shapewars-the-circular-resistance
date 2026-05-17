@@ -141,7 +141,6 @@ main :: proc(){
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
 
-        update_camera(dt)
         check_collisions()
         update_game(dt)
         draw_game()
@@ -169,6 +168,7 @@ save_game :: proc(){
 }
 
 update_game :: proc(dt : f32) {
+    update_camera(dt)
     update_helper()
     update_handler(dt)
     if !game.is_paused && !game.level.power_level_up{
