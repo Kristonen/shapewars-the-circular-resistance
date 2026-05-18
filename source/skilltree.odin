@@ -5,7 +5,7 @@ import "core:fmt"
 import "ui"
 
 //UI Skill Tree
-UI_Node_State :: enum{None, Focussed, Pressed}
+UI_Node_State :: enum{None, Focussed, Spend, Refund}
 Skilltree_Type :: union {Skilltree_Bullet_Type, Skilltree_Ability_Type}
 
 Skilltree_Bullet_Type :: enum{NormalBullet, BetterBUllet}
@@ -26,7 +26,7 @@ UI_Skill_Node :: struct{
     pos : rl.Vector2,
     radius : f32,
     state : UI_Node_State,
-    apply : proc(n : ^UI_Skill_Node, is_counting : bool = true) `json:"-"`,
+    apply : proc(n : ^UI_Skill_Node, refund : bool = true) `json:"-"`,
     count : i32,
     max_count : i32,
     needed_count : i32,

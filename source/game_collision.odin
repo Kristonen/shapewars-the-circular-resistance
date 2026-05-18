@@ -265,12 +265,15 @@ check_collision_menu :: proc(){
 
 check_skill_node :: proc(){
     type := fmt.tprintf("%v", game.active_skilltree)
-    for &n in game.skilltrees[type].nodes{
+    for &n, idx in game.skilltrees[type].nodes{
         mouse_pos := rl.GetMousePosition()
         if rl.CheckCollisionPointCircle(mouse_pos, n.pos, n.radius){
             n.state = .Focussed
             if rl.IsMouseButtonPressed(.LEFT) && n.is_active && n.count < n.max_count && game.skill_points > 0{
-                n.state = .Pressed
+                n.state = .Spend
+            }
+            if rl.IsMouseButtonPressed(.RIGHT) && n.is_active && n.count > 0 && check_if_node_can_be_refund(n, i32(idx), type){
+                n.state = .Refund
             }
         } else{
             n.state = .None

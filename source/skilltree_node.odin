@@ -1,5 +1,6 @@
 package game
 
+import "core:fmt"
 import rl "vendor:raylib"
 
 create_skill_node :: proc(name : string, desc : string, max_count : i32, pos : rl.Vector2) -> UI_Skill_Node{
@@ -31,31 +32,51 @@ create_skill_node :: proc(name : string, desc : string, max_count : i32, pos : r
     }
 }
 
-apply_node_dmg :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
+apply_node_dmg :: proc(n : ^UI_Skill_Node, refund : bool = true){
     stat := &game.player.weapon.bullet.damage
-    stat^ += 5
+    if refund{
+        stat^ -= 5
+    } else{
+        stat^ += 5
+    }
 }
 
-apply_node_rl_cd :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
+apply_node_rl_cd :: proc(n : ^UI_Skill_Node, refund : bool = true){
     stat := &game.player.ability.cd.cast_rate
-    stat^ *= 0.96
+    if refund{
+        stat^ *= 0.96
+    } else{
+        stat^ += (stat^ / 96 * 100)
+    }
 }
 
-apply_node_burn_status :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
+apply_node_burn_status :: proc(n : ^UI_Skill_Node, refund : bool = true){
     clear(&game.player.weapon.bullet.applied_status)
-    status := create_fire_status(2, 0.5, 2)
-    append(&game.player.weapon.bullet.applied_status, status)
+    if !refund{
+        status := create_fire_status(2, 0.5, 2)
+        append(&game.player.weapon.bullet.applied_status, status)
+    }
 }
 
-apply_node_burn_dmg :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
+apply_node_burn_dmg :: proc(n : ^UI_Skill_Node, refund : bool = true){
     for &s in game.player.weapon.bullet.applied_status{
         if s.type != .Burn do continue
         s.strength += 2
     }
 }
 
-apply_node_poison_status :: proc(n : ^UI_Skill_Node, is_counting : bool = true){
+apply_node_poison_status :: proc(n : ^UI_Skill_Node, refund : bool = true){
     clear(&game.player.weapon.bullet.applied_status)
     status := create_poison_status()
     append(&game.player.weapon.bullet.applied_status, status)
+}
+
+check_if_node_can_be_refund :: proc(from_node : UI_Skill_Node, idx : i32, skilltree_type : string) -> bool{
+    for l in game.skilltrees[skilltree_type].lines{
+        if l.from_idx != idx do continue
+        to_node := game.skilltrees[skilltree_type].nodes[l.to_idx]
+        if to_node.count == 0 do return true
+        if from_node.count == to_node.needed_count do return false
+    }
+    return true
 }

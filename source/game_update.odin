@@ -519,11 +519,19 @@ update_skilltree :: proc(){
 
 update_skill_nodes :: proc(n : ^UI_Skill_Node){
     n.used.content = fmt.tprintf("%i/%i", n.count, n.max_count)
-    if n.state == .Pressed{
-        game.skill_points -= 1
-        n.count += 1
+    if n.state == .Spend || n.state == .Refund{
+        refund := n.state == .Refund
+        if refund{
+            game.skill_points += 1
+            n.count -= 1
+        } else {
+            game.skill_points -= 1
+            n.count += 1
+        }
+        
         if game.active_skilltree != game.player.current_weapon && game.active_skilltree != game.player.current_ability do return
-        n->apply()
+        n->apply(refund)
+        n.state = .None
     }
 }
 
