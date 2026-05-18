@@ -27,6 +27,7 @@ Level_Data :: struct{
     player_bullets : [dynamic]Bullet,
 
     loot : [dynamic]loot.Shape_Shard,
+    chest : Chest,
 
     portal : Portal,
 
@@ -83,6 +84,9 @@ create_start_level :: proc(){
     } else{
         panic("Map could not load")
     }
+
+    chest := create_chest({0, 0})
+    game.level.chest = chest
 }
 
 create_first_test_level :: proc(){

@@ -163,6 +163,13 @@ draw_loot :: proc(){
     }
 }
 
+draw_chest :: proc(){
+    rl.DrawCircleV(game.level.chest.pos, 24, game.level.chest.texture)
+    if game.helper_activated{
+        draw_collider_circle(game.level.chest.interact.collider)
+    }
+}
+
 draw_particles :: proc(){
     for p in game.level.particles{
 

@@ -264,6 +264,8 @@ update_player_interact :: proc(dt : f32){
                 e.interactable.action()
             case Portal:
                 e.interact.action()
+            case Chest:
+                e.interact.action()
         }
     }
 }
@@ -478,6 +480,8 @@ update_interact :: proc(){
         case NPC: 
             game.level.interact.text.content = e.interactable.text
         case Portal:
+            game.level.interact.text.content = e.interact.text
+        case Chest:
             game.level.interact.text.content = e.interact.text
     }
 }

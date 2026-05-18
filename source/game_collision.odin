@@ -176,6 +176,11 @@ check_player_interact :: proc(){
     game.level.portal.interact.collider.pos, game.level.portal.interact.collider.radius) && game.level.portal.active{
         game.level.interact.interactable = any{data=rawptr(&game.level.portal), id = typeid_of(Portal)}
     }
+
+    if rl.CheckCollisionCircles(game.player.physics_collider.pos, game.player.physics_collider.radius, 
+        game.level.chest.interact.collider.pos, game.level.chest.interact.collider.radius){
+            game.level.interact.interactable = any{data=rawptr(&game.level.chest), id = typeid_of(Chest)}
+    }
 }
 
 check_bullet_wall :: proc(b : ^Bullet){
