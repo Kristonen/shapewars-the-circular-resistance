@@ -4,7 +4,6 @@ import "core:mem/virtual"
 import "core:fmt"
 import "core:mem"
 import rl "vendor:raylib"
-import "loot"
 import "ui"
 import m "map"
 
@@ -26,7 +25,7 @@ Level_Data :: struct{
 
     player_bullets : [dynamic]Bullet,
 
-    loot : [dynamic]loot.Shape_Shard,
+    loot : [dynamic]Loot,
     chest : Chest,
 
     portal : Portal,
@@ -112,7 +111,7 @@ create_test_level :: proc(){
     append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
     spawner.enemy = create_poison_moloch()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     spawner.enemy = create_second_enemy()
     // append(&game.level.spawner, spawner)
     spawner.enemy = create_third_enemy()

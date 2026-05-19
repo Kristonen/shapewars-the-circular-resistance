@@ -4,7 +4,6 @@ import "core:mem/virtual"
 import "core:mem"
 import rl "vendor:raylib"
 import m "map"
-import "loot"
 import "ui"
 
 game : Game_State
@@ -19,6 +18,7 @@ Unlocked :: struct{
     data : Unlocked_Data_Type,
     type : Unlocked_Type,
     unlocked : bool,
+    blueprints : i32,
 }
 
 create_unlockable :: proc(idx : i32, name : string, data : Unlocked_Data_Type, type : Unlocked_Type, unlocked : bool = false){

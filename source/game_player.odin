@@ -13,6 +13,7 @@ Loot_Bag :: struct{
     level : i32,
     level_increase : f32,
     mul : f32,
+    increase_value : proc(b : ^Loot_Bag, value : f32) `json:"-"`, 
 }
 
 Ghost_Image :: struct{
@@ -39,7 +40,6 @@ Player :: struct {
     statuses : [dynamic]Status_Effect,
 
     loot_bag : Loot_Bag,
-    increase_value : proc(b : ^Loot_Bag, value : f32) `json:"-"`, 
 
     hurt_collider : cl.Collider_Circle,
     collector : cl.Collider_Circle,
@@ -68,8 +68,8 @@ create_player :: proc() -> Player{
             level = 1,
             level_increase = 50,
             mul = 1,
+            increase_value = increase_value,
         },
-        increase_value = increase_value,
     }
     p.physics_collider = {
         radius = p.radius,

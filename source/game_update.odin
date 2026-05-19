@@ -6,7 +6,6 @@ import rl "vendor:raylib"
 import "handler"
 import "ui"
 import "collider"
-import "loot"
 import "core:math"
 
 update_handler :: proc(dt : f32){
@@ -404,11 +403,19 @@ update_particle :: proc(dt : f32){
 }
 
 update_loot :: proc(dt : f32){
-    for &l in game.level.loot{
+    for i := 0; i < len(game.level.loot);{
+        l := &game.level.loot[i]
+
+        if l.is_dead{
+            unordered_remove(&game.level.loot, i)
+            continue
+        }
+
         if !l.is_active{
             l.time -= dt
             if l.time <= 0{
                 l.is_active = true
+                i += 1
                 continue
             }
             pos : rl.Vector2 = {l.rec.x, l.rec.y} + l.dir * l.speed * dt
@@ -416,8 +423,15 @@ update_loot :: proc(dt : f32){
             l.rec.y = pos.y
             l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
             l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+            continue
         }
-        if !l.is_following do continue
+
+        
+
+        if !l.is_following{
+            i += 1
+            continue
+        }
         dir := game.player.pos - {l.rec.x, l.rec.y}
         dir = rl.Vector2Normalize(dir)
 
@@ -429,6 +443,7 @@ update_loot :: proc(dt : f32){
         l.rec.y = pos.y
         l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
         l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+        i += 1
     }
 }
 

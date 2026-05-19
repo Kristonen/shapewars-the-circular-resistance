@@ -5,7 +5,6 @@ import "core:math/rand"
 import rl "vendor:raylib"
 import cl "collider"
 import "ui"
-import "loot"
 
 Enemy_Hit_Time :: 0.1
 
@@ -262,9 +261,13 @@ on_hit :: proc(e : ^Enemy, dmg : f32){
 on_death :: proc(e : Enemy, idx : i32){
     game.shake = 50
     count := rand.int32_range(3, 7)
-    loot.spawn_shards(&game.level.loot, count, e.origin)
+    spawn_shards(&game.level.loot, count, e.origin)
     if spawner := (^Spawner)(e.spawner); spawner != nil{
         spawner.count -= 1
+    }
+    health_rand := rand.float32()
+    if health_rand < 0.2{
+        spawn_health_pack(e.origin)
     }
     create_fragments_death(&game.level.enemy_fragments ,e)
     unordered_remove(&game.level.enemies, idx)

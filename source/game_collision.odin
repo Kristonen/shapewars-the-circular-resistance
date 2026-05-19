@@ -209,27 +209,36 @@ check_bullet_wall :: proc(b : ^Bullet){
 }
 
 check_collisions_detection_loot :: proc(){
-    for &l in game.level.loot{
-        if l.is_following || !l.is_active do continue
+    for i := 0; i < len(game.level.loot);{
+        l := &game.level.loot[i]
+        if l.is_following || !l.is_active{
+            i += 1
+            continue
+        }
 
         if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, game.player.pos, game.player.radius){
             l.is_following = true
         }
+        i += 1
     }
 }
 
 check_collisions_pickup_loot :: proc(){
-    for &l, idx in game.level.loot{
-        if !l.is_active do continue
-
+    for i : int = 0; i < len(game.level.loot);{
+        l := &game.level.loot[i]
+        if !l.is_active{
+            i += 1
+            continue
+        }
         if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, game.player.collector.pos, game.player.collector.radius){
-            game.player.increase_value(&game.player.loot_bag, l.value)
+            l->on_collect()
+            l.is_dead = true
             if game.level.power_level_up{
                 level_up_spawner_update()
                 create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
             }
-            unordered_remove(&game.level.loot, idx)
         }
+        i += 1
     }
 }
 

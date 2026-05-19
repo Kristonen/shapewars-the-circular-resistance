@@ -6,11 +6,8 @@ import "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
 import "core:mem"
-import cl "collider"
 import m "map"
 import "ui"
-import "handler"
-import "loot"
 
 //////////////////////////////////////////////////////
 //   Project to learn the odin programming language //
