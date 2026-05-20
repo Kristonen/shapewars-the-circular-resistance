@@ -417,6 +417,17 @@ sync_menu :: proc(){
             back_btn := ui.create_button("Close", rec, on_click_continue, -1)
             append(&game.menu.elements, back_btn)
             refresh_ui_pointers()
+        case .Craftman:
+            rec := rl.Rectangle{
+                x = 50,
+                y = 50,
+                width = 400,
+                height = 200,
+            }
+            for i in 0..<len(game.unlockables){
+                text := game.unlockables[i].name
+                btn := ui.create_button(text, rec, on_click_back, -1)
+            }
         case .EquiptmentBullet:
             create_equiptment_menu(.Weapon)
         case .EquiptmentAbility:

@@ -78,3 +78,20 @@ create_quartermaster_npc :: proc(pos : rl.Vector2) -> NPC{
     }
     return n
 }
+
+create_craftman_npc :: proc(pos : rl.Vector2) -> NPC{
+    n := NPC{
+        pos = pos,
+        radius = 20,
+        texture = rl.BEIGE,
+    }
+    n.interactable = {
+        text = "E - Craftman",
+        collider = {
+            pos = pos,
+            radius = n.radius * 2,
+        },
+        action = quartermaster_interact,
+    }
+    return n
+}
