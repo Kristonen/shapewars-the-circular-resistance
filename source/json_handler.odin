@@ -16,6 +16,13 @@ Save_Game_Data :: struct{
     max_xp : f32,
     target_ability : Unlocked_Data_Type,
     weapon : Unlocked_Data_Type,
+    unlockables : [12]Unlocked_Save_Data
+}
+
+Unlocked_Save_Data :: struct{
+    idx : i32,
+    count : i32,
+    unlocked : bool,
 }
 
 Save_Skilltree_Data :: struct{
@@ -107,6 +114,12 @@ load_game_data :: proc(){
     game.skill_points = game_data.skill_points
     game.player.current_ability = game_data.target_ability
     game.player.current_weapon = game_data.weapon
+
+    for i := 0; i > len(game.unlockables);{
+        game.unlockables[i].blueprints = game_data.unlockables[i].count
+        game.unlockables[i].unlocked = game_data.unlockables[i].unlocked
+        i += 1
+    }
 }
 
 save_game_data :: proc(){
@@ -118,6 +131,15 @@ save_game_data :: proc(){
         target_ability = game.player.current_ability,
         weapon = game.player.current_weapon,
     }
+
+    for i := 0; i < len(game.unlockables);{
+        u := game.unlockables[i]
+        game_data.unlockables[i].count = u.blueprints
+        game_data.unlockables[i].idx = i32(i)
+        game_data.unlockables[i].unlocked = u.unlocked
+        i += 1
+    }
+
     json_data, err := json.marshal(game_data, {pretty = true}, context.temp_allocator)
     
     if err != json.Marshal_Data_Error.None{

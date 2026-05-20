@@ -261,7 +261,7 @@ on_hit :: proc(e : ^Enemy, dmg : f32){
 on_death :: proc(e : Enemy, idx : i32){
     game.shake = 50
     count := rand.int32_range(3, 7)
-    spawn_shards(&game.level.loot, count, e.origin)
+    spawn_shards(count, e.origin)
     if spawner := (^Spawner)(e.spawner); spawner != nil{
         spawner.count -= 1
     }

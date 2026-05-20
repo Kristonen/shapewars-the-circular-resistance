@@ -6,6 +6,9 @@ import "core:math/rand"
 import rl "vendor:raylib"
 import cl "collider"
 
+Bomb_Idx :: 8
+Bomb_Chance :: 1.0//0.25
+
 Shard_Type :: enum {
     Low, Mid, High
 }
@@ -46,7 +49,7 @@ create_simple_shard :: proc(drops : ^[dynamic]Loot, pos : rl.Vector2){
     append(drops, shard)
 }
 
-spawn_shards :: proc(drops : ^[dynamic]Loot, count : i32, pos : rl.Vector2){
+spawn_shards :: proc(count : i32, pos : rl.Vector2){
     for _ in 0..<count{
         new_shard : Loot
         new_shard.dir = {rand.float32_range(-1, 1), rand.float32_range(-1, 1)}
@@ -67,6 +70,17 @@ spawn_health_pack :: proc(pos : rl.Vector2){
     health_pack.rec.width = 50
     health_pack.rec.height = 70
     append(&game.level.loot, health_pack)
+}
+
+spawn_bomb_blueprint :: proc(pos : rl.Vector2){
+    bp : Loot
+    give_shard_everything(&bp, pos)
+    bp.value = Bomb_Idx
+    bp.color = rl.DARKBLUE
+    bp.rec.width = 100
+    bp.rec.height = 100
+    bp.on_collect = on_blueprint_collect
+    append(&game.level.loot, bp)
 }
 
 give_shard_everything :: proc(shard : ^Loot, pos : rl.Vector2){
@@ -104,4 +118,10 @@ on_shard_collect :: proc(l : ^Loot){
 
 on_health_pack_collect :: proc(l : ^Loot){
     game.player.health.heal_amount += l.value
+}
+
+on_blueprint_collect :: proc(l : ^Loot){
+    idx := i32(l.value)
+    u := &game.unlockables[idx]
+    u.blueprints += 1
 }

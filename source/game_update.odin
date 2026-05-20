@@ -432,7 +432,7 @@ update_loot :: proc(dt : f32){
             i += 1
             continue
         }
-        dir := game.player.pos - {l.rec.x, l.rec.y}
+        dir := game.player.pos - {l.rec.x + (l.rec.width/2), l.rec.y + (l.rec.height/2)}
         dir = rl.Vector2Normalize(dir)
 
         if l.current_speed <= l.max_speed{

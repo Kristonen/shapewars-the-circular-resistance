@@ -1,5 +1,6 @@
 package game
 
+import "core:math/rand"
 import "core:fmt"
 import rl "vendor:raylib"
 
@@ -28,4 +29,8 @@ create_chest :: proc(pos : rl.Vector2) -> Chest{
 
 open_chest :: proc(){
     fmt.println("Kiste wurde geöffnet!")
+    rand := rand.float32()
+    if rand <= Bomb_Chance{
+        spawn_bomb_blueprint(game.level.chest.pos)
+    }
 }
