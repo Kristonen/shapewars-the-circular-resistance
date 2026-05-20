@@ -6,6 +6,8 @@ import rl "vendor:raylib"
 
 Fake_Particle_Gravitiy :: 2.5
 
+Particle_Type :: enum{Normal, Line, Expanding, PlasmaSmoke}
+
 Particle :: struct{
     pos : rl.Vector2,
     entity_pos : rl.Vector2,
@@ -16,6 +18,15 @@ Particle :: struct{
     size : f32,
     alive : bool,
     use_grav : bool,
+    type : Particle_Type,
+}
+//Create a random direction as vector 2. (0 - 360 degrees)
+get_random_unit_vector :: proc(speed : f32 = 1.0) -> rl.Vector2{
+    random_fraction := f32(rl.GetRandomValue(0, 1000))
+    angle := f32(rl.GetRandomValue(0, 360)) * (math.PI / 100.0)
+    return {
+        math.cos(angle) * speed, math.sin(angle) * speed,
+    }
 }
 
 create_hit_particles :: proc(area : rl.Rectangle){
@@ -29,7 +40,73 @@ create_hit_particles :: proc(area : rl.Rectangle){
             color = rl.RED,
             max_life = f32(rl.GetRandomValue(5, 10)) / 10,
             size = f32(rl.GetRandomValue(5, 9)),
-            alive = true
+            alive = true,
+            type = .Normal,
+        }
+        append(&game.level.particles, p)
+    }
+}
+
+create_explosion_particles :: proc(area : rl.Rectangle){
+
+    p := Particle{
+        pos = {area.x, area.y},
+        vel = {0, 0},
+        size = 0,
+        type = .Expanding,
+        max_life = 0.2,
+        color = rl.GOLD,
+        alive = true,
+    }
+
+    append(&game.level.particles, p)
+
+    // for _ in 0..<amount{
+    //     angle := f32(rl.GetRandomValue(0, 360)) * (math.PI/100.0)
+    //     speed := f32(rl.GetRandomValue(180, 220))
+    //     p : Particle = {
+    //         pos = {area.x, area.y},
+    //         vel = {math.cos(angle) * speed, math.sin(angle) * speed},
+    //         color = rl.RED,
+    //         max_life = f32(rl.GetRandomValue(10, 15)) / 10,
+    //         size = f32(rl.GetRandomValue(5, 8)),
+    //         alive = true,
+    //         type = .Normal,
+    //     }
+    //     append(&game.level.particles, p)
+    // }
+
+    for _ in 0..<25{
+        
+        speed := f32(rl.GetRandomValue(30, 100))
+        dir := get_random_unit_vector(speed)
+        color := (rl.GetRandomValue(0, 1) == 0) ? rl.RED : rl.PURPLE
+        p := Particle{
+            pos = {area.x, area.y},
+            vel = dir,
+            color = color,
+            max_life = f32(rl.GetRandomValue(3, 6)) / 10,
+            size = 16.0,
+            type = .PlasmaSmoke,
+            alive = true,
+        }
+        append(&game.level.particles, p)
+    }
+
+    for _ in 0..<50{
+        // angle := f32(rl.GetRandomValue(0, 360)) * (math.PI/100.0)
+        speed := f32(rl.GetRandomValue(400, 700))
+        dir := get_random_unit_vector(speed)
+        rand := rl.GetRandomValue(1, 3)
+        color := rand == 1 ? rl.RED : rand == 2 ? rl.ORANGE : rl.YELLOW
+        p : Particle = {
+            pos = {area.x, area.y},
+            vel = dir,
+            color = color,
+            size = 15.0,
+            max_life = 0.2,
+            type = .Line,
+            alive = true,
         }
         append(&game.level.particles, p)
     }
@@ -52,6 +129,7 @@ create_bleeding_particle :: proc(area : rl.Rectangle){
                 max_life = f32(rl.GetRandomValue(2, 3))/10,
                 size = f32(rl.GetRandomValue(3, 5)),
                 alive = true,
+                type = .Normal,
             }
             append(&game.level.particles, p)
         }
@@ -69,7 +147,8 @@ create_destroy_bullet_particle :: proc(area : rl.Rectangle){
             color = rl.GRAY,
             max_life = f32(rl.GetRandomValue(3, 5)) / 10,
             size = f32(rl.GetRandomValue(2, 5)),
-            alive = true
+            alive = true,
+            type = .Normal,
         }
         append(&game.level.particles, p)
     }
@@ -97,7 +176,8 @@ create_poison_particle :: proc(area : rl.Rectangle){
                 color = {0, green_c, 0, 255},
                 max_life = f32(rl.GetRandomValue(3, 6)) / 10,
                 size = f32(rl.GetRandomValue(3, 9)),
-                alive = true
+                alive = true,
+                type = .Normal,
             }
             append(&game.level.particles, p)
         }
@@ -117,6 +197,7 @@ create_death_poison_particle :: proc(pos : rl.Vector2){
             size = f32(rl.GetRandomValue(3, 9)),
             alive = true,
             use_grav = true,
+            type = .Normal,
         }
 
         append(&game.level.particles, p)
@@ -139,6 +220,7 @@ create_fire_particle :: proc(area : rl.Rectangle){
             max_life = f32(rl.GetRandomValue(5, 8)) / 10,
             size = f32(rl.GetRandomValue(1, 7)),
             alive = true,
+            type = .Normal,
         }
         append(&game.level.particles, p)
         smoke_p := p
@@ -163,6 +245,7 @@ create_dash_particle :: proc(pos : rl.Vector2, dir : rl.Vector2){
                 max_life = f32(rl.GetRandomValue(1, 2)),
                 size = f32(rl.GetRandomValue(4, 6)),
                 alive = true,
+                type = .Normal,
             }
             append(&game.level.particles, p)
         }
@@ -176,7 +259,7 @@ create_dash_particle :: proc(pos : rl.Vector2, dir : rl.Vector2){
             max_life = f32(rl.GetRandomValue(2, 4)),
             size = f32(rl.GetRandomValue(2, 5)),
             alive = true,
-
+            type = .Normal,
         }
         append(&game.level.particles, p)
     }

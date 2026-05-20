@@ -9,7 +9,7 @@ import "ui"
 
 draw_player :: proc(){
     rl.DrawCircleV(game.player.pos, game.player.radius, rl.VIOLET)
-    if game.player.ability.active && game.player.target_ability == .Dash{
+    if game.player.ability.active && game.player.current_ability == .Dash{
         rl.DrawCircleLinesV(game.player.pos, game.player.radius, rl.BLACK)
     }
     for i in 0..<len(game.player.ghosts){
@@ -23,6 +23,15 @@ draw_player :: proc(){
         draw_collider_circle(game.player.physics_collider)
         draw_collider_circle(game.player.hurt_collider)
         draw_collider_circle(game.player.collector)
+    }
+}
+
+draw_player_indicator :: proc(){
+    if game.level.indicator == nil do return
+    switch i in game.level.indicator{
+        case AoE_Indicator:
+            rl.DrawCircleV(i.pos, i.radius, {0, 0, 0, 100})
+        case Line_Indicator:
     }
 }
 
@@ -154,12 +163,36 @@ draw_loot :: proc(){
     }
 }
 
+draw_chest :: proc(){
+    rl.DrawCircleV(game.level.chest.pos, 24, game.level.chest.texture)
+    if game.helper_activated{
+        draw_collider_circle(game.level.chest.interact.collider)
+    }
+}
+
 draw_particles :: proc(){
     for p in game.level.particles{
+
         alpha := 1.0 - (p.life/p.max_life)
         color := p.color
         color.a = u8(alpha*255)
-        rl.DrawCircleV(p.pos, p.size/2, color)
+
+        switch p.type{
+            case .Normal:
+                rl.DrawCircleV(p.pos, p.size/2, color)
+            case .Line:
+                if rl.Vector2Length(p.vel) > 0.1{
+                    line_end := p.pos - rl.Vector2Normalize(p.vel) * (p.size * 1.5)
+                    color = rl.ColorAlphaBlend(rl.GOLD, p.color, color)
+                    rl.DrawLineEx(p.pos, line_end, 3.0, color)
+                }
+            case .Expanding:
+                rl.DrawCircleV(p.pos, p.size, color)
+            case .PlasmaSmoke:
+                mid_color := rl.ColorAlphaBlend(rl.RED, rl.ORANGE, color)
+                final_color := rl.ColorAlphaBlend(rl.DARKGRAY, mid_color, color)
+                rl.DrawCircleV(p.pos, 15, final_color)
+        }
     }
 }
 
@@ -247,6 +280,7 @@ draw_in_game_ui :: proc(){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 draw_status_bar(e)
+            case ui.UI_Panel:
         }
     }
     if !game.is_paused{
@@ -396,6 +430,8 @@ draw_menu :: proc(){
     rl.DrawRectangleV({0, 0}, {game.menu.width, game.menu.height}, game.menu.color)
     for element in game.menu.elements{
         switch e in element{
+            case ui.UI_Panel:
+                draw_panel(e)
             case ui.UI_Cooldown:
             case ui.UI_Button:
                 draw_button(e)
@@ -408,6 +444,10 @@ draw_menu :: proc(){
             case ui.UI_Status_Bar:
         } 
     }
+}
+
+draw_panel :: proc(p : ui.UI_Panel){
+    rl.DrawRectangleRec(p.rec, p.color)
 }
 
 draw_skilltree :: proc(){
@@ -499,7 +539,7 @@ draw_button :: proc(b : ui.UI_Button){
     rl.DrawRectangleLinesEx(b.rec, 5, rl.BLACK)
     draw_better_text(b.text, b.rec)
 
-    if b.state == .Focus && (game.current_menu == .EquiptmentBullet || game.current_menu == .EquiptmentAbility){
+    if (b.state == .Focus || b.state == .Pressing || b.state == .Pressed) && (game.current_menu == .EquiptmentBullet || game.current_menu == .EquiptmentAbility){
         switch type in b.data{
             case Unlocked_Data_Type:
                 x := f32(rl.GetScreenWidth())*0.75

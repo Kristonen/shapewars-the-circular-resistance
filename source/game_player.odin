@@ -1,5 +1,6 @@
 package game
 
+import "core:fmt"
 import rl "vendor:raylib"
 import cl "collider"
 import "ui"
@@ -12,6 +13,7 @@ Loot_Bag :: struct{
     level : i32,
     level_increase : f32,
     mul : f32,
+    increase_value : proc(b : ^Loot_Bag, value : f32) `json:"-"`, 
 }
 
 Ghost_Image :: struct{
@@ -28,7 +30,7 @@ Player :: struct {
     weapon : Weapon,
 
     ability : Ability,
-    target_ability : Upgrade_Target,
+    current_ability : Unlocked_Data_Type,
     current_weapon : Unlocked_Data_Type,
 
     health : Health,
@@ -38,7 +40,6 @@ Player :: struct {
     statuses : [dynamic]Status_Effect,
 
     loot_bag : Loot_Bag,
-    increase_value : proc(b : ^Loot_Bag, value : f32) `json:"-"`, 
 
     hurt_collider : cl.Collider_Circle,
     collector : cl.Collider_Circle,
@@ -67,8 +68,8 @@ create_player :: proc() -> Player{
             level = 1,
             level_increase = 50,
             mul = 1,
+            increase_value = increase_value,
         },
-        increase_value = increase_value,
     }
     p.physics_collider = {
         radius = p.radius,
@@ -105,12 +106,26 @@ apply_lifesteal :: proc(p : ^Player, dmg : f32){
 get_upgrade_target :: proc() {
     switch a in game.player.ability.data{
         case Radial_Liberation_Data:
-            game.player.target_ability = .Radial_Liberation
+            game.player.current_ability = .Radial_Liberation
         case Dash_Data:
-            game.player.target_ability = .Dash
+            game.player.current_ability = .Dash
+        case Bomb_Data:
+            game.player.current_ability = .Bomb
     }
 }
 
 get_ability_cd :: proc() -> ^Ability_Cooldown{
     return &game.player.ability.cd
+}
+
+get_player_health_as_string :: proc() -> string{
+    return fmt.tprintf("Health : %0.0f/%0.0f", game.player.health.current, game.player.health.max)
+}
+
+get_player_damage_as_string :: proc() -> string{
+    return fmt.tprintf("Damage : %0.0f", game.player.weapon.bullet.damage)
+}
+
+get_player_attack_speed_as_string :: proc() -> string{
+    return fmt.tprintf("Attack Speed : %0.2f", game.player.weapon.fire_rate)
 }

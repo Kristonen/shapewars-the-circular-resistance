@@ -26,13 +26,8 @@ on_click_quit :: proc(b : ui.UI_Button){
 
 on_click_skilltree :: proc(b : ui.UI_Button){
     game.last_menu = game.current_menu
-    if game.current_menu == .Catalyst{
-        test := b.data.(^Skilltree_Ability_Type)
-        game.active_skilltree = test^
-    } else{
-        test := b.data.(^Skilltree_Bullet_Type)
-        game.active_skilltree = test^
-    }
+    type := b.data.(Unlocked_Data_Type)
+    game.active_skilltree = type
     game.current_menu = .Skilltree
     sync_menu()
 }
@@ -62,17 +57,17 @@ on_equip :: proc(b : ui.UI_Button){
     switch type{
         case .NormalBullet:
             game.player.current_weapon = type
-            switch_weapon()
         case .PierceBullet:
             game.player.current_weapon = type
-            switch_weapon()
         case .Dash:
-            game.player.ability = create_standard_dash()
-            game.player.target_ability = .Dash
-        case .RadialLiberation:
-            game.player.ability = create_standard_radial_liberation()
-            game.player.target_ability = .Radial_Liberation
+            game.player.current_ability = .Dash
+        case .Radial_Liberation:
+            game.player.current_ability = .Radial_Liberation
+        case .Bomb:
+            game.player.current_ability = .Bomb
     }
+    switch_weapon()
+    switch_ability()
 }
 
 on_upgrade :: proc(u : ^Upgrade){

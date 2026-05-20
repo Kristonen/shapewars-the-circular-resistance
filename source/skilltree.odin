@@ -5,7 +5,7 @@ import "core:fmt"
 import "ui"
 
 //UI Skill Tree
-UI_Node_State :: enum{None, Focussed, Pressed}
+UI_Node_State :: enum{None, Focussed, Spend, Refund}
 Skilltree_Type :: union {Skilltree_Bullet_Type, Skilltree_Ability_Type}
 
 Skilltree_Bullet_Type :: enum{NormalBullet, BetterBUllet}
@@ -14,7 +14,7 @@ Skilltree_Ability_Type :: enum {Radial_Liberation, Dash}
 UI_Skill_Tree :: struct{
     nodes : [dynamic]UI_Skill_Node,
     lines : [dynamic]UI_Skill_Line,
-    type : Skilltree_Type,
+    type : Unlocked_Data_Type,
     // texture : rl.Texture `json:"-"`,
     unlocked : bool,
 }
@@ -26,7 +26,7 @@ UI_Skill_Node :: struct{
     pos : rl.Vector2,
     radius : f32,
     state : UI_Node_State,
-    apply : proc(n : ^UI_Skill_Node, is_counting : bool = true) `json:"-"`,
+    apply : proc(n : ^UI_Skill_Node, refund : bool = true) `json:"-"`,
     count : i32,
     max_count : i32,
     needed_count : i32,
@@ -38,17 +38,31 @@ UI_Skill_Line :: struct{
     to_idx : i32,
 }
 
-create_skill_tree :: proc(type : Skilltree_Type, a : ^map[string]UI_Skill_Tree){
+apply_skilltree :: proc(type : Unlocked_Data_Type){
+    for _, &tree in game.skilltrees{
+        if tree.type != type do continue
+        for &n in tree.nodes{
+            for _ in 0..<n.count{
+                n->apply(false)
+            }
+        }
+        break
+    }
+}
+
+create_skill_tree :: proc(type : Unlocked_Data_Type, a : ^map[string]UI_Skill_Tree){
     switch type{
         case .NormalBullet:
             create_normal_bullet_skilltree(type, a)
+        case .PierceBullet:
         case .Radial_Liberation:
             create_rl_skilltree(type)
+        case .Dash:
+        case .Bomb:
     }
-    
 }
 
-create_rl_skilltree :: proc(type : Skilltree_Type){
+create_rl_skilltree :: proc(type : Unlocked_Data_Type){
     st : UI_Skill_Tree
     st.unlocked = true
     st.type = type
@@ -63,7 +77,7 @@ create_rl_skilltree :: proc(type : Skilltree_Type){
     fmt.println(game.skilltrees[text].unlocked)
 }
 
-create_normal_bullet_skilltree :: proc(type : Skilltree_Type, a : ^map[string]UI_Skill_Tree){
+create_normal_bullet_skilltree :: proc(type : Unlocked_Data_Type, a : ^map[string]UI_Skill_Tree){
     st : UI_Skill_Tree
     if type == .NormalBullet{
         st.unlocked = true    

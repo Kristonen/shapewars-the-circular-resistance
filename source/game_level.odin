@@ -4,7 +4,6 @@ import "core:mem/virtual"
 import "core:fmt"
 import "core:mem"
 import rl "vendor:raylib"
-import "loot"
 import "ui"
 import m "map"
 
@@ -18,6 +17,7 @@ Level_Data :: struct{
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
     enemy_bullets : [dynamic]Bullet,
     area_effects : [dynamic]Area_Effect,
+    indicator : Indicator,
 
     particles : [dynamic]Particle,
 
@@ -25,7 +25,8 @@ Level_Data :: struct{
 
     player_bullets : [dynamic]Bullet,
 
-    loot : [dynamic]loot.Shape_Shard,
+    loot : [dynamic]Loot,
+    chest : Chest,
 
     portal : Portal,
 
@@ -45,6 +46,7 @@ create_level :: proc(type : Level_Type){
     err := virtual.arena_init_growing(&game.map_arena)
     game.map_allocator = virtual.arena_allocator(&game.map_arena)
     refresh_level()
+    refresh_player()
     game.current_level = type
     switch type{
         case .HQ:
@@ -60,6 +62,11 @@ create_level :: proc(type : Level_Type){
     }
 }
 
+refresh_player :: proc(){
+    switch_weapon()
+    switch_ability()
+}
+
 create_start_level :: proc(){
     npc := create_gunsmith_npc({100, 100})
     append(&game.level.npcs, npc)
@@ -71,12 +78,14 @@ create_start_level :: proc(){
     append(&game.level.npcs, npc)
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
         game.player.pos = m.get_player_spawn_pos(level_visual)
-        game.player.ability = create_standard_dash()
         game.camera.target = game.player.pos
         game.level.level_visual = level_visual
     } else{
         panic("Map could not load")
     }
+
+    chest := create_chest({0, 0})
+    game.level.chest = chest
 }
 
 create_first_test_level :: proc(){
@@ -102,11 +111,11 @@ create_test_level :: proc(){
     append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
     spawner.enemy = create_poison_moloch()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     spawner.enemy = create_second_enemy()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     spawner.enemy = create_third_enemy()
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual
@@ -170,7 +179,7 @@ create_choose_level :: proc(rec : rl.Rectangle, type : ^Level_Type) -> ui.UI_But
     return ui.create_button(text, rec, on_click_change_level, type)
 }
 
-create_choose_ability_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Ability_Type) -> ui.UI_Button{
+create_choose_ability_skilltree :: proc(rec : rl.Rectangle, type : ^Unlocked_Data_Type) -> ui.UI_Button{
     text := fmt.tprintf("%v", type^)
     return ui.create_button(text, rec, on_click_skilltree, type)
 }

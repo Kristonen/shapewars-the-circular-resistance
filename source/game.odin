@@ -4,7 +4,6 @@ import "core:mem/virtual"
 import "core:mem"
 import rl "vendor:raylib"
 import m "map"
-import "loot"
 import "ui"
 
 game : Game_State
@@ -13,13 +12,13 @@ Create_Hit_Particle :: #type proc(area : rl.Rectangle)
 
 Entity :: union {Player, Enemy}
 Unlocked_Type :: enum{Weapon, Ability}
-Unlocked_Data_Type :: enum{NormalBullet, PierceBullet, Dash, RadialLiberation}
-// Unlocked_Data :: union{Weapon, Ability}
+Unlocked_Data_Type :: enum{NormalBullet, PierceBullet, Dash, Radial_Liberation, Bomb}
 Unlocked :: struct{
     name : string,
     data : Unlocked_Data_Type,
     type : Unlocked_Type,
     unlocked : bool,
+    blueprints : i32,
 }
 
 create_unlockable :: proc(idx : i32, name : string, data : Unlocked_Data_Type, type : Unlocked_Type, unlocked : bool = false){
@@ -33,13 +32,15 @@ get_text_for_unlocked :: proc(type : Unlocked_Data_Type) -> string{
     text := ""
     switch type{
         case .NormalBullet:
-            text = "Damage : 10\n Fire rate : 0.5\nSpeed : 700"
+            text = "Damage : 10\nFire rate : 0.5\nSpeed : 700"
         case .PierceBullet:
             text = "Damage : 8\nFire rate : 1.0\nSpeed : 500\nThis weapon will make the enemy bleed."
         case .Dash:
             text = "Make a big movment to the position, where you are moving."
-        case .RadialLiberation:
+        case .Radial_Liberation:
             text = "Create a wave of 8 bullets around the player.\nDamage : 5 (per bullet)"
+        case .Bomb:
+            text = "Throw a bomb that makes a lot of damage in a area."
     }
     return text
 }
@@ -79,19 +80,13 @@ Game_State :: struct{
     tooltip_timer : f32,
 
     skilltrees : map[string]UI_Skill_Tree,
-    active_skilltree : Skilltree_Type,
+    active_skilltree : Unlocked_Data_Type,
 
     map_arena : virtual.Arena,
     map_allocator : mem.Allocator,
 
     skill_arena : virtual.Arena,
     skill_allocator : mem.Allocator,
-
-    all_bullets : [dynamic]Skilltree_Bullet_Type,
-    unlocked_bullets : [dynamic]Skilltree_Bullet_Type,
-
-    all_abilities : [dynamic]Skilltree_Ability_Type,
-    unlocked_abilities : [dynamic]Skilltree_Ability_Type,
 
     //Test
     fbo : rl.RenderTexture,

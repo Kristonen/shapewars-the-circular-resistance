@@ -34,7 +34,7 @@ create_max_health_upgrade :: proc(name : string, desc : string,
         value = value,
         type = type,
         rarity = rarity,
-        target = .Player,
+        target = .NormalBullet,
         apply = apply_max_health_upgrade,
     }
 }
@@ -60,7 +60,7 @@ create_current_health_upgrade :: proc(name : string, desc : string,
         value = value,
         type = type,
         rarity = rarity,
-        target = .Player,
+        target = .NormalBullet,
         apply = apply_current_health_upgrade,
     }
 }

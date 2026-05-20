@@ -176,6 +176,11 @@ check_player_interact :: proc(){
     game.level.portal.interact.collider.pos, game.level.portal.interact.collider.radius) && game.level.portal.active{
         game.level.interact.interactable = any{data=rawptr(&game.level.portal), id = typeid_of(Portal)}
     }
+
+    if rl.CheckCollisionCircles(game.player.physics_collider.pos, game.player.physics_collider.radius, 
+        game.level.chest.interact.collider.pos, game.level.chest.interact.collider.radius){
+            game.level.interact.interactable = any{data=rawptr(&game.level.chest), id = typeid_of(Chest)}
+    }
 }
 
 check_bullet_wall :: proc(b : ^Bullet){
@@ -204,27 +209,36 @@ check_bullet_wall :: proc(b : ^Bullet){
 }
 
 check_collisions_detection_loot :: proc(){
-    for &l in game.level.loot{
-        if l.is_following || !l.is_active do continue
+    for i := 0; i < len(game.level.loot);{
+        l := &game.level.loot[i]
+        if l.is_following || !l.is_active{
+            i += 1
+            continue
+        }
 
         if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, game.player.pos, game.player.radius){
             l.is_following = true
         }
+        i += 1
     }
 }
 
 check_collisions_pickup_loot :: proc(){
-    for &l, idx in game.level.loot{
-        if !l.is_active do continue
-
+    for i : int = 0; i < len(game.level.loot);{
+        l := &game.level.loot[i]
+        if !l.is_active{
+            i += 1
+            continue
+        }
         if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, game.player.collector.pos, game.player.collector.radius){
-            game.player.increase_value(&game.player.loot_bag, l.value)
+            l->on_collect()
+            l.is_dead = true
             if game.level.power_level_up{
                 level_up_spawner_update()
-                create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades, game.player.target_ability)
+                create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
             }
-            unordered_remove(&game.level.loot, idx)
         }
+        i += 1
     }
 }
 
@@ -249,6 +263,7 @@ check_collision_upgrade_slot :: proc(){
 check_collision_menu :: proc(){
     for &element in game.menu.elements{
         switch &e in element{
+            case ui.UI_Panel:
             case ui.UI_Cooldown:
             case ui.UI_Button:
                 check_collision_button(&e)
@@ -264,12 +279,15 @@ check_collision_menu :: proc(){
 
 check_skill_node :: proc(){
     type := fmt.tprintf("%v", game.active_skilltree)
-    for &n in game.skilltrees[type].nodes{
+    for &n, idx in game.skilltrees[type].nodes{
         mouse_pos := rl.GetMousePosition()
         if rl.CheckCollisionPointCircle(mouse_pos, n.pos, n.radius){
             n.state = .Focussed
             if rl.IsMouseButtonPressed(.LEFT) && n.is_active && n.count < n.max_count && game.skill_points > 0{
-                n.state = .Pressed
+                n.state = .Spend
+            }
+            if rl.IsMouseButtonPressed(.RIGHT) && n.is_active && n.count > 0 && check_if_node_can_be_refund(n, i32(idx), type){
+                n.state = .Refund
             }
         } else{
             n.state = .None
@@ -310,6 +328,7 @@ check_in_game_ui_tooltip :: proc(){
     game.tooltip_ptr = nil
     for &element in game.level.ui_elements{
         switch &e in element{
+            case ui.UI_Panel:
             case ui.UI_Cooldown:
             case ui.UI_Button:
             case ui.UI_Menu:

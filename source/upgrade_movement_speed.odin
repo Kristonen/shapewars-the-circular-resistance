@@ -26,7 +26,7 @@ create_movement_speed_upgrade :: proc(name : string, desc : string, value : f32,
         value = value,
         type = type,
         rarity = rarity,
-        target = .Player,
+        target = .NormalBullet,
         apply = apply_movespeed_upgrade,
     }
 }

@@ -6,11 +6,15 @@ import rl "vendor:raylib"
 import "handler"
 import "ui"
 import "collider"
-import "loot"
 import "core:math"
 
 update_handler :: proc(dt : f32){
     if rl.IsKeyPressed(.ESCAPE){
+        if game.player.ability.indicator_active{
+            game.player.ability.indicator_active = false
+            game.level.indicator = nil
+            return
+        }
         clear(&game.menu.elements)
         switch game.current_menu{
             case .Play:
@@ -43,6 +47,9 @@ update_handler :: proc(dt : f32){
                 game.current_menu = game.last_menu
             case .EquiptmentAbility:
                 game.current_menu = game.last_menu
+            case .Stats:
+                game.is_paused = false
+                game.current_menu = .Play
         }
         sync_menu()
     }
@@ -53,7 +60,13 @@ update_handler :: proc(dt : f32){
 
     if rl.IsKeyPressed(.U){
         game.level.power_level_up = true
-        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades, game.player.target_ability)
+        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
+    }
+
+    if rl.IsKeyPressed(.TAB){
+        game.is_paused = !game.is_paused
+        game.current_menu = game.is_paused ? .Stats : .Play
+        sync_menu()
     }
 }
 
@@ -175,6 +188,7 @@ update_enemy_bullets :: proc(dt : f32){
 }
 
 update_player_shooting :: proc(dt : f32){
+    if game.player.ability.indicator_active do return
     if game.player.weapon.cooldown > 0{
         game.player.weapon.cooldown -= dt
     }
@@ -210,21 +224,36 @@ update_player_casting :: proc(dt : f32){
         cd.cooldown -= dt
     }
 
+    if game.player.ability.indicator_active{
+        game.player.ability.indicator(dt)
+    }
+
     if rl.IsKeyPressed(.SPACE) && cd.cooldown <= 0 && !game.player.ability.active{
-        // switch &a in game.player.ability{
-        //     case Radial_Liberation:
-        //         cd.cooldown = a.ability_cd.cast_rate
-        //     case Dash:
-        //         cd.cooldown = a.ability_cd.cast_rate
-        // }
-        game.player.ability.active = true
+        // game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
+        // game.player.ability.activate(dt)
+        game.player.ability.indicator_active = true
+    }
+
+    if game.player.ability.activated{
+        game.player.ability.indicator_active = false
+        game.player.ability.activated = false
         game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
         game.player.ability.activate(dt)
-        // cast_player_ability()
+        game.level.indicator = nil
+        game.player.ability.active = true
     }
 
     if game.player.ability.active{
         game.player.ability.update(dt)
+    }
+}
+
+update_player_indicator :: proc(dt : f32){
+    if game.level.indicator == nil do return
+    switch &i in game.level.indicator{
+        case AoE_Indicator:
+            i.pos = rl.GetMousePosition()
+        case Line_Indicator:
     }
 }
 
@@ -236,6 +265,8 @@ update_player_interact :: proc(dt : f32){
             case NPC:
                 e.interactable.action()
             case Portal:
+                e.interact.action()
+            case Chest:
                 e.interact.action()
         }
     }
@@ -342,28 +373,52 @@ update_fragement :: proc(dt : f32){
 }
 
 update_particle :: proc(dt : f32){
-    for &p, idx in game.level.particles{
+    for i := 0; i < len(game.level.particles);{
+        p := &game.level.particles[i]
         if p.life >= p.max_life{
             p.alive = false
         }
         if !p.alive{
-            unordered_remove(&game.level.particles, idx)
+            unordered_remove(&game.level.particles, i)
             continue
         }
         if p.use_grav{
             p.vel.y += Fake_Particle_Gravitiy
         }
         p.life += dt
-        p.pos += p.vel * dt
+        progress := p.life/p.max_life
+        switch p.type{
+            case .Normal:
+                p.pos += p.vel * dt
+            case .Line:
+                p.pos += p.vel * dt
+                p.vel *= 0.98
+                // p.size = (p.life/p.max_life)*15.0
+            case .Expanding:
+                p.size = progress * 130.0
+            case .PlasmaSmoke:
+                p.pos += p.vel * dt
+                p.vel *= 0.99
+                p.size = (1.0 - progress) * 18.0
+        }
+        i += 1  
     }
 }
 
 update_loot :: proc(dt : f32){
-    for &l in game.level.loot{
+    for i := 0; i < len(game.level.loot);{
+        l := &game.level.loot[i]
+
+        if l.is_dead{
+            unordered_remove(&game.level.loot, i)
+            continue
+        }
+
         if !l.is_active{
             l.time -= dt
             if l.time <= 0{
                 l.is_active = true
+                i += 1
                 continue
             }
             pos : rl.Vector2 = {l.rec.x, l.rec.y} + l.dir * l.speed * dt
@@ -371,9 +426,16 @@ update_loot :: proc(dt : f32){
             l.rec.y = pos.y
             l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
             l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+            continue
         }
-        if !l.is_following do continue
-        dir := game.player.pos - {l.rec.x, l.rec.y}
+
+        
+
+        if !l.is_following{
+            i += 1
+            continue
+        }
+        dir := game.player.pos - {l.rec.x + (l.rec.width/2), l.rec.y + (l.rec.height/2)}
         dir = rl.Vector2Normalize(dir)
 
         if l.current_speed <= l.max_speed{
@@ -384,6 +446,7 @@ update_loot :: proc(dt : f32){
         l.rec.y = pos.y
         l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
         l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+        i += 1
     }
 }
 
@@ -423,6 +486,7 @@ update_in_game_ui :: proc(dt : f32){
             case ui.UI_Slider:
             case ui.UI_Status_Bar:
                 update_status_bar(&e)
+            case ui.UI_Panel:
         }
     }
     update_interact()
@@ -435,6 +499,8 @@ update_interact :: proc(){
             game.level.interact.text.content = e.interactable.text
         case Portal:
             game.level.interact.text.content = e.interact.text
+        case Chest:
+            game.level.interact.text.content = e.interact.text
     }
 }
 
@@ -444,6 +510,7 @@ update_menu :: proc(){
 
         }
         switch &e in element{
+            case ui.UI_Panel:
             case ui.UI_Cooldown:
                 cd := get_ability_cd()
                 update_cooldown(&e, cd.cooldown, cd.cast_rate)
@@ -474,9 +541,19 @@ update_skilltree :: proc(){
 
 update_skill_nodes :: proc(n : ^UI_Skill_Node){
     n.used.content = fmt.tprintf("%i/%i", n.count, n.max_count)
-    if n.state == .Pressed{
-        game.skill_points -= 1
-        n->apply()
+    if n.state == .Spend || n.state == .Refund{
+        refund := n.state == .Refund
+        if refund{
+            game.skill_points += 1
+            n.count -= 1
+        } else {
+            game.skill_points -= 1
+            n.count += 1
+        }
+        
+        if game.active_skilltree != game.player.current_weapon && game.active_skilltree != game.player.current_ability do return
+        n->apply(refund)
+        n.state = .None
     }
 }
 

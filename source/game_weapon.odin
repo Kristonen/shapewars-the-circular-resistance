@@ -39,6 +39,8 @@ switch_weapon :: proc(){
             game.player.weapon = create_pierce_weapon()
             append(&game.player.weapon.bullet.applied_status, create_bleed_status(5, 0.5, 2))
         case .Dash:
-        case .RadialLiberation:
+        case .Radial_Liberation:
+        case .Bomb:
     }
+    apply_skilltree(game.player.current_weapon)
 }

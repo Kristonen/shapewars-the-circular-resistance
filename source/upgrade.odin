@@ -29,7 +29,7 @@ Upgrade :: struct{
     texture : rl.Color,
     rarity : Rarity,
     apply : Apply_Upgrade,
-    target : Upgrade_Target,
+    target : Unlocked_Data_Type,
     type : Upgrade_Type,
     toogle_target : Upgrade_Toogle_Target,
     max_used : i32,
@@ -59,7 +59,7 @@ Upgrade_Shader :: struct{
     timer : f32,
 }
 
-create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade, a_target : Upgrade_Target){
+create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade){
     m.width = f32(rl.GetScreenWidth())
     m.height = f32(rl.GetScreenHeight())
     m.is_active = !rl.IsMouseButtonDown(.LEFT)

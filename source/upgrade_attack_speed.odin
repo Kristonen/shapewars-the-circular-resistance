@@ -28,7 +28,7 @@ create_as_upgrade :: proc(name : string, desc : string, value : f32, type : Upgr
         value = value,
         type = type,
         rarity = rarity,
-        target = .Player,
+        target = .NormalBullet,
         apply = apply_attack_speed_upgrade,
     }
 }

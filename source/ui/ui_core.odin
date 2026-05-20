@@ -10,12 +10,13 @@ UI_Element :: union{
     UI_Label,
     UI_Slider,
     UI_Status_Bar,
+    UI_Panel,
 }
 //Structs
 //UI_Menu
 Menu_Type :: enum{
     Play, Pause, Main, Options, Gunsmith, Catalyst, Skilltree, ChooseLevel, Quartermaster, Craftman,
-    EquiptmentBullet, EquiptmentAbility
+    EquiptmentBullet, EquiptmentAbility, Stats
 }
 
 UI_Menu :: struct{
@@ -144,4 +145,11 @@ UI_Interact :: struct{
     rec : rl.Rectangle,
     text : UI_Text,
     interactable : any,
+}
+
+//Panel
+UI_Panel :: struct{
+    rec : rl.Rectangle,
+    color : rl.Color,
+    alpha : u8,
 }
