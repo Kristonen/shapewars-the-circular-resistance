@@ -578,6 +578,12 @@ draw_button :: proc(b : ui.UI_Button){
                     valign = .Left,
                 }
                 draw_better_text(t, rec)
+                rec.x = f32(rl.GetScreenWidth())/2 - 200
+                rec.y = f32(rl.GetScreenHeight()) - 205
+                rec.width = 400
+                rec.height = 200
+                t.content = fmt.tprintf("Shards: %0.0f", game.shards)
+                draw_better_text(t, rec)
                 
         }
         refresh_ui_pointers()

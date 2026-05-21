@@ -9,11 +9,19 @@ Ghost_Time :: 0.025
 
 Loot_Bag :: struct{
     value : f32,
+    full_value : f32,
     max_value : f32,
     level : i32,
     level_increase : f32,
     mul : f32,
     increase_value : proc(b : ^Loot_Bag, value : f32) `json:"-"`, 
+}
+
+reset_loot_bag :: proc(l : ^Loot_Bag){
+    l.level = 1
+    l.value = 0
+    l.max_value = 50
+    l.mul = 1
 }
 
 Ghost_Image :: struct{
@@ -88,6 +96,7 @@ create_player :: proc() -> Player{
 
 increase_value :: proc(bag : ^Loot_Bag, value : f32){
     bag.value += value * bag.mul
+    bag.full_value += value
     if bag.value >= bag.max_value{
         bag.level += 1
         bag.value -= bag.max_value

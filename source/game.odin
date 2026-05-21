@@ -20,13 +20,15 @@ Unlocked :: struct{
     type : Unlocked_Type,
     unlocked : bool,
     blueprints : i32,
+    cost : f32,
 }
 
-create_unlockable :: proc(idx : i32, name : string, data : Unlocked_Data_Type, type : Unlocked_Type, unlocked : bool = false){
+create_unlockable :: proc(idx : i32, name : string, data : Unlocked_Data_Type, type : Unlocked_Type, unlocked : bool = false, cost : f32 = 0){
     game.unlockables[idx].name = name
     game.unlockables[idx].data = data
     game.unlockables[idx].type = type
     game.unlockables[idx].unlocked = unlocked
+    game.unlockables[idx].cost = cost
 }
 
 get_text_for_unlocked :: proc(type : Unlocked_Data_Type) -> string{
@@ -54,7 +56,7 @@ get_text_for_craftable :: proc(type : Unlocked_Data_Type) -> string{
             break
         }
     }
-    text := fmt.tprintf("Name: %v\nBlueprints: %i", type, unlockable.blueprints)
+    text := fmt.tprintf("Name: %v\nBlueprints: %i\nCost: %0.0f", type, unlockable.blueprints, unlockable.cost)
     return text
 }
 
@@ -91,6 +93,7 @@ Game_State :: struct{
     rank : i32,
     current_xp : f32,
     max_xp : f32,
+    shards : f32,
     
     helper_activated : bool,
     map_drawing : bool,

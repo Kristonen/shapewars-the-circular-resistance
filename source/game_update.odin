@@ -68,6 +68,10 @@ update_handler :: proc(dt : f32){
         game.current_menu = game.is_paused ? .Stats : .Play
         sync_menu()
     }
+
+    if rl.IsKeyPressed(.H){
+        create_level(.HQ)
+    }
 }
 
 update_helper :: proc(){
@@ -583,9 +587,8 @@ update_button :: proc(b : ^ui.UI_Button){
         switch type in b.data{
             case Unlocked_Data_Type:
                 u := get_unlockable(type)
-                b.disabled = u.blueprints < 1
+                b.disabled = u.blueprints < 1 && u.cost < game.shards
         }
-        
     }
 }
 

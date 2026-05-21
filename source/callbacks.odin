@@ -69,8 +69,8 @@ on_click_select_craftable :: proc(b : ui.UI_Button){
 on_click_craft :: proc(b : ui.UI_Button){
     type := b.data.(Unlocked_Data_Type)
     u := get_unlockable(type)
-    if u.blueprints < 1 do return
     u.blueprints -= 1
+    game.shards -= u.cost
     if !u.unlocked do u.unlocked = true
 }
 

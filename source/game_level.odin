@@ -38,6 +38,7 @@ Level_Data :: struct{
     ui_elements : [dynamic]ui.UI_Element,
     interact : ui.UI_Interact,
     level_visual : m.Tiled_Map,
+    completed : bool,
 }
 
 create_level :: proc(type : Level_Type){
@@ -47,6 +48,12 @@ create_level :: proc(type : Level_Type){
     game.map_allocator = virtual.arena_allocator(&game.map_arena)
     refresh_level()
     refresh_player()
+
+    if game.current_level != .HQ{
+        game.shards += game.player.loot_bag.full_value
+    }
+
+    reset_loot_bag(&game.player.loot_bag)
     game.current_level = type
     switch type{
         case .HQ:
@@ -63,6 +70,9 @@ create_level :: proc(type : Level_Type){
 }
 
 refresh_player :: proc(){
+    game.player.health.max = 100
+    game.player.health.current = 100
+    clear(&game.player.weapon.bullet.hitted_enemies)
     switch_weapon()
     switch_ability()
 }
@@ -98,8 +108,9 @@ create_first_test_level :: proc(){
     create_battle_ui()
     level_up_spawner_update()
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
-        get_upgrade_target()
-        fill_available_upgrades()
+        // get_upgrade_target()
+        // fill_available_upgrades()
+        create_battle_level()
         game.camera.target = game.player.pos
         game.level.level_visual = level_visual
     } else{
@@ -112,7 +123,7 @@ create_test_level :: proc(){
     spawner.enemy = create_dummy_enemy()
     append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
-    spawner.enemy = create_poison_moloch()
+    // spawner.enemy = create_poison_moloch()
     // append(&game.level.spawner, spawner)
     spawner.enemy = create_second_enemy()
     // append(&game.level.spawner, spawner)
@@ -121,10 +132,10 @@ create_test_level :: proc(){
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual
-    create_battle_ui()
+    create_battle_level()
     level_up_spawner_update()
-    get_upgrade_target()
-    fill_available_upgrades()
+    // get_upgrade_target()
+    // fill_available_upgrades()
 }
 
 create_boss_test_level :: proc(){
@@ -134,10 +145,15 @@ create_boss_test_level :: proc(){
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual
     game.player.pos = {0, 0}
-    create_battle_ui()
+    create_battle_level()
     level_up_spawner_update()
-    get_upgrade_target()
+    // get_upgrade_target()
+    // fill_available_upgrades()
+}
+
+create_battle_level :: proc(){
     fill_available_upgrades()
+    create_battle_ui()
 }
 
 create_battle_ui :: proc(){
@@ -195,12 +211,14 @@ refresh_level :: proc(){
     clear(&game.level.npcs)
     clear(&game.level.area_effects)
     for &e in game.level.enemies{
-        clear(&e.applied_status)
-        clear(&e.statuses)
+        delete(e.applied_status)
+        delete(e.statuses)
+    }
+    for &b in game.level.player_bullets{
+        delete(b.hitted_enemies)
     }
     clear(&game.level.enemies)
     clear(&game.level.player_bullets)
-    clear(&game.level.enemies)
     clear(&game.level.enemy_bullets)
     clear(&game.level.enemy_fragments)
     clear(&game.level.ui_elements)

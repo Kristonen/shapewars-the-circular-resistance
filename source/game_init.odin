@@ -18,14 +18,14 @@ init_unlockables :: proc(){
     //Bullet
     create_unlockable(0, "Normal Bullet", .NormalBullet, .Weapon, true)
     create_unlockable(1, "Bloody Pain", .PierceBullet, .Weapon, true)
-    create_unlockable(2, "", .NormalBullet, .Weapon)
+    create_unlockable(2, "", .NormalBullet, .Weapon, cost = 5000)
     create_unlockable(3, "", .NormalBullet, .Weapon)
     create_unlockable(4, "", .NormalBullet, .Weapon)
     create_unlockable(5, "", .NormalBullet, .Weapon)
     //Ability
     create_unlockable(6, "Dash", .Dash, .Ability, true)
     create_unlockable(7, "Radial Liberation", .Radial_Liberation, .Ability, true)
-    create_unlockable(8, "Bomb", .Bomb, .Ability)
+    create_unlockable(8, "Bomb", .Bomb, .Ability, cost = 10)
     create_unlockable(9, "", .NormalBullet, .Ability)
     create_unlockable(10, "", .NormalBullet, .Ability)
     create_unlockable(11, "", .NormalBullet, .Ability)

@@ -14,6 +14,7 @@ Save_Game_Data :: struct{
     rank : i32,
     current_xp : f32,
     max_xp : f32,
+    shards : f32,
     target_ability : Unlocked_Data_Type,
     weapon : Unlocked_Data_Type,
     unlockables : [12]Unlocked_Save_Data
@@ -114,6 +115,7 @@ load_game_data :: proc(){
     game.skill_points = game_data.skill_points
     game.player.current_ability = game_data.target_ability
     game.player.current_weapon = game_data.weapon
+    game.shards = game_data.shards
 
     for i := 0; i < len(game.unlockables);{
         u := &game.unlockables[i]
@@ -138,6 +140,7 @@ save_game_data :: proc(){
         game_data.unlockables[i].count = u.blueprints
         game_data.unlockables[i].idx = i32(i)
         game_data.unlockables[i].unlocked = u.unlocked
+        game_data.shards = game.shards
         i += 1
     }
 
