@@ -1,11 +1,14 @@
 package game
 
+import "base:builtin"
 import "core:math"
 import "core:strings"
 import rl "vendor:raylib"
 import "core:fmt"
 import "collider"
 import "ui"
+
+Btn_Disabled_Color :: rl.Color{50, 50, 50, 255}
 
 draw_player :: proc(){
     rl.DrawCircleV(game.player.pos, game.player.radius, rl.VIOLET)
@@ -531,11 +534,9 @@ draw_skilltree_desc :: proc(n : ui.UI_Text, desc : ui.UI_Text){
 }
 
 draw_button :: proc(b : ui.UI_Button){
-    if b.disabled{
-        rl.DrawRectangleRec(b.rec, {50, 50, 50, 255})
-    } else{
-        rl.DrawRectangleV({b.rec.x, b.rec.y}, {b.rec.width, b.rec.height}, b.color)
-    }
+    if !b.show do return
+    color := b.disabled ? Btn_Disabled_Color : b.color
+    rl.DrawRectangleRec(b.rec, color)
     rl.DrawRectangleLinesEx(b.rec, 5, rl.BLACK)
     draw_better_text(b.text, b.rec)
 
@@ -555,6 +556,31 @@ draw_button :: proc(b : ui.UI_Button){
                 rec := rl.Rectangle{x = x, y = y, width = f32(rl.GetScreenWidth()) - x, height = f32(rl.GetScreenHeight())}
                 draw_better_text(text, rec)
         }
+    }
+
+    if game.current_menu == .Craftman && b.text.content == "Buy"{
+        switch type in b.data{
+            case Unlocked_Data_Type:
+                x := f32(rl.GetScreenWidth()) * 0.3
+                y : f32 = 0
+                rl.DrawLineEx({x, y}, {x, f32(rl.GetScreenHeight())/2}, 5, rl.WHITE)
+                rec := rl.Rectangle{
+                    x = x + 5,
+                    y = 5,
+                    width = 500,
+                    height = 500,
+                }
+                t := ui.UI_Text{
+                    content = get_text_for_craftable(type),
+                    font_size = 25,
+                    text_color = rl.WHITE,
+                    halign = .Top,
+                    valign = .Left,
+                }
+                draw_better_text(t, rec)
+                
+        }
+        refresh_ui_pointers()
     }
 }
 

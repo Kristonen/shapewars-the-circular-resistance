@@ -21,10 +21,17 @@ create_button :: proc(text : string, rec : rl.Rectangle, on_click : On_Click, da
         state = .None,
         on_click = on_click,
         disabled = false,
+        show = true,
     }
     b.storage = 0
     ((^T) (&b.storage))^ = data
     b.data = any{&b.storage, typeid_of(T)}
     return b
+}
+
+change_button_data :: proc(b : ^UI_Button, data : $T){
+    b.storage = 0
+    ((^T) (&b.storage))^ = data
+    b.data = any{&b.storage, typeid_of(T)}
 }
 

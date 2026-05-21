@@ -58,4 +58,5 @@ craftman_interact :: proc(){
     ui.create_menu(&game.menu)
     game.menu.color = {0, 0, 0, 255}
     game.current_menu = .Craftman
+    sync_menu()
 }

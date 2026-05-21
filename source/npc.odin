@@ -91,7 +91,7 @@ create_craftman_npc :: proc(pos : rl.Vector2) -> NPC{
             pos = pos,
             radius = n.radius * 2,
         },
-        action = quartermaster_interact,
+        action = craftman_interact,
     }
     return n
 }

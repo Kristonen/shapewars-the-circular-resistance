@@ -578,6 +578,15 @@ update_button :: proc(b : ^ui.UI_Button){
         case .Pressing: b.color = b.p_color
         case .Pressed: b.color = b.p_color
     }
+
+    if b.text.content == "Buy"{
+        switch type in b.data{
+            case Unlocked_Data_Type:
+                u := get_unlockable(type)
+                b.disabled = u.blueprints < 1
+        }
+        
+    }
 }
 
 update_cooldown :: proc(cd : ^ui.UI_Cooldown, value : f32, max : f32){

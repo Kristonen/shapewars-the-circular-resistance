@@ -438,15 +438,39 @@ sync_menu :: proc(){
             refresh_ui_pointers()
         case .Craftman:
             rec := rl.Rectangle{
-                x = 50,
-                y = 50,
-                width = 400,
-                height = 200,
+                x = 5,
+                y = 5,
+                width = 250,
+                height = 150,
             }
             for i in 0..<len(game.unlockables){
                 text := game.unlockables[i].name
-                btn := ui.create_button(text, rec, on_click_back, -1)
+                btn := ui.create_button(text, rec, on_click_select_craftable, game.unlockables[i].data)
+                btn.text.font_size = 25
+                append(&game.menu.elements, btn)
+                rec.y += 160
+                if i == 5{
+                    rec.x += 270
+                    rec.y = 5
+                }
             }
+            rec.x = f32(rl.GetScreenWidth()-55)
+            rec.y = 5
+            rec.width = 50
+            rec.height = 50
+            close_btn := ui.create_button("X", rec, on_click_continue, -1)
+            close_btn.text.font_size = 15
+            append(&game.menu.elements, close_btn)
+            rec.x = f32(rl.GetScreenWidth())*0.3 + 5
+            rec.y = 505
+            rec.width = 250
+            rec.height = 100
+            buy_btn := ui.create_button("Buy", rec, on_click_craft, -1)
+            buy_btn.text.font_size = 20
+            buy_btn.show = false
+            buy_btn.disabled = true
+            append(&game.menu.elements, buy_btn)
+            refresh_ui_pointers()
         case .EquiptmentBullet:
             create_equiptment_menu(.Weapon)
         case .EquiptmentAbility:

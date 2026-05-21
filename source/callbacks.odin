@@ -2,6 +2,7 @@ package game
 
 import "core:fmt"
 import "ui"
+import rl "vendor:raylib"
 
 on_click_continue :: proc(b : ui.UI_Button){
     game.is_paused = !game.is_paused
@@ -51,9 +52,31 @@ on_click_equiptment_menu :: proc(b : ui.UI_Button){
     sync_menu()
 }
 
+on_click_select_craftable :: proc(b : ui.UI_Button){
+    type := b.data.(Unlocked_Data_Type)
+
+    for &e in game.menu.elements{
+        if btn, ok := &e.(ui.UI_Button); ok && btn.text.content == "Buy"{
+            ui.change_button_data(btn, type)
+            btn.show = true
+            u := get_unlockable(type)
+            btn.disabled = u.blueprints < 1
+        }
+    }
+    refresh_ui_pointers()
+}
+
+on_click_craft :: proc(b : ui.UI_Button){
+    type := b.data.(Unlocked_Data_Type)
+    u := get_unlockable(type)
+    if u.blueprints < 1 do return
+    u.blueprints -= 1
+    if !u.unlocked do u.unlocked = true
+}
+
 on_equip :: proc(b : ui.UI_Button){
     type := b.data.(Unlocked_Data_Type)
-    if type == game.player.current_weapon do return
+    if type == game.player.current_weapon || type == game.player.current_ability do return
     switch type{
         case .NormalBullet:
             game.player.current_weapon = type

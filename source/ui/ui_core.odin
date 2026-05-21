@@ -52,6 +52,7 @@ UI_Button :: struct{
     on_click : On_Click,
 
     disabled : bool,
+    show : bool,
 }
 
 //UI Cooldown

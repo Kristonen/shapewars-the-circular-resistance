@@ -1,5 +1,6 @@
 package game
 
+import "core:fmt"
 import "core:mem/virtual"
 import "core:mem"
 import rl "vendor:raylib"
@@ -43,6 +44,28 @@ get_text_for_unlocked :: proc(type : Unlocked_Data_Type) -> string{
             text = "Throw a bomb that makes a lot of damage in a area."
     }
     return text
+}
+
+get_text_for_craftable :: proc(type : Unlocked_Data_Type) -> string{
+    unlockable : Unlocked
+    for u in game.unlockables{
+        if u.data == type{
+            unlockable = u
+            break
+        }
+    }
+    text := fmt.tprintf("Name: %v\nBlueprints: %i", type, unlockable.blueprints)
+    return text
+}
+
+get_unlockable :: proc(type : Unlocked_Data_Type) -> ^Unlocked{
+    unlocked : ^Unlocked
+    for &u in game.unlockables{
+        if u.data != type do continue
+        unlocked = &u
+        break
+    }
+    return unlocked
 }
 
 Game_State :: struct{

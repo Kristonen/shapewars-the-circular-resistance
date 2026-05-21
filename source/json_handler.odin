@@ -115,9 +115,10 @@ load_game_data :: proc(){
     game.player.current_ability = game_data.target_ability
     game.player.current_weapon = game_data.weapon
 
-    for i := 0; i > len(game.unlockables);{
-        game.unlockables[i].blueprints = game_data.unlockables[i].count
-        game.unlockables[i].unlocked = game_data.unlockables[i].unlocked
+    for i := 0; i < len(game.unlockables);{
+        u := &game.unlockables[i]
+        u.blueprints = game_data.unlockables[i].count
+        u.unlocked = game_data.unlockables[i].unlocked
         i += 1
     }
 }
