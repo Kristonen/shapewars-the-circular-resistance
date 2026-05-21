@@ -60,14 +60,16 @@ get_text_for_craftable :: proc(type : Unlocked_Data_Type) -> string{
     return text
 }
 
-get_unlockable :: proc(type : Unlocked_Data_Type) -> ^Unlocked{
+get_unlockable :: proc(type : Unlocked_Data_Type) -> (^Unlocked, int){
     unlocked : ^Unlocked
-    for &u in game.unlockables{
+    i : int
+    for &u, idx in game.unlockables{
         if u.data != type do continue
         unlocked = &u
+        i = idx
         break
     }
-    return unlocked
+    return unlocked, i
 }
 
 Game_State :: struct{

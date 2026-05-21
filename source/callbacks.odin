@@ -59,7 +59,7 @@ on_click_select_craftable :: proc(b : ui.UI_Button){
         if btn, ok := &e.(ui.UI_Button); ok && btn.text.content == "Buy"{
             ui.change_button_data(btn, type)
             btn.show = true
-            u := get_unlockable(type)
+            u, i := get_unlockable(type)
             btn.disabled = u.blueprints < 1
         }
     }
@@ -68,7 +68,7 @@ on_click_select_craftable :: proc(b : ui.UI_Button){
 
 on_click_craft :: proc(b : ui.UI_Button){
     type := b.data.(Unlocked_Data_Type)
-    u := get_unlockable(type)
+    u, i := get_unlockable(type)
     u.blueprints -= 1
     game.shards -= u.cost
     if !u.unlocked do u.unlocked = true

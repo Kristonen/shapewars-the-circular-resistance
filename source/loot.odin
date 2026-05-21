@@ -7,7 +7,7 @@ import rl "vendor:raylib"
 import cl "collider"
 
 Bomb_Idx :: 8
-Bomb_Chance :: 1.0//0.25
+Bomb_Chance :: 0.25
 
 Shard_Type :: enum {
     Low, Mid, High

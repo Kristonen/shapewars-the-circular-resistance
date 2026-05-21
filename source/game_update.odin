@@ -425,11 +425,12 @@ update_loot :: proc(dt : f32){
                 i += 1
                 continue
             }
-            pos : rl.Vector2 = {l.rec.x, l.rec.y} + l.dir * l.speed * dt
-            l.rec.x = pos.x
-            l.rec.y = pos.y
+            //pos : rl.Vector2 = {l.rec.x, l.rec.y} + l.dir * l.speed * dt
+            l.rec.x += l.dir.x * l.speed * dt//pos.x
+            l.rec.y += l.dir.y * l.speed * dt//pos.y
             l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
             l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+            i += 1
             continue
         }
 
@@ -586,7 +587,7 @@ update_button :: proc(b : ^ui.UI_Button){
     if b.text.content == "Buy"{
         switch type in b.data{
             case Unlocked_Data_Type:
-                u := get_unlockable(type)
+                u, i := get_unlockable(type)
                 b.disabled = u.blueprints < 1 && u.cost < game.shards
         }
     }
