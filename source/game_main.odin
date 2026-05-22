@@ -168,7 +168,6 @@ save_game :: proc(){
 
 update_game :: proc(dt : f32) {
     update_camera(dt)
-    update_helper()
     update_handler(dt)
     if !game.is_paused && !game.level.power_level_up{
         game.play_time += dt

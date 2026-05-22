@@ -72,13 +72,10 @@ update_handler :: proc(dt : f32){
     if rl.IsKeyPressed(.H){
         create_level(.HQ)
     }
-}
 
-update_helper :: proc(){
     if rl.IsKeyPressed(.F2){
         game.helper_activated = !game.helper_activated
     }
-
 }
 
 update_camera :: proc(dt : f32){
