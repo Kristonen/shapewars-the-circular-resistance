@@ -376,6 +376,40 @@ update_fragement :: proc(dt : f32){
     }
 }
 
+update_portal :: proc(dt : f32){
+    update_animation(&game.level.portal.animation, dt)
+}
+
+update_animation :: proc(a : ^Animation, dt : f32){
+    if a.is_finished do return
+    a.duration_left -= dt
+    if a.duration_left <= 0{
+        a.duration_left = a.speed
+        a.current_frame += a.anim_direction
+        
+        switch a.mode{
+            case .Once:
+                if a.current_frame > a.last_frame{
+                    a.current_frame = a.last_frame
+                    a.is_finished = true
+                }
+            case .Loop:
+                if a.current_frame > a.last_frame{
+                    a.current_frame = a.first_frame
+                }
+            case .Ping_Pong:
+                if a.current_frame > a.last_frame{
+                    a.anim_direction = -1
+                    a.current_frame = a.last_frame - 1
+                }
+                if a.current_frame < a.first_frame{
+                    a.anim_direction = 1
+                    a.current_frame = 1
+                }
+        }
+    }
+}
+
 update_particle :: proc(dt : f32){
     for i := 0; i < len(game.level.particles);{
         p := &game.level.particles[i]

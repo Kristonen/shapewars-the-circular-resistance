@@ -134,7 +134,11 @@ draw_enemies :: proc(){
 draw_portal :: proc(){
     if !game.level.portal.active do return
     // rl.DrawCircleV(game.level.portal.pos, game.level.portal.radius, rl.RED)
-    rl.DrawEllipse(i32(game.level.portal.pos.x), i32(game.level.portal.pos.y), game.level.portal.radius, game.level.portal.radius * 1.5, rl.RED)
+    // rl.DrawEllipse(i32(game.level.portal.pos.x), i32(game.level.portal.pos.y), game.level.portal.radius, game.level.portal.radius * 1.5, rl.RED)
+    // rl.DrawTexture(game.level.portal.texture, i32(game.level.portal.pos.x), i32(game.level.portal.pos.y), rl.WHITE)
+    pos := rl.Vector2{game.level.portal.pos.x, game.level.portal.pos.y}
+    source_rec := get_animation_frame(game.level.portal.animation, 4)
+    rl.DrawTexturePro(game.level.portal.texture, source_rec, {pos.x - 32, pos.y - 32, 64, 65}, {}, 0, rl.WHITE)
     if game.helper_activated{
         draw_collider_circle(game.level.portal.interact.collider)
     }

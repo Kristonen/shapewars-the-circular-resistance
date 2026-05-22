@@ -133,6 +133,8 @@ main :: proc(){
     }
     create_upgrades(&game.level.upgrade_pool)
     fill_available_upgrades()
+    game.level.portal = create_portal({-100, -100})
+    game.level.portal.texture = rl.LoadTexture("assets/portal.png")
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
     for !rl.WindowShouldClose(){
@@ -186,6 +188,7 @@ update_game :: proc(dt : f32) {
         update_particle(dt)
         update_in_game_ui(dt)
         update_tooltip(dt)
+        update_portal(dt)
     } else if game.level.power_level_up{
         update_upgrade(dt)
     } else if game.current_menu == .Skilltree{
