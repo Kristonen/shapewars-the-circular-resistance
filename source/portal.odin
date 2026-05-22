@@ -29,9 +29,9 @@ create_portal :: proc(pos : rl.Vector2) -> Portal{
             last_frame = 3,
             current_frame = 0,
             speed = 0.25,
-            duration_left = 0.1,
+            duration_left = 0.25,
             anim_direction = 1,
-            mode = .Once,
+            mode = .Ping_Pong,
         }
     }
     return p
