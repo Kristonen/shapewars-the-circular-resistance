@@ -188,13 +188,14 @@ update_game :: proc(dt : f32) {
         update_in_game_ui(dt)
         update_tooltip(dt)
         update_portal(dt)
+    } 
+    if game.is_paused{
+        update_menu()  
     } else if game.level.power_level_up{
         update_upgrade(dt)
     } else if game.current_menu == .Skilltree{
         update_menu()
         update_skilltree()
-    } else{
-        update_menu()
     }
 }
 
@@ -209,10 +210,11 @@ check_collisions :: proc(){
         check_player_area_effect()
         check_player_interact()
         check_in_game_ui_tooltip()
+    }
+    if game.is_paused{
+        check_collision_menu()
     } else if game.level.power_level_up{
         check_collision_upgrade_slot()
-    } else{
-        check_collision_menu()
     }
     if game.current_menu == .Skilltree{
         check_skill_node()
