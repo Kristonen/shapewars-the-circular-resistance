@@ -4,14 +4,38 @@ import "core:container/intrusive/list"
 import rl "vendor:raylib"
 import "ui"
 
-Cast_Ability :: proc(b : ^Enemy, dt : f32)
+Activate_Ability :: #type proc(e : ^Enemy)
+Update_Ability :: #type proc(e : ^Enemy, dt : f32)
+Finish_Ability :: #type proc(e : ^Enemy)
+Cast_Ability :: #type proc(e : ^Enemy, dt : f32)
+
+no_activate_enemy_ability :: proc(e : ^Enemy){}
+no_update_enemy_ability :: proc(e : ^Enemy, dt : f32){}
+no_finish_enemy_ability :: proc(e : ^Enemy){}
 
 Boss_Ability :: struct{
     cd : Ability_Cooldown,
+    data : Enemy_Ability_Data,
     cast_time : f32,
     cast_timer : f32,
     cast_ability : Cast_Ability,
+    active : Activate_Ability,
+    update : Update_Ability,
+    finish : Finish_Ability,
     is_active : bool,
+}
+
+Enemy_Ability_Data :: union{
+    Reinforcment_Data, Bombardment_Data
+}
+
+Reinforcment_Data :: struct{
+
+}
+
+Bombardment_Data :: struct{
+    pos : rl.Vector2,
+    radius : f32,
 }
 
 Boss_Data :: struct{
@@ -76,7 +100,7 @@ test_boss_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
             i += 1
             continue
         }
-        if a.cd.cooldown > 0 && !data.is_casting{
+        if a.cd.cooldown > 0{
             a.cd.cooldown -= dt
             i += 1
             continue
@@ -104,6 +128,8 @@ test_boss_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
             data.current_cast = -1
             a.cd.cooldown = a.cd.cast_rate
             a.cast_ability(e, dt)
+            // a.active(e)
+            // a.update(e, dt)
         }
         i += 1
     }
