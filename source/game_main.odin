@@ -68,6 +68,7 @@ main :: proc(){
         }
         delete(game.level.player_bullets)
         delete(game.level.enemy_bullets)
+        delete(game.level.ability_projectiles)
         delete(game.level.enemy_fragments)
         delete(game.level.area_effects)
         delete(game.level.loot)
@@ -188,6 +189,7 @@ update_game :: proc(dt : f32) {
         update_in_game_ui(dt)
         update_tooltip(dt)
         update_portal(dt)
+        update_ability_projectiles(dt)
     } 
     if game.is_paused && game.current_menu != .Skilltree{
         update_menu()  
@@ -246,6 +248,7 @@ draw_game :: proc(){
         draw_bullet()
         draw_enemies()
         draw_particles()
+        draw_ability_projectiles()
         draw_portal()
         if game.player.ability.active{
             game.player.ability.draw()

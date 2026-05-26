@@ -273,6 +273,15 @@ update_player_interact :: proc(dt : f32){
     }
 }
 
+update_ability_projectiles :: proc(dt : f32){
+    for &p in game.level.ability_projectiles{
+        if rl.Vector2Distance({p.rec.x, p.rec.y}, p.target_pos) > 10{
+            p.rec.x += p.dir.x * p.speed * dt
+            p.rec.y += p.dir.y * p.speed * dt
+        }
+    }
+}
+
 update_spawner :: proc(dt : f32){
     for &s in game.level.spawner{
         if !s.is_active do continue

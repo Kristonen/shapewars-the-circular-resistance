@@ -110,6 +110,12 @@ draw_bullet :: proc(){
     }
 }
 
+draw_ability_projectiles :: proc(){
+    for p in game.level.ability_projectiles{
+        rl.DrawRectangleRec(p.rec, rl.BLACK)
+    }
+}
+
 draw_enemies :: proc(){
     for e in game.level.enemies{
         width := e.rec.width * e.visual_scale.x

@@ -238,14 +238,17 @@ create_test_boss :: proc() -> Enemy{
     }
     e.knocback.apply = apply_no_knockback
     e.behave = test_boss_behavior
-    e.behavior = Boss_Data{
-        ability = {
-            cd = {
-                cast_rate = 10,
-            },
-            cast_time = 1,
-        }
-    }
+    data : Boss_Data
+    data.abilities[0].is_active = true
+    data.abilities[0].cd.cast_rate = 10
+    data.abilities[0].cast_time = 5
+    data.abilities[0].cast_ability = call_reinforcement
+    data.abilities[1].is_active = true
+    data.abilities[1].cd.cast_rate = 2
+    data.abilities[1].cast_time = 1
+    data.abilities[1].cast_ability = call_bombardment
+    data.current_cast = -1
+    e.behavior = data
     e.on_death = on_death_boss
     return e
 }

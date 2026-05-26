@@ -25,6 +25,8 @@ Level_Data :: struct{
 
     player_bullets : [dynamic]Bullet,
 
+    ability_projectiles : [dynamic]Test_Projectile,
+
     loot : [dynamic]Loot,
     chest : Chest,
 

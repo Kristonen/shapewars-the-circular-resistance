@@ -1,22 +1,34 @@
 package game
 
+import "core:container/intrusive/list"
 import rl "vendor:raylib"
 import "ui"
+
+Cast_Ability :: proc(b : ^Enemy, dt : f32)
 
 Boss_Ability :: struct{
     cd : Ability_Cooldown,
     cast_time : f32,
     cast_timer : f32,
-    cast_ability : proc(e : ^Enemy, dt : f32),
+    cast_ability : Cast_Ability,
+    is_active : bool,
 }
 
 Boss_Data :: struct{
-    // abilities : [4]Ability,
+    abilities : [4]Boss_Ability,
     ability : Boss_Ability,
     is_casting : bool,
+    current_cast : i32,
 }
 
-call_reinforcement :: proc(b : Enemy){
+Test_Projectile :: struct {
+    rec : rl.Rectangle,
+    speed : f32,
+    dir : rl.Vector2,
+    target_pos : rl.Vector2,
+}
+
+call_reinforcement :: proc(b : ^Enemy, dt : f32){
     e := create_start_enemy()
     directions := []rl.Vector2 {{b.rec.x - 150, b.rec.y - 150}, {b.rec.x + 150, b.rec.y - 150}, {b.rec.x + 150, b.rec.y + 150}, {b.rec.x - 150, b.rec.y + 150}}
     for dir in directions{
@@ -35,25 +47,65 @@ call_reinforcement :: proc(b : Enemy){
     }
 }
 
+call_bombardment :: proc(b : ^Enemy, dt : f32){
+    for _ in 0..<5{
+        x := f32(rl.GetRandomValue(-150, 150))
+        y := f32(rl.GetRandomValue(- 150, 150))
+        pos := rl.Vector2 {game.player.pos.x + x, game.player.pos.y + y}
+        p := Test_Projectile{
+            target_pos = pos,
+            rec = {
+                x = pos.x,
+                y = pos.y - 1000,
+                width = 10,
+                height = 50,
+            },
+            speed = 900,
+            dir = {0, 1},
+        }
+        append(&game.level.ability_projectiles, p)
+    }
+}
+
 test_boss_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
     data := &d.(Boss_Data)
-    if data.ability.cd.cooldown > 0 && !data.is_casting{
-        data.ability.cd.cooldown -= dt
-    }
 
-    if data.ability.cd.cooldown <= 0 && !data.is_casting{
-        data.ability.cast_timer = data.ability.cast_time
-        data.is_casting = true
-    }
+    for i := 0; i < len(data.abilities);{
+        a := &data.abilities[i]
+        if !a.is_active{
+            i += 1
+            continue
+        }
+        if a.cd.cooldown > 0 && !data.is_casting{
+            a.cd.cooldown -= dt
+            i += 1
+            continue
+        }
 
-    if data.is_casting && data.ability.cast_timer > 0{
-        data.ability.cast_timer -= dt
-    }
+        if a.cd.cooldown <= 0 && !data.is_casting{
+            a.cast_timer = a.cast_time
+            data.is_casting = true
+            data.current_cast = i32(i)
+        }
 
-    if data.is_casting && data.ability.cast_timer <= 0{
-        data.ability.cd.cooldown = data.ability.cd.cast_rate
-        call_reinforcement(e^)
-        data.is_casting = false
+        if i32(i) != data.current_cast{
+            i += 1
+            continue
+        }
+
+        if data.is_casting && a.cast_timer > 0{
+            a.cast_timer -= dt
+            i += 1
+            continue
+        }
+
+        if data.is_casting && a.cast_timer <= 0{
+            data.is_casting = false
+            data.current_cast = -1
+            a.cd.cooldown = a.cd.cast_rate
+            a.cast_ability(e, dt)
+        }
+        i += 1
     }
 
     if data.is_casting do return
