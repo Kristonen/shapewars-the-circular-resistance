@@ -449,25 +449,13 @@ update_loot :: proc(dt : f32){
             continue
         }
 
-        if !l.is_active{
-            l.time -= dt
-            if l.time <= 0{
-                l.is_active = true
-                i += 1
-                continue
-            }
-            //pos : rl.Vector2 = {l.rec.x, l.rec.y} + l.dir * l.speed * dt
-            l.rec.x += l.dir.x * l.speed * dt//pos.x
-            l.rec.y += l.dir.y * l.speed * dt//pos.y
-            l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
-            l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+        if l.state == .Spawning{//!l.is_active{
+            l.on_spawn(l, dt)
             i += 1
             continue
         }
 
-        
-
-        if !l.is_following{
+        if l.state == .Idle{//!l.is_following{
             i += 1
             continue
         }

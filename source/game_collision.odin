@@ -211,13 +211,13 @@ check_bullet_wall :: proc(b : ^Bullet){
 check_collisions_detection_loot :: proc(){
     for i := 0; i < len(game.level.loot);{
         l := &game.level.loot[i]
-        if l.is_following || !l.is_active{
+        if l.state != .Idle{
             i += 1
             continue
         }
 
         if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, game.player.pos, game.player.radius){
-            l.is_following = true
+            l.state = .Following
         }
         i += 1
     }
@@ -226,7 +226,7 @@ check_collisions_detection_loot :: proc(){
 check_collisions_pickup_loot :: proc(){
     for i : int = 0; i < len(game.level.loot);{
         l := &game.level.loot[i]
-        if !l.is_active{
+        if l.state != .Following{
             i += 1
             continue
         }

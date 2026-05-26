@@ -14,7 +14,8 @@ Shard_Type :: enum {
 }
 
 LootCallback :: proc(l : ^Loot)
-Loot_State :: enum{Spawning, Idle}
+LootSpawn :: proc(l : ^Loot, dt : f32)
+Loot_State :: enum{Spawning, Idle, Following}
 
 Loot :: struct{
     rec : rl.Rectangle,
@@ -39,6 +40,7 @@ Loot :: struct{
     is_dead : bool,
 
     on_collect : LootCallback,
+    on_spawn : LootSpawn,
     state : Loot_State,
 }
 
@@ -95,6 +97,8 @@ give_shard_everything :: proc(shard : ^Loot, pos : rl.Vector2){
     shard.pickup.pos = {shard.rec.x + shard.rec.width/2, shard.rec.y + shard.rec.height/2}
     shard.pickup.radius = shard.rec.width / 4
     shard.on_collect = on_shard_collect
+    shard.on_spawn = on_normal_spawn
+    shard.state = .Spawning
 
     roll := rand.float32()
     if roll < 0.05{
@@ -124,4 +128,17 @@ on_blueprint_collect :: proc(l : ^Loot){
     idx := i32(l.value)
     u := &game.unlockables[idx]
     u.blueprints += 1
+}
+
+on_normal_spawn :: proc(l : ^Loot, dt : f32){
+    l.time -= dt
+    if l.time <= 0{
+        l.state = .Idle
+        // l.is_active = true
+        return
+    }
+    l.rec.x += l.dir.x * l.speed * dt
+    l.rec.y += l.dir.y * l.speed * dt
+    l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+    l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
 }

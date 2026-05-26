@@ -94,6 +94,7 @@ spawn_shards_around_chest :: proc(){
         shard.pickup.radius = shard.rec.width/4
         shard.time = duration
         shard.color = rl.SKYBLUE
+        shard.on_spawn = on_normal_spawn
         append(&game.level.loot, shard)
     }
 }
