@@ -275,7 +275,7 @@ on_death :: proc(e : Enemy, idx : i32){
 
 on_death_boss :: proc(e : Enemy, idx : i32){
     game.shake = 300
-    game.level.portal = create_portal(e.origin)
+    activate_portal(e.origin)//create_portal(e.origin)
     unordered_remove(&game.level.enemies, idx)
 }
 

@@ -133,7 +133,7 @@ main :: proc(){
     }
     create_upgrades(&game.level.upgrade_pool)
     fill_available_upgrades()
-    game.level.portal = create_portal({-100, -100})
+    game.level.portal = create_portal({0, 0})
     game.level.portal.texture = rl.LoadTexture("assets/portal.png")
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
@@ -236,7 +236,6 @@ draw_game :: proc(){
         if game.map_drawing{
             draw_map()
         }
-        draw_portal()
         draw_area_effects()
         draw_fragments()
         draw_player_indicator()
@@ -247,6 +246,7 @@ draw_game :: proc(){
         draw_bullet()
         draw_enemies()
         draw_particles()
+        draw_portal()
         if game.player.ability.active{
             game.player.ability.draw()
         }

@@ -23,7 +23,6 @@ create_portal :: proc(pos : rl.Vector2) -> Portal{
                 radius = 32 * 2,
             },
         },
-        active = true,
         animation = {
             first_frame = 0,
             last_frame = 3,
@@ -35,4 +34,10 @@ create_portal :: proc(pos : rl.Vector2) -> Portal{
         }
     }
     return p
+}
+
+activate_portal :: proc(pos : rl.Vector2){
+    game.level.portal.active = true
+    game.level.portal.pos = pos
+    game.level.portal.interact.collider.pos = pos
 }
