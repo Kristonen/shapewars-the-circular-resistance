@@ -189,7 +189,7 @@ update_game :: proc(dt : f32) {
         update_tooltip(dt)
         update_portal(dt)
     } 
-    if game.is_paused{
+    if game.is_paused && game.current_menu != .Skilltree{
         update_menu()  
     } else if game.level.power_level_up{
         update_upgrade(dt)
