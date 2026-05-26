@@ -444,7 +444,7 @@ update_loot :: proc(dt : f32){
     for i := 0; i < len(game.level.loot);{
         l := &game.level.loot[i]
 
-        if l.is_dead{
+        if l.state == .Collected{
             unordered_remove(&game.level.loot, i)
             continue
         }

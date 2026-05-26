@@ -15,7 +15,7 @@ Shard_Type :: enum {
 
 LootCallback :: proc(l : ^Loot)
 LootSpawn :: proc(l : ^Loot, dt : f32)
-Loot_State :: enum{Spawning, Idle, Following}
+Loot_State :: enum{Spawning, Idle, Following, Collected}
 
 Loot :: struct{
     rec : rl.Rectangle,

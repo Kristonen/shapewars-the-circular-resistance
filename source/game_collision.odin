@@ -232,7 +232,7 @@ check_collisions_pickup_loot :: proc(){
         }
         if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, game.player.collector.pos, game.player.collector.radius){
             l->on_collect()
-            l.is_dead = true
+            l.state = .Collected
             if game.level.power_level_up{
                 level_up_spawner_update()
                 create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
