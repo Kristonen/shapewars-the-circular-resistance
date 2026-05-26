@@ -238,10 +238,10 @@ update_player_casting :: proc(dt : f32){
     if game.player.ability.activated{
         game.player.ability.indicator_active = false
         game.player.ability.activated = false
+        game.player.ability.active = true
         game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
         game.player.ability.activate(dt)
         game.level.indicator = nil
-        game.player.ability.active = true
     }
 
     if game.player.ability.active{
