@@ -14,6 +14,8 @@ Ability_Activate :: #type proc(dt : f32)
 Ability_Finish :: #type proc(dt : f32)
 Ability_Draw :: #type proc()
 
+Ability_Projectile_Draw :: #type proc(p : Ability_Projectile)
+
 Ability :: struct{
     cd : Ability_Cooldown,
     indicator_active : bool,
@@ -46,6 +48,23 @@ AoE_Indicator :: struct{
 Line_Indicator :: struct{
     pos : rl.Vector2,
     length : f32,
+}
+
+Ability_Projectile_Data :: union{
+    Ability_Projectile_Bombardment,
+}
+
+Ability_Projectile_Bombardment :: struct{
+    radius : f32,
+}
+
+Ability_Projectile :: struct{
+    rec : rl.Rectangle,
+    speed : f32,
+    dir : rl.Vector2,
+    target_pos : rl.Vector2,
+    data : Enemy_Ability_Data,
+    draw : Ability_Projectile_Draw,
 }
 
 no_indicator_update :: proc(dt : f32){

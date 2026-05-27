@@ -274,11 +274,16 @@ update_player_interact :: proc(dt : f32){
 }
 
 update_ability_projectiles :: proc(dt : f32){
-    for &p in game.level.ability_projectiles{
+    for i := 0; i < len(game.level.ability_projectiles);{
+        p := &game.level.ability_projectiles[i]
         if rl.Vector2Distance({p.rec.x, p.rec.y}, p.target_pos) > 10{
             p.rec.x += p.dir.x * p.speed * dt
             p.rec.y += p.dir.y * p.speed * dt
+        } else{
+            unordered_remove(&game.level.ability_projectiles, i)
+            continue
         }
+        i += 1
     }
 }
 
@@ -341,6 +346,7 @@ update_enemy :: proc(dt : f32){
         e.health_bar.rec.x = e.rec.x - 10
         e.health_bar.rec.y = e.rec.y - 20
         update_enemy_status(&e, dt)
+        update_enemy_ability(&e, dt)
     }
     
 }
@@ -356,6 +362,25 @@ update_enemy_status :: proc(e : ^Enemy, dt : f32){
         if !s.is_active{
             unordered_remove(&e.statuses, idx)
         }
+    }
+}
+
+update_enemy_ability :: proc(e : ^Enemy, dt : f32){
+    switch &b in e.behavior{
+        case Melee_Data:
+        case Distance_Data:
+        case Charge_Data:
+        case Boss_Data:
+            if !b.is_casting do break
+            a := &b.abilities[b.current_cast]
+            a.casting_visualizer.can_show = false
+            if a.casting_visualizer.current_tick > 0{
+                a.casting_visualizer.current_tick -= dt
+                break
+            } else{
+                a.casting_visualizer.current_tick = a.casting_visualizer.tick
+                a.casting_visualizer.can_show = true
+            }
     }
 }
 

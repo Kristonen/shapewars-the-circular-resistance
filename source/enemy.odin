@@ -228,31 +228,6 @@ create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy
     return e
 }
 
-create_test_boss :: proc() -> Enemy{
-    rec := rl.Rectangle{x = 0, y = 0, width = 100, height = 80}
-    e := create_enemy(rec, 150, rl.BLACK)
-    e.health = {
-        current = 5,
-        max = 500,
-        take_dmg = take_damage,
-    }
-    e.knocback.apply = apply_no_knockback
-    e.behave = test_boss_behavior
-    data : Boss_Data
-    data.abilities[0].is_active = true
-    data.abilities[0].cd.cast_rate = 10
-    data.abilities[0].cast_time = 5
-    data.abilities[0].cast_ability = call_reinforcement
-    data.abilities[1].is_active = true
-    data.abilities[1].cd.cast_rate = 2
-    data.abilities[1].cast_time = 1
-    data.abilities[1].cast_ability = call_bombardment
-    data.current_cast = -1
-    e.behavior = data
-    e.on_death = on_death_boss
-    return e
-}
-
 on_hit :: proc(e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
     game.create_hit_particle(e.rec)
