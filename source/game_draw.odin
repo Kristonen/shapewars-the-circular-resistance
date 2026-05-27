@@ -110,27 +110,8 @@ draw_bullet :: proc(){
     }
 }
 
-draw_ability_projectiles :: proc(){
-    for p in game.level.ability_projectiles{
-        p.draw(p)
-        // rl.DrawRectangleRec(p.rec, rl.BLACK)
-    }
-}
-
 draw_enemies :: proc(){
     for e in game.level.enemies{
-
-        switch b in e.behavior{
-            case Melee_Data:
-            case Distance_Data:
-            case Charge_Data:
-            case Boss_Data:
-                if !b.is_casting do break
-                a := b.abilities[b.current_cast]
-                if a.casting_visualizer.can_show{
-                    a.casting_visualizer.draw(e.origin)
-                }
-        }
 
         width := e.rec.width * e.visual_scale.x
         height := e.rec.height * e.visual_scale.y

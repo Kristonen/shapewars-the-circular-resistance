@@ -36,19 +36,19 @@ create_standard_bomb :: proc() -> Ability{
     }
 }
 
-bomb_indicator_update :: proc(dt : f32){
+bomb_indicator_update :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Bomb_Data)
     game.level.indicator = AoE_Indicator{
         radius = data.explosion_radius,
         pos = rl.GetScreenToWorld2D(rl.GetMousePosition(), game.camera),
     }
     if rl.IsMouseButtonPressed(.LEFT){
-        game.player.ability.activated = true
+        game.player.ability.casting = true
         game.player.ability.indicator_active = false
     }
 }
 
-bomb_activate :: proc(dt : f32){
+bomb_activate :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Bomb_Data)
     indicator := game.level.indicator.(AoE_Indicator)
     data.target_pos = indicator.pos
@@ -56,7 +56,7 @@ bomb_activate :: proc(dt : f32){
     data.pos = game.player.pos
 }
 
-bomb_update :: proc(dt : f32){
+bomb_update :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Bomb_Data)
 
     dir := data.target_pos - data.pos
@@ -69,11 +69,11 @@ bomb_update :: proc(dt : f32){
     if data.timer > 0{
         data.timer -= dt
     } else {
-        game.player.ability.finish(dt)
+        game.player.ability.finish(a, dt)
     }
 }
 
-bomb_finish :: proc(dt : f32){
+bomb_finish :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Bomb_Data)
     data.timer = BOMB_TIMER
     game.player.ability.active = false
@@ -88,7 +88,7 @@ bomb_finish :: proc(dt : f32){
     create_explosion_particles(rec)
 }
 
-bomb_draw :: proc(){
+bomb_draw :: proc(a : Ability){
     data := game.player.ability.data.(Bomb_Data)
     rl.DrawCircleV(data.pos, data.radius, rl.BEIGE)
 }

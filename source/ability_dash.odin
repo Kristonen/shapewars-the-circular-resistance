@@ -24,7 +24,7 @@ create_standard_dash :: proc() -> Ability{
     }
 }
 
-dash_activate :: proc(dt : f32){
+dash_activate :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Dash_Data)
     data.dir = game.player.vel
     if data.dir.x == 0 && data.dir.y == 0{
@@ -38,7 +38,7 @@ dash_activate :: proc(dt : f32){
     game.player.ability.activated = false
 }
 
-dash_update :: proc(dt : f32){
+dash_update :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Dash_Data)
     if data.timer > 0{
         create_dash_particle(game.player.pos, data.dir)
@@ -57,11 +57,11 @@ dash_update :: proc(dt : f32){
         }
     } else {
         game.player.ability.active = false
-        dash_finish(dt)
+        dash_finish(a, dt)
     }
 }
 
-dash_finish :: proc(dt : f32){
+dash_finish :: proc(a : ^Ability, dt : f32){
     game.shake = 50
 
 }

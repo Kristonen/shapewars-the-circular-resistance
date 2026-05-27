@@ -248,11 +248,10 @@ draw_game :: proc(){
         draw_bullet()
         draw_enemies()
         draw_particles()
-        draw_ability_projectiles()
         draw_portal()
-        if game.player.ability.active{
-            game.player.ability.draw()
-        }
+        // if game.player.ability.active{
+        //     game.player.ability.draw()
+        // }
     rl.EndMode2D()
     
     draw_in_game_ui()

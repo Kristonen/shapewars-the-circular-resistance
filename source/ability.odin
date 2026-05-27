@@ -5,29 +5,45 @@ import "core:math"
 import rl "vendor:raylib"
 
 Ability_Data :: union {
-    Radial_Liberation_Data, Dash_Data, Bomb_Data
+    Radial_Liberation_Data, Dash_Data, Bomb_Data, Reinforcment_Data
 }
 
-Ability_Indicator_Update :: #type proc(dt : f32)
-Ability_Update :: #type proc(dt : f32)
-Ability_Activate :: #type proc(dt : f32)
-Ability_Finish :: #type proc(dt : f32)
-Ability_Draw :: #type proc()
+Ability_Owner :: enum {Player, Enemy}
+
+Ability_Indicator_Update :: #type proc(a : ^Ability, dt : f32)
+Ability_Update :: #type proc(a : ^Ability, dt : f32)
+Ability_Activate :: #type proc(a : ^Ability, dt : f32)
+Ability_Finish :: #type proc(a : ^Ability, dt : f32)
+Ability_Draw :: #type proc(a : Ability)
 
 Ability_Projectile_Draw :: #type proc(p : Ability_Projectile)
 
 Ability :: struct{
+    //Cooldown for the Ability
     cd : Ability_Cooldown,
+    //Timer for how long it takes to cast the ability
+    cast_timer : Ability_Cooldown,
+
     indicator_active : bool,
     activated : bool,
+    finished : bool,
     active : bool,
     casting : bool,
+
     indicator : Ability_Indicator_Update,
     activate : Ability_Activate,
     update : Ability_Update,
     finish : Ability_Finish,
-    data : Ability_Data,
     draw : Ability_Draw,
+
+    data : Ability_Data,
+}
+
+Casting_Visualizer :: struct{
+    tick : f32,
+    current_tick : f32,
+    draw : Ability_Draw,
+    can_show : bool,
 }
 
 Ability_Cooldown :: struct{
@@ -63,21 +79,24 @@ Ability_Projectile :: struct{
     speed : f32,
     dir : rl.Vector2,
     target_pos : rl.Vector2,
-    data : Enemy_Ability_Data,
     draw : Ability_Projectile_Draw,
 }
 
-no_indicator_update :: proc(dt : f32){
-    game.player.ability.activated = true
+no_indicator_update :: proc(a : ^Ability, dt : f32){
+    a.casting = true
+    a.indicator_active = false
+    a.cast_timer.cooldown = a.cast_timer.cast_rate
 }
-no_activate :: proc(dt : f32){
-    game.player.ability.active = true
-    game.player.ability.activated = false
-    game.player.ability.indicator_active = false
+no_activate :: proc(a : ^Ability, dt : f32){
+    // a.active = true
+    // a.activated = false
+    // a.indicator_active = false
 }
-no_update :: proc(dt : f32){}
-no_finish :: proc(dt : f32){}
-no_draw :: proc(){}
+no_update :: proc(a : ^Ability, dt : f32){
+    a.finished = true
+}
+no_finish :: proc(a : ^Ability, dt : f32){}
+no_draw :: proc(a : Ability){}
 
 switch_ability :: proc(){
     switch game.player.current_ability{

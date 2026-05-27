@@ -21,6 +21,9 @@ create_standard_radial_liberation :: proc() -> Ability{
         cd = {
             cast_rate = 5,
         },
+        cast_timer = {
+            cast_rate = 0,
+        },
         indicator = no_indicator_update,
         activate = radial_liberation_activate,
         update = no_update,
@@ -33,7 +36,7 @@ create_standard_radial_liberation :: proc() -> Ability{
     }
 }
 
-radial_liberation_activate :: proc(dt : f32){
+radial_liberation_activate :: proc(a : ^Ability, dt : f32){
     data := game.player.ability.data.(Radial_Liberation_Data)
     for i in 0..<data.amount{
         angle := f32(i) * (rl.PI * 2.0 / f32(data.amount))

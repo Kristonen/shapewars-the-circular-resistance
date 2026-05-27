@@ -120,6 +120,7 @@ get_upgrade_target :: proc() {
             game.player.current_ability = .Dash
         case Bomb_Data:
             game.player.current_ability = .Bomb
+        case Reinforcment_Data:
     }
 }
 
