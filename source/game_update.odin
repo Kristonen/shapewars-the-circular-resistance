@@ -440,7 +440,7 @@ update_enemy_status :: proc(e : ^Enemy, dt : f32){
 }
 
 update_enemy_ability :: proc(e : ^Enemy, dt : f32){
-    data, ok := e.behavior.(Boss_Data)
+    data, ok := &e.behavior.(Boss_Data)
     if !ok do return
 
     for &s in data.abilities{
