@@ -258,6 +258,7 @@ update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavi
     }
 
     if a.cast_timer.cooldown > 0{
+        update_casting_visualizer(&a.cast_visualizer, dt)
         a.cast_timer.cooldown -= dt
     }
 
@@ -275,6 +276,7 @@ update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavi
     } else{
         if a.cd.cooldown <= 0 && !a.active && !a.casting{
             data := &d.(Boss_Data)
+            if data.is_casting do return
             a.indicator(a, dt)
             data.is_casting = true
         }
@@ -451,6 +453,17 @@ update_enemy_ability :: proc(e : ^Enemy, dt : f32){
             case Reinforcment_Data:
                 d.pos = e.origin
         }
+    }
+}
+
+update_casting_visualizer :: proc(cv : ^Casting_Visualizer, dt : f32){
+    cv.can_show = false
+    if cv.current_tick >= 0{
+        cv.current_tick -= dt
+    }
+    if cv.current_tick <= 0{
+        cv.can_show = true
+        cv.current_tick = cv.tick
     }
 }
 

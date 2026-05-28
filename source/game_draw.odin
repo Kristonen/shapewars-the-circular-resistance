@@ -129,6 +129,24 @@ draw_enemies :: proc(){
         if game.helper_activated{
             draw_collider_rect(e.collidor)
         }
+
+        switch d in e.behavior{
+            case Melee_Data:
+            case Distance_Data:
+            case Charge_Data:
+            case Boss_Data:
+                for s in d.abilities{
+                    if !s.active do break
+                    if s.ability.cast_visualizer.can_show do s.ability.cast_visualizer.draw(e.origin)
+                }
+        }
+
+    }
+}
+
+draw_ability_projectiles :: proc(){
+    for ap in game.level.ability_projectiles{
+        ap.draw(ap)
     }
 }
 

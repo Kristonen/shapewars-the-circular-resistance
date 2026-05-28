@@ -26,12 +26,17 @@ create_test_boss :: proc() -> Enemy{
     }
     data : Boss_Data
     data.abilities[0].active = true
+    data.abilities[1].active = true
     a := &data.abilities[0].ability
     a.cd = {
         cast_rate = 10,
     }
     a.cast_timer = {
-        cast_rate = 2,
+        cast_rate = 5,
+    }
+    a.cast_visualizer ={
+        tick = 0.2,
+        draw = draw_reinforcment,
     }
 
     a.indicator = no_indicator_update
@@ -41,6 +46,17 @@ create_test_boss :: proc() -> Enemy{
 
     a.data = Reinforcment_Data{}
 
+    b := &data.abilities[1].ability
+    b.cd.cast_rate = 3
+    b.cast_timer.cast_rate = 1
+    b.cast_visualizer.tick = 0.2
+    b.cast_visualizer.draw = no_casting_draw
+
+    b.indicator = no_indicator_update
+    b.activate = activate_bombardment
+    b.update = no_update
+    b.finish = no_finish
+
     e.behavior = data
     e.knocback.apply = apply_no_knockback
     e.behave = test_boss_behavior
@@ -48,7 +64,7 @@ create_test_boss :: proc() -> Enemy{
     return e
 }
 
-activate_bombardment :: proc(b : ^Enemy, data : Ability_Data){
+activate_bombardment :: proc(a : ^Ability, dt : f32){
     for _ in 0..<5{
         x := f32(rl.GetRandomValue(-150, 150))
         y := f32(rl.GetRandomValue(- 150, 150))

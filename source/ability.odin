@@ -15,6 +15,7 @@ Ability_Update :: #type proc(a : ^Ability, dt : f32)
 Ability_Activate :: #type proc(a : ^Ability, dt : f32)
 Ability_Finish :: #type proc(a : ^Ability, dt : f32)
 Ability_Draw :: #type proc(a : Ability)
+Cast_Draw :: #type proc(pos : rl.Vector2)
 
 Ability_Projectile_Draw :: #type proc(p : Ability_Projectile)
 
@@ -23,6 +24,8 @@ Ability :: struct{
     cd : Ability_Cooldown,
     //Timer for how long it takes to cast the ability
     cast_timer : Ability_Cooldown,
+
+    cast_visualizer : Casting_Visualizer,
 
     indicator_active : bool,
     activated : bool,
@@ -42,7 +45,7 @@ Ability :: struct{
 Casting_Visualizer :: struct{
     tick : f32,
     current_tick : f32,
-    draw : Ability_Draw,
+    draw : Cast_Draw,
     can_show : bool,
 }
 
@@ -97,6 +100,7 @@ no_update :: proc(a : ^Ability, dt : f32){
 }
 no_finish :: proc(a : ^Ability, dt : f32){}
 no_draw :: proc(a : Ability){}
+no_casting_draw :: proc(pos : rl.Vector2){}
 
 switch_ability :: proc(){
     switch game.player.current_ability{

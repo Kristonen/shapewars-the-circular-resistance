@@ -238,6 +238,7 @@ draw_game :: proc(){
         if game.map_drawing{
             draw_map()
         }
+        draw_ability_projectiles()
         draw_area_effects()
         draw_fragments()
         draw_player_indicator()
