@@ -15,3 +15,10 @@ Cooldown_Shader :: struct{
     shader : rl.Shader,
     progress_loc : i32,
 }
+
+Dissolve_Shader :: struct{
+    shader : rl.Shader,
+    time_loc : i32,
+    radius_loc : i32,
+    center_loc : i32,
+}

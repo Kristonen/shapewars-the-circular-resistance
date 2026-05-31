@@ -120,6 +120,7 @@ Game_State :: struct{
     fbo : rl.RenderTexture,
     glow : Glow_Shader,
     cd_shader : Cooldown_Shader,
+    dissolve : Dissolve_Shader,
     // glow_shader : rl.Shader,
     // intensity_loc : i32,
 }

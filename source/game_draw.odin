@@ -170,11 +170,20 @@ draw_fragments :: proc(){
 }
 
 draw_area_effects :: proc(){
-    for a in game.level.area_effects{
+    for &a in game.level.area_effects{
+        rl.BeginShaderMode(game.dissolve.shader)
+        current_time := f32(rl.GetTime())
         alpha := (a.duration/a.max_duration)
         color := rl.LIME
         color.a = u8(alpha*255)
+        
+        rl.SetShaderValue(game.dissolve.shader, game.dissolve.time_loc, &current_time, .FLOAT)
+        rl.SetShaderValue(game.dissolve.shader, game.dissolve.radius_loc, &a.radius, .FLOAT)
+        rl.SetShaderValue(game.dissolve.shader, game.dissolve.center_loc, &a.pos, .VEC2)
+
         rl.DrawCircleV(a.pos, a.radius, color)
+        rl.EndShaderMode()
+        
     }
 }
 
