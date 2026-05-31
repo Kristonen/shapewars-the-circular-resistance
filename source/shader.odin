@@ -10,3 +10,8 @@ Glow_Shader :: struct{
     shader : rl.Shader,
     intensity_loc : i32,
 }
+
+Cooldown_Shader :: struct{
+    shader : rl.Shader,
+    progress_loc : i32,
+}

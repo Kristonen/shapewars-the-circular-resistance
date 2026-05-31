@@ -12,6 +12,9 @@ init_skilltrees :: proc(){
 init_shaders :: proc(){
     game.glow.shader = rl.LoadShader(nil, "assets/shaders/glow.glsl")
     game.glow.intensity_loc = rl.GetShaderLocation(game.glow.shader, "intensity")
+
+    game.cd_shader.shader = rl.LoadShader(nil, "assets/shaders/cooldown.glsl")
+    game.cd_shader.progress_loc = rl.GetShaderLocation(game.cd_shader.shader, "cooldownProgress")
 }
 
 init_unlockables :: proc(){

@@ -354,10 +354,19 @@ draw_progress_bar :: proc(bar : ui.UI_Progress_Bar){
 }
 
 draw_cooldown :: proc(cd : ui.UI_Cooldown){
-    rl.DrawRectangleV({cd.rec.x, cd.rec.y}, {cd.rec.width, cd.rec.height}, rl.BLACK)
-    color := rl.Color{255, 255, 255, 100}
-    height := cd.rec.height * (cd.value/cd.max)
-    rl.DrawRectangleV({cd.rec.x, cd.rec.y}, {cd.rec.width, height}, color)
+    // rl.DrawRectangleV({cd.rec.x, cd.rec.y}, {cd.rec.width, cd.rec.height}, rl.BLACK)
+    // rl.DrawRectangleRec(cd.rec, rl.BLACK)
+    // color := rl.Color{255, 255, 255, 100}
+    // height := cd.rec.height * (cd.value/cd.max)
+    // rl.DrawRectangleV({cd.rec.x, cd.rec.y}, {cd.rec.width, height}, color)
+    // rl.DrawRectangleRec(cd.rec, color)
+
+    progress := cd.value / cd.max
+
+    rl.SetShaderValue(game.cd_shader.shader, game.cd_shader.progress_loc, &progress, .FLOAT)
+    rl.BeginShaderMode(game.cd_shader.shader)
+    rl.DrawRectangleRec(cd.rec, rl.BLACK)
+    rl.EndShaderMode()
 }
 
 draw_collider_circle :: proc(c : collider.Collider_Circle){

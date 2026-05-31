@@ -119,6 +119,7 @@ Game_State :: struct{
     //Test
     fbo : rl.RenderTexture,
     glow : Glow_Shader,
+    cd_shader : Cooldown_Shader,
     // glow_shader : rl.Shader,
     // intensity_loc : i32,
 }
