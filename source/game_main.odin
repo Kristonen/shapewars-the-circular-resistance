@@ -443,7 +443,15 @@ sync_menu :: proc(){
             }
             for i in 0..<len(game.unlockables){
                 text := game.unlockables[i].name
+                not_buyable := !game.unlockables[i].unlocked && game.unlockables[i].blueprints == 0
+                
                 btn := ui.create_button(text, rec, on_click_select_craftable, game.unlockables[i].data)
+
+                if not_buyable{
+                    btn.text.content = "???"
+                    btn.disabled = true   
+                }
+
                 btn.text.font_size = 25
                 append(&game.menu.elements, btn)
                 rec.y += 160
