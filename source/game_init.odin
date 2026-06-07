@@ -16,7 +16,7 @@ init_shaders :: proc(){
     game.cd_shader.shader = rl.LoadShader(nil, "assets/shaders/cooldown.glsl")
     game.cd_shader.progress_loc = rl.GetShaderLocation(game.cd_shader.shader, "cooldownProgress")
 
-    game.dissolve.shader = rl.LoadShader(nil, "assets/shaders/test.glsl")
+    game.dissolve.shader = rl.LoadShader(nil, "assets/shaders/area_effect.glsl")
     game.dissolve.time_loc = rl.GetShaderLocation(game.dissolve.shader, "time")
     game.dissolve.radius_loc = rl.GetShaderLocation(game.dissolve.shader, "radius")
     game.dissolve.center_loc = rl.GetShaderLocation(game.dissolve.shader, "centerPos")
