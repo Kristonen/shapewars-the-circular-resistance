@@ -3,66 +3,18 @@ package game
 import rl "vendor:raylib"
 
 create_health_upgrades :: proc(a : ^[dynamic]Upgrade){
-    common_m := create_max_health_upgrade("Better Nutrition", "Increase the life by 10.", 10.0, .Additive, .Common)
-    common_c := create_current_health_upgrade("Medicine", "Heals you by 5.", 5, .Additive, .Common)
-    rare := create_max_health_upgrade("Survival Lesson", "Increase the life by 10%", 1.1, .Multiplicative, .Rare)
-    legendary := create_current_health_upgrade("Holy Water", "Heals you by 100.", 100, .Additive, .Legendary)
+    common_m := create_upgrade("Better Nutrition", "Increase the life by 10.", 10.0, .Additive, .Common)
+    common_m.apply = apply_max_health_upgrade
+    common_c := create_upgrade("Medicine", "Heals you by 5.", 5, .Additive, .Common)
+    common_c.apply = apply_current_health_upgrade
+    rare := create_upgrade("Survival Lesson", "Increase the life by 10%", 1.1, .Multiplicative, .Rare)
+    rare.apply = apply_max_health_upgrade
+    legendary := create_upgrade("Holy Water", "Heals you by 100.", 100, .Additive, .Legendary)
+    legendary.apply = apply_current_health_upgrade
     append(a, common_m)
     append(a, common_c)
     append(a, rare)
     append(a, legendary)
-}
-
-create_max_health_upgrade :: proc(name : string, desc : string, 
-    value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    
-    return {
-        name = {
-            content = name,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE,
-        },
-        desc = {
-            content = desc,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE
-        },
-        value = value,
-        type = type,
-        rarity = rarity,
-        target = .NormalBullet,
-        apply = apply_max_health_upgrade,
-    }
-}
-
-create_current_health_upgrade :: proc(name : string, desc : string, 
-    value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    
-    return {
-        name = {
-            content = name,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE,
-        },
-        desc = {
-            content = desc,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE
-        },
-        value = value,
-        type = type,
-        rarity = rarity,
-        target = .NormalBullet,
-        apply = apply_current_health_upgrade,
-    }
 }
 
 apply_current_health_upgrade :: proc(u : Upgrade){

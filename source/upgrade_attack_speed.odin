@@ -3,34 +3,12 @@ package game
 import rl "vendor:raylib"
 
 create_as_upgrades :: proc(a : ^[dynamic]Upgrade){
-    uncommon := create_as_upgrade("MORE", "Increase the attack speed by 5%", 0.95, .Multiplicative, .Uncommon)
-    rare := create_as_upgrade("AND MORE", "Increase the attack speed by 10%", 0.90, .Multiplicative, .Rare)
+    uncommon := create_upgrade("MORE", "Increase the attack speed by 5%", 0.95, .Multiplicative, .Uncommon)
+    uncommon.apply = apply_attack_speed_upgrade
+    rare := create_upgrade("AND MORE", "Increase the attack speed by 10%", 0.90, .Multiplicative, .Rare)
+    rare.apply = apply_attack_speed_upgrade
     append(a, uncommon)
     append(a, rare)
-}
-
-create_as_upgrade :: proc(name : string, desc : string, value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    return {
-        name = {
-            content = name,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE,
-        },
-        desc = {
-            content = desc,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE
-        },
-        value = value,
-        type = type,
-        rarity = rarity,
-        target = .NormalBullet,
-        apply = apply_attack_speed_upgrade,
-    }
 }
 
 apply_attack_speed_upgrade :: proc(u : Upgrade){

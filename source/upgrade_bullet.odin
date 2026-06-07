@@ -3,9 +3,9 @@ package game
 import rl "vendor:raylib"
 
 create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
-    common := create_bullet_upgrade("Faster projectile", "Increase the speed of your bullet by 25.", 25, .Additive, .Common)
-    legendary := create_bullet_upgrade("Pierce Bullet", "Bullets will not destroy on hit.", true, .Toogle, .Legendary)
-    epic := create_bullet_upgrade("Multishot", "Add one bullet to your primary shotting.", 1, .Additive, .Epic)
+    common := create_upgrade("Faster projectile", "Increase the speed of your bullet by 25.", 25, .Additive, .Common)
+    legendary := create_upgrade("Pierce Bullet", "Bullets will not destroy on hit.", true, .Toogle, .Legendary)
+    epic := create_upgrade("Multishot", "Add one bullet to your primary shotting.", 1, .Additive, .Epic)
     common.apply = apply_speed_upgrade
     legendary.apply = apply_pierce_upgrade
     legendary.max_used = 1
@@ -13,29 +13,6 @@ create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
     append(a, common)
     append(a, epic)
     append(a, legendary)
-}
-
-create_bullet_upgrade :: proc(name : string, desc : string, value : Upgrade_Value, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    return {
-        name = {
-            content = name,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE,
-        },
-        desc = {
-            content = desc,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE
-        },
-        value = value,
-        texture = rl.BLACK,
-        rarity = rarity,
-        type = type,
-    }
 }
 
 apply_pierce_upgrade :: proc(u : Upgrade){

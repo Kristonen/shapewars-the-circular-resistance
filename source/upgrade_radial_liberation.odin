@@ -3,10 +3,12 @@ package game
 import rl "vendor:raylib"
 
 create_rl_upgrades :: proc(a : ^[dynamic]Upgrade){
-    epic := create_rl_upgrade("More Bullets", "Increase the amount of bullets by 2.", 2, .Additive, .Epic)
-    uncommon := create_rl_upgrade("Radical Damage", "Increase the damage of your ability by 5.", 5, .Additive, .Uncommon)
-    rare := create_rl_upgrade("Synthetic Power", "Decrease the cd by 5%", 0.95, .Multiplicative, .Rare)
-    legendary := create_rl_upgrade("Radial Vampire", "Bullets from the ability, have now lifesteal", true, .Toogle, .Legendary)
+    epic := create_upgrade("More Bullets", "Increase the amount of bullets by 2.", 2, .Additive, .Epic)
+    uncommon := create_upgrade("Radical Damage", "Increase the damage of your ability by 5.", 5, .Additive, .Uncommon)
+    rare := create_upgrade("Synthetic Power", "Decrease the cd by 5%", 0.95, .Multiplicative, .Rare)
+    legendary := create_upgrade("Radial Vampire", "Bullets from the ability, have now lifesteal", true, .Toogle, .Legendary)
+
+    epic.target = .Radial_Liberation
     
     epic.apply = apply_rl_amount_upgrade
     uncommon.apply = apply_rl_dmg_upgrade
@@ -19,32 +21,6 @@ create_rl_upgrades :: proc(a : ^[dynamic]Upgrade){
     append(a, rare)
     append(a, legendary)
 }
-
-create_rl_upgrade :: proc(name : string, desc : string,
-    value : Upgrade_Value, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    
-    return{
-        name = {
-            content = name,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE,
-        },
-        desc = {
-            content = desc,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE
-        },
-        value = value,
-        type = type,
-        rarity = rarity,
-        target = .Radial_Liberation,
-    }
-}
-
 apply_rl_cd_upgrade :: proc(u : Upgrade){
     stat := &get_ability_cd().cast_rate
     // stat := &game.player.ability_cd.cast_rate

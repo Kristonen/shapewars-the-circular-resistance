@@ -3,62 +3,15 @@ package game
 import rl "vendor:raylib"
 
 create_dmg_upgrades :: proc(a : ^[dynamic]Upgrade){
-    uncommon := create_dmg_upgrade("Circle improvement", "Increase the damage by 5.", 5, .Additive, .Uncommon)
-    epic := create_dmg_upgrade("Circular Engineering", "Increase damage by 25%.", 1.25, .Multiplicative, .Epic)
-    ls_epic := create_ls_upgrade("Bloodthirsty", "Increase the lifesteal by 0.01", 0.01, .Additive, .Epic)
+    uncommon := create_upgrade("Circle improvement", "Increase the damage by 5.", 5, .Additive, .Uncommon)
+    uncommon.apply = apply_dmg_upgrade
+    epic := create_upgrade("Circular Engineering", "Increase damage by 25%.", 1.25, .Multiplicative, .Epic)
+    epic.apply = apply_dmg_upgrade
+    ls_epic := create_upgrade("Bloodthirsty", "Increase the lifesteal by 0.01", 0.01, .Additive, .Epic)
+    ls_epic.apply = apply_lifesteal_upgrade
     append(a, uncommon)
     append(a, epic)
     append(a, ls_epic)
-}
-
-create_dmg_upgrade :: proc(name : string, desc : string, value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    return{
-        name = {
-            content = name,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE,
-        },
-        desc = {
-            content = desc,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE
-        },
-        value = value,
-        texture = rl.BLACK,
-        rarity = rarity,
-        target = .NormalBullet,
-        type = type,
-        apply = apply_dmg_upgrade,
-    }
-}
-
-create_ls_upgrade :: proc(name : string, desc : string, value : f32, type : Upgrade_Type, rarity : Rarity) -> Upgrade{
-    return{
-        name = {
-            content = name,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE,
-        },
-        desc = {
-            content = desc,
-            halign = .Center,
-            valign = .Center,
-            font_size = 30,
-            text_color = rl.WHITE
-        },
-        value = value,
-        texture = rl.BLACK,
-        rarity = rarity,
-        target = .NormalBullet,
-        type = type,
-        apply = apply_lifesteal_upgrade,
-    }
 }
 
 apply_dmg_upgrade :: proc(u : Upgrade){
