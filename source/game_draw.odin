@@ -26,6 +26,7 @@ draw_player :: proc(){
         draw_collider_circle(game.player.physics_collider)
         draw_collider_circle(game.player.hurt_collider)
         draw_collider_circle(game.player.collector)
+        draw_collider_circle(game.player.loot_detector)
     }
 }
 
@@ -192,7 +193,6 @@ draw_loot :: proc(){
         rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
         // rl.DrawRectangleRec(l.rec, l.color)
         if game.helper_activated{
-            draw_collider_circle(l.detection)
             draw_collider_circle(l.pickup)
         }
     }

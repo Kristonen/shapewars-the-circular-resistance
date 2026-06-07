@@ -216,7 +216,7 @@ check_collisions_detection_loot :: proc(){
             continue
         }
 
-        if rl.CheckCollisionCircles(l.detection.pos, l.detection.radius, game.player.pos, game.player.radius){
+        if rl.CheckCollisionCircles(l.pickup.pos, l.pickup.radius, game.player.loot_detector.pos, game.player.loot_detector.radius){
             l.state = .Following
         }
         i += 1

@@ -90,7 +90,7 @@ spawn_shards_around_chest :: proc(){
             width = 10,
             height = 10,
         }
-        shard.detection.radius = shard.rec.width * 6
+        // shard.detection.radius = shard.rec.width * 6
         shard.pickup.radius = shard.rec.width/4
         shard.time = duration
         shard.color = rl.SKYBLUE

@@ -51,7 +51,9 @@ Player :: struct {
 
     hurt_collider : cl.Collider_Circle,
     collector : cl.Collider_Circle,
+    loot_detector : cl.Collider_Circle,
     physics_collider : cl.Collider_Circle,
+
 
     ignore_input : bool,
 
@@ -90,6 +92,10 @@ create_player :: proc() -> Player{
     p.hurt_collider = {
         radius = p.radius * 0.75,
         pos = p.pos
+    }
+    p.loot_detector = {
+        radius = p.radius * 4,
+        pos = p.pos,
     }
     return p
 }

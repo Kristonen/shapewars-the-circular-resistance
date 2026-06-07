@@ -22,7 +22,7 @@ Loot :: struct{
     // pos : rl.Vector2,
     // size : rl.Vector2,
     value : f32,
-    detection : cl.Collider_Circle,
+    // detection : cl.Collider_Circle,
     pickup : cl.Collider_Circle,
     color : rl.Color,
 
@@ -92,8 +92,8 @@ give_shard_everything :: proc(shard : ^Loot, pos : rl.Vector2){
     shard.rec.y = pos.y
     shard.rec.width = 20
     shard.rec.height = 20
-    shard.detection.pos = {shard.rec.x + shard.rec.width/2, shard.rec.y + shard.rec.height/2}
-    shard.detection.radius = shard.rec.width * 6
+    // shard.detection.pos = {shard.rec.x + shard.rec.width/2, shard.rec.y + shard.rec.height/2}
+    // shard.detection.radius = shard.rec.width * 6
     shard.pickup.pos = {shard.rec.x + shard.rec.width/2, shard.rec.y + shard.rec.height/2}
     shard.pickup.radius = shard.rec.width / 4
     shard.on_collect = on_shard_collect
@@ -139,6 +139,6 @@ on_normal_spawn :: proc(l : ^Loot, dt : f32){
     }
     l.rec.x += l.dir.x * l.speed * dt
     l.rec.y += l.dir.y * l.speed * dt
-    l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+    // l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
     l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
 }

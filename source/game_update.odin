@@ -121,6 +121,7 @@ update_player :: proc(dt : f32){
     game.player.hurt_collider.pos = game.player.pos
     game.player.collector.pos = game.player.pos
     game.player.physics_collider.pos = game.player.pos
+    game.player.loot_detector.pos = game.player.pos
     
     //Other player update stuff
     update_player_status(dt)
@@ -585,7 +586,7 @@ update_loot :: proc(dt : f32){
         pos : rl.Vector2 = {l.rec.x, l.rec.y} + dir * l.current_speed * dt
         l.rec.x = pos.x
         l.rec.y = pos.y
-        l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
+        // l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
         l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
         i += 1
     }
