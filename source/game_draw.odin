@@ -23,10 +23,10 @@ draw_player :: proc(){
         rl.DrawCircleLinesV(game.player.ghosts[i].pos, game.player.radius, black)
     }
     if game.helper_activated{
-        draw_collider_circle(game.player.physics_collider)
-        draw_collider_circle(game.player.hurt_collider)
-        draw_collider_circle(game.player.collector)
-        draw_collider_circle(game.player.loot_detector)
+        draw_collider(game.player.physics_collider)
+        draw_collider(game.player.hurt_collider)
+        draw_collider(game.player.collector)
+        draw_collider(game.player.loot_detector)
     }
 }
 
@@ -43,7 +43,7 @@ draw_npc :: proc(){
     for n in game.level.npcs{
         rl.DrawCircleV(n.pos, n.radius, n.texture)
         if game.helper_activated{
-            draw_collider_circle(n.interactable.collider)
+            draw_collider(n.interactable.collider)
         }
     }
 }
@@ -99,14 +99,14 @@ draw_bullet :: proc(){
     for b in game.level.player_bullets{
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if game.helper_activated{
-            draw_collider_circle(b.collider)
+            draw_collider(b.collider)
         }
     }
 
     for b in game.level.enemy_bullets{
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if game.helper_activated{
-            draw_collider_circle(b.collider)
+            draw_collider(b.collider)
         }
     }
 }
@@ -128,7 +128,7 @@ draw_enemies :: proc(){
         }
         draw_progress_bar(e.health_bar)
         if game.helper_activated{
-            draw_collider_rect(e.collidor)
+            draw_collider(e.collidor)
         }
 
         switch d in e.behavior{
@@ -160,7 +160,7 @@ draw_portal :: proc(){
     source_rec := get_animation_frame(game.level.portal.animation, 4)
     rl.DrawTexturePro(game.level.portal.texture, source_rec, {pos.x - 32, pos.y - 32, 64, 65}, {}, 0, rl.WHITE)
     if game.helper_activated{
-        draw_collider_circle(game.level.portal.interact.collider)
+        draw_collider(game.level.portal.interact.collider)
     }
 }
 
@@ -193,7 +193,7 @@ draw_loot :: proc(){
         rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
         // rl.DrawRectangleRec(l.rec, l.color)
         if game.helper_activated{
-            draw_collider_circle(l.pickup)
+            draw_collider(l.pickup)
         }
     }
 }
@@ -201,7 +201,7 @@ draw_loot :: proc(){
 draw_chest :: proc(){
     rl.DrawCircleV(game.level.chest.pos, 24, game.level.chest.texture)
     if game.helper_activated{
-        draw_collider_circle(game.level.chest.interact.collider)
+        draw_collider(game.level.chest.interact.collider)
     }
 }
 
@@ -376,6 +376,11 @@ draw_cooldown :: proc(cd : ui.UI_Cooldown){
     rl.BeginShaderMode(game.cd_shader.shader)
     rl.DrawRectangleRec(cd.rec, rl.BLACK)
     rl.EndShaderMode()
+}
+
+draw_collider :: proc{
+    draw_collider_circle,
+    draw_collider_rect,
 }
 
 draw_collider_circle :: proc(c : collider.Collider_Circle){
