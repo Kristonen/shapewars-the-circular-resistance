@@ -61,12 +61,12 @@ Player :: struct {
     ghost_timer : f32,
 }
 
-create_player :: proc() -> Player{
-    p := Player{
+init_player :: proc(){
+    game.player = {
         speed = 400,
         radius = 32,
-        weapon = create_normal_weapon(),
         current_weapon = .NormalBullet,
+        weapon = {},
         health = {
           current = 100,
           max = 100, 
@@ -81,23 +81,22 @@ create_player :: proc() -> Player{
             increase_value = increase_value,
         },
     }
-    p.physics_collider = {
-        radius = p.radius,
-        pos = p.pos
+    game.player.physics_collider = {
+        radius = game.player.radius,
+        pos = game.player.pos
     }
-    p.collector = {
-        radius = p.radius * 0.5,
-        pos = p.pos,
+    game.player.collector = {
+        radius = game.player.radius * 0.5,
+        pos = game.player.pos,
     }
-    p.hurt_collider = {
-        radius = p.radius * 0.75,
-        pos = p.pos
+    game.player.hurt_collider = {
+        radius = game.player.radius * 0.75,
+        pos = game.player.pos
     }
-    p.loot_detector = {
-        radius = p.radius * 4,
-        pos = p.pos,
+    game.player.loot_detector = {
+        radius = game.player.radius * 4,
+        pos = game.player.pos,
     }
-    return p
 }
 
 increase_value :: proc(bag : ^Loot_Bag, value : f32){

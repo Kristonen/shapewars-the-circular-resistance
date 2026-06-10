@@ -48,7 +48,6 @@ main :: proc(){
             zoom = 1,
             offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
         },
-        player = create_player(),
         helper_activated = false,
         current_menu = .Play,
         create_hit_particle = create_hit_particles,
@@ -139,6 +138,8 @@ main :: proc(){
     game.level.portal.texture = rl.LoadTexture("assets/portal.png")
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
+
+    //Game Loop
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
 
@@ -152,6 +153,7 @@ main :: proc(){
     }
 }
 init_game :: proc(){
+    init_player()
     init_skilltrees()
     init_shaders()
     init_unlockables()

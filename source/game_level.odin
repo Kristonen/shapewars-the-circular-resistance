@@ -97,19 +97,6 @@ create_start_level :: proc(){
     } else{
         panic("Map could not load")
     }
-
-    chest := create_chest({0, 0})
-    game.level.chest = chest
-
-    area := Area_Effect{
-        pos = {0, 0},
-        radius = 100,
-        duration = 10,
-        max_duration = 10,
-        trigger = on_area_poison_trigger
-    }
-
-    append(&game.level.area_effects, area)
 }
 
 create_first_test_level :: proc(){
