@@ -7,6 +7,7 @@ import cl "collider"
 import "ui"
 
 Enemy_Hit_Time :: 0.1
+Enemy_Hurt_Sound_Path :: "assets/audio/standard_hurt.wav"
 
 Behavior :: #type proc(e : ^Enemy, b : ^Behavior_Data, dt : f32)
 On_Hit :: #type proc(e : ^Enemy, dmg : f32)
@@ -60,6 +61,8 @@ Enemy :: struct {
     spawner : rawptr,
 
     hit_timer : f32,
+
+    hurt_sound : rl.Sound,
 
     on_hit : On_Hit,
     on_death : On_Death,
@@ -225,11 +228,14 @@ create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy
         on_death = on_death,
     }
     e.collidor.rec = rec
+    e.hurt_sound = rl.LoadSound(Enemy_Hurt_Sound_Path)
+    rl.SetSoundVolume(e.hurt_sound, 0.15)
     return e
 }
 
 on_hit :: proc(e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
+    play_sound_varied(e.hurt_sound, 0.5, 1.5)
     game.create_hit_particle(e.rec)
     e.knocback->apply(game.player.pos, &e.rec)
     e.health->take_dmg(dmg)

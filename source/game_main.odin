@@ -16,6 +16,7 @@ import "ui"
 main :: proc(){
     
     rl.InitWindow(1920, 1080, "Shapewars: The Circular Resistance")
+    rl.InitAudioDevice()
     rl.SetWindowState({.WINDOW_RESIZABLE})
     rl.SetTargetFPS(500)
     rl.SetExitKey(.KEY_NULL)
