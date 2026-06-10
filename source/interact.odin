@@ -12,6 +12,7 @@ Interactable :: struct{
 //Interaction with the portal
 portal_interact :: proc(){
     game.level.portal.active = false
+    game.level.state = .Ongoing
     create_level(.HQ)
 }
 //Interaction with the gunsmith

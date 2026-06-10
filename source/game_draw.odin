@@ -336,6 +336,16 @@ draw_in_game_ui :: proc(){
         valign = .Center,
     }
     draw_better_text(text, rec)
+
+    if game.level.state == .Finished{
+        rec.x = f32(rl.GetScreenWidth()/2) - 300
+        rec.y = f32(rl.GetScreenHeight()) * 0.80
+        rec.width = 600
+        rec.height = 100
+        text.content = "Press T to call the portal"
+        text.font_size = 30
+        draw_better_text(text, rec)
+    }
 }
 
 draw_interact :: proc(){

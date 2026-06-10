@@ -69,6 +69,10 @@ update_handler :: proc(dt : f32){
         sync_menu()
     }
 
+    if rl.IsKeyPressed(.T) && game.level.state == .Finished{
+        activate_portal(game.player.pos + {100, 100})
+    }
+
     if rl.IsKeyPressed(.H){
         create_level(.HQ)
     }

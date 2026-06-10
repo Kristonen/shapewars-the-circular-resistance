@@ -11,6 +11,10 @@ Level_Type :: enum{
     HQ, Battlefield, Forest, Test, Boss_Test
 }
 
+Level_State :: enum{
+    Ongoing, Finished
+}
+
 Level_Data :: struct{
     spawner : [dynamic]Spawner,
     enemies : [dynamic]Enemy,
@@ -40,7 +44,7 @@ Level_Data :: struct{
     ui_elements : [dynamic]ui.UI_Element,
     interact : ui.UI_Interact,
     level_visual : m.Tiled_Map,
-    completed : bool,
+    state : Level_State,
 }
 
 create_level :: proc(type : Level_Type){
