@@ -133,7 +133,7 @@ main :: proc(){
         interactable = nil,
     }
     create_upgrades(&game.level.upgrade_pool)
-    fill_available_upgrades()
+    // fill_available_upgrades()
     game.level.portal = create_portal({0, 0})
     game.level.portal.texture = rl.LoadTexture("assets/portal.png")
     

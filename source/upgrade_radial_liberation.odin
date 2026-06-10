@@ -9,6 +9,9 @@ create_rl_upgrades :: proc(a : ^[dynamic]Upgrade){
     legendary := create_upgrade("Radial Vampire", "Bullets from the ability, have now lifesteal", true, .Toogle, .Legendary)
 
     epic.target = .Radial_Liberation
+    uncommon.target = .Radial_Liberation
+    legendary.target = .Radial_Liberation
+    rare.target = .Radial_Liberation
     
     epic.apply = apply_rl_amount_upgrade
     uncommon.apply = apply_rl_dmg_upgrade

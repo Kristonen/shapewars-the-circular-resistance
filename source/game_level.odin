@@ -53,6 +53,7 @@ create_level :: proc(type : Level_Type){
 
     if game.current_level != .HQ{
         game.shards += game.player.loot_bag.full_value
+        fill_available_upgrades()
     }
 
     reset_loot_bag(&game.player.loot_bag)

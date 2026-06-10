@@ -58,7 +58,7 @@ update_handler :: proc(dt : f32){
         game.map_drawing = !game.map_drawing
     }
 
-    if rl.IsKeyPressed(.U){
+    if rl.IsKeyPressed(.U) && game.current_level != .HQ{
         game.level.power_level_up = true
         create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
     }
