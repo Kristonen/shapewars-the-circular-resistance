@@ -222,35 +222,7 @@ update_player_shooting :: proc(dt : f32){
 }
 
 update_player_casting :: proc(dt : f32){
-    // cd := get_ability_cd()
-    // if cd.cooldown > 0{
-    //     cd.cooldown -= dt
-    // }
-
-    // if game.player.ability.indicator_active{
-    //     game.player.ability.indicator(&game.player.ability, dt)
-    // }
-
-    // if rl.IsKeyPressed(.SPACE) && cd.cooldown <= 0 && !game.player.ability.active && !game.player.ability.casting{
-    //     // game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
-    //     // game.player.ability.activate(dt)
-    //     game.player.ability.indicator_active = true
-    // }
-
     update_ability(&game.player.ability, dt, .Player)
-
-    // if game.player.ability.activated{
-    //     game.player.ability.indicator_active = false
-    //     game.player.ability.activated = false
-    //     game.player.ability.active = true
-    //     game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
-    //     game.player.ability.activate(dt)
-    //     game.level.indicator = nil
-    // }
-
-    // if game.player.ability.active{
-    //     game.player.ability.update(dt)
-    // }
 }
 
 update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavior_Data = nil){
@@ -271,8 +243,6 @@ update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavi
         }
 
         if rl.IsKeyPressed(.SPACE) && a.cd.cooldown <= 0 && !a.active && !a.casting{
-            // game.player.ability.cd.cooldown = game.player.ability.cd.cast_rate
-            // game.player.ability.activate(dt)
             a.indicator_active = true
         }
     } else{
