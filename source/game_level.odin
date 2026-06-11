@@ -79,6 +79,7 @@ create_level :: proc(type : Level_Type){
 refresh_player :: proc(){
     game.player.health.max = 100
     game.player.health.current = 100
+    game.player.loot_detector.radius = game.player.radius * 4
     clear(&game.player.weapon.bullet.hitted_enemies)
     switch_weapon()
     switch_ability()
