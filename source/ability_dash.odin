@@ -57,7 +57,7 @@ dash_update :: proc(a : ^Ability, dt : f32){
         }
     } else {
         game.player.ability.active = false
-        dash_finish(a, dt)
+        // dash_finish(a, dt)
     }
 }
 
