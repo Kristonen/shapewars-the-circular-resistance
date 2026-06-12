@@ -8,6 +8,10 @@ Ability_Data :: union {
     Radial_Liberation_Data, Dash_Data, Bomb_Data, Reinforcment_Data
 }
 
+Ability_State :: enum{
+    None, Using, Charging, Activated, Executing, Finished
+}
+
 Ability_Owner :: enum {Player, Enemy}
 
 Ability_Indicator_Update :: #type proc(a : ^Ability, dt : f32)
@@ -21,17 +25,13 @@ Ability_Projectile_Draw :: #type proc(p : Ability_Projectile)
 
 Ability :: struct{
     //Cooldown for the Ability
-    cd : Ability_Cooldown,
+    cooldown_timer : Ability_Cooldown,
     //Timer for how long it takes to cast the ability
     cast_timer : Ability_Cooldown,
 
     cast_visualizer : Casting_Visualizer,
 
-    indicator_active : bool,
-    activated : bool,
-    finished : bool,
-    active : bool,
-    casting : bool,
+    is_available : bool,
 
     indicator : Ability_Indicator_Update,
     activate : Ability_Activate,
@@ -40,6 +40,8 @@ Ability :: struct{
     draw : Ability_Draw,
 
     data : Ability_Data,
+
+    state : Ability_State,
 }
 
 Casting_Visualizer :: struct{
@@ -86,17 +88,13 @@ Ability_Projectile :: struct{
 }
 
 no_indicator_update :: proc(a : ^Ability, dt : f32){
-    a.casting = true
-    a.indicator_active = false
-    a.cast_timer.cooldown = a.cast_timer.cast_rate
+    a.state = .Charging
 }
 no_activate :: proc(a : ^Ability, dt : f32){
-    // a.active = true
-    // a.activated = false
-    // a.indicator_active = false
+    a.state = .Executing
 }
 no_update :: proc(a : ^Ability, dt : f32){
-    a.finished = true
+    a.state = .Finished
 }
 no_finish :: proc(a : ^Ability, dt : f32){}
 no_draw :: proc(a : Ability){}

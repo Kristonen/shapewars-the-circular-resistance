@@ -10,8 +10,8 @@ import "core:math"
 
 update_handler :: proc(dt : f32){
     if rl.IsKeyPressed(.ESCAPE){
-        if game.player.ability.indicator_active{
-            game.player.ability.indicator_active = false
+        if game.player.ability.state == .Using{
+            game.player.ability.state = .None
             game.level.indicator = nil
             return
         }
@@ -194,7 +194,7 @@ update_enemy_bullets :: proc(dt : f32){
 }
 
 update_player_shooting :: proc(dt : f32){
-    if game.player.ability.indicator_active do return
+    if game.player.ability.state == .Using do return
     if game.player.weapon.cooldown > 0{
         game.player.weapon.cooldown -= dt
     }
@@ -226,13 +226,16 @@ update_player_shooting :: proc(dt : f32){
 }
 
 update_player_casting :: proc(dt : f32){
+    if rl.IsKeyPressed(.SPACE) && game.player.ability.state == .None && game.player.ability.cooldown_timer.cooldown <= 0{
+        game.player.ability.state = .Using
+    }
     update_ability(&game.player.ability, dt, .Player)
 }
 
 update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavior_Data = nil){
 
-    if a.cd.cooldown > 0{
-        a.cd.cooldown -= dt
+    if a.cooldown_timer.cooldown > 0{
+        a.cooldown_timer.cooldown -= dt
     }
 
     if a.cast_timer.cooldown > 0{
@@ -240,54 +243,92 @@ update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavi
         a.cast_timer.cooldown -= dt
     }
 
-    if type == .Player{
-
-        if a.indicator_active{
-            a.indicator(a, dt)
-        }
-
-        if rl.IsKeyPressed(.SPACE) && a.cd.cooldown <= 0 && !a.active && !a.casting{
-            a.indicator_active = true
-        }
-    } else{
-        if a.cd.cooldown <= 0 && !a.active && !a.casting{
-            data := &d.(Boss_Data)
-            if data.is_casting do return
-            a.indicator(a, dt)
-            data.is_casting = true
+    if d != nil && a.state == .None && a.cooldown_timer.cooldown <= 0{
+        if data, ok := d.(Boss_Data); ok && check_enemy_use_ability(data){
+            a.state = .Using
         }
     }
 
-    if a.active{
+    if a.state == .None do return
+
+    if a.state == .Using{
+        a.indicator(a, dt)
+        if a.state == .Charging{
+            a.cast_timer.cooldown = a.cast_timer.cast_rate
+        }
+    }
+
+    if a.state == .Charging && a.cast_timer.cooldown <= 0{
+        a.state = .Activated
+    }
+
+    // if a.state == .Charging do return
+
+    if a.state == .Activated{
+        a.cooldown_timer.cooldown = a.cooldown_timer.cast_rate
+        a.activate(a, dt)
+        a.state = .Executing
+    }
+
+    if a.state == .Executing{
         a.update(a, dt)
     }
 
-    if a.casting && a.cast_timer.cooldown <= 0 && !a.active{
-        a.casting = false
-        a.activated = true
-    }
-
-    if a.activated{
-        a.indicator_active = false
-        a.activated = false
-
-        a.active = true
-        a.cd.cooldown = a.cd.cast_rate
-        a.activate(a, dt)
-        if type == .Player{
-            game.level.indicator = nil
-        }
-    }
-
-    if a.finished{
+    if a.state == .Finished{
         a.finish(a, dt)
-        a.active = false
-        a.finished = false
-        if type == .Enemy{
-            data := &d.(Boss_Data)
-            data.is_casting = false
-        }
+        a.state = .None
     }
+
+
+
+    // if type == .Player{
+
+    //     if a.indicator_active{
+    //         a.indicator(a, dt)
+    //     }
+
+    //     if rl.IsKeyPressed(.SPACE) && a.cd.cooldown <= 0 && !a.active && !a.casting{
+    //         a.indicator_active = true
+    //     }
+    // } else{
+    //     if a.cd.cooldown <= 0 && !a.active && !a.casting{
+    //         data := &d.(Boss_Data)
+    //         if data.is_casting do return
+    //         a.indicator(a, dt)
+    //         data.is_casting = true
+    //     }
+    // }
+
+    // if a.active{
+    //     a.update(a, dt)
+    // }
+
+    // if a.casting && a.cast_timer.cooldown <= 0 && !a.active{
+    //     a.casting = false
+    //     a.activated = true
+    // }
+
+    // if a.activated{
+    //     a.indicator_active = false
+    //     a.activated = false
+
+    //     a.active = true
+    //     a.cd.cooldown = a.cd.cast_rate
+    //     a.activate(a, dt)
+    //     if type == .Player{
+    //         game.level.indicator = nil
+    //     }
+    // }
+
+    // if a.finished{
+    //     a.finish(a, dt)
+    //     a.active = false
+    //     a.finished = false
+    //     if type == .Enemy{
+    //         data := &d.(Boss_Data)
+    //         data.is_casting = false
+    //     }
+    // }
 }
 
 update_player_indicator :: proc(dt : f32){
@@ -394,10 +435,10 @@ update_enemy :: proc(dt : f32){
             case Charge_Data:
             case Boss_Data:
                 // if data.is_casting do return
-                for &s in data.abilities{
-                    if !s.active do continue
+                for &a in data.abilities{
+                    if !a.is_available do continue
                     update_enemy_ability(&e, dt)
-                    update_ability(&s.ability, dt, .Enemy, &e.behavior)
+                    update_ability(&a, dt, .Enemy, &e.behavior)
                 }
         }
     }
@@ -421,8 +462,8 @@ update_enemy_ability :: proc(e : ^Enemy, dt : f32){
     data, ok := &e.behavior.(Boss_Data)
     if !ok do return
 
-    for &s in data.abilities{
-        switch &d in s.ability.data{
+    for &a in data.abilities{
+        switch &d in a.data{
             case Radial_Liberation_Data:
             case Dash_Data:
             case Bomb_Data:

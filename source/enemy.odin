@@ -380,3 +380,26 @@ charge_enemy_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
         data.is_charging = false
     }
 }
+
+// check_enemy_use_ability :: proc(abilities : []Ability) -> bool{
+//     for a in abilities{
+//         if a.state != .None do return false
+//     }
+//     return true
+// }
+
+check_enemy_use_ability :: proc{
+    check_enemy_use_boss_ability,
+    check_other_enemy_data,
+}
+
+check_enemy_use_boss_ability :: proc(data : Boss_Data) -> bool{
+    for a in data.abilities{
+        if a.state != .None do return false
+    }
+    return true
+}
+
+check_other_enemy_data :: proc(data : Melee_Data) -> bool{
+    return true
+}

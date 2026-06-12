@@ -12,7 +12,7 @@ Btn_Disabled_Color :: rl.Color{50, 50, 50, 255}
 
 draw_player :: proc(){
     rl.DrawCircleV(game.player.pos, game.player.radius, rl.VIOLET)
-    if game.player.ability.active && game.player.current_ability == .Dash{
+    if game.player.ability.state == .Executing && game.player.current_ability == .Dash{
         rl.DrawCircleLinesV(game.player.pos, game.player.radius, rl.BLACK)
     }
     for i in 0..<len(game.player.ghosts){
@@ -22,6 +22,9 @@ draw_player :: proc(){
         black.a = u8(alpha*255)
         rl.DrawCircleLinesV(game.player.ghosts[i].pos, game.player.radius, black)
     }
+
+    draw_ability(game.player.ability)
+
     if game.helper_activated{
         draw_collider(game.player.physics_collider)
         draw_collider(game.player.hurt_collider)
@@ -45,6 +48,12 @@ draw_npc :: proc(){
         if game.helper_activated{
             draw_collider(n.interactable.collider)
         }
+    }
+}
+
+draw_ability :: proc(a : Ability){
+    if a.state == .Executing{
+        a.draw(a)
     }
 }
 
@@ -136,9 +145,13 @@ draw_enemies :: proc(){
             case Distance_Data:
             case Charge_Data:
             case Boss_Data:
-                for s in d.abilities{
-                    if !s.active do break
-                    if s.ability.cast_visualizer.can_show do s.ability.cast_visualizer.draw(e.origin)
+                for a in d.abilities{
+                    // if !s.active do break
+                    if a.state == .None do continue
+                    if a.cast_visualizer.can_show do a.cast_visualizer.draw(e.origin)
+                    if a.state == .Executing{
+                        a.draw(a)
+                    }
                 }
         }
 

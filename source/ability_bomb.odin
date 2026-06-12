@@ -18,7 +18,7 @@ Bomb_Data :: struct{
 
 create_standard_bomb :: proc() -> Ability{
     return{
-        cd = {
+        cooldown_timer = {
             cast_rate = 1,
         },
         indicator = bomb_indicator_update,
@@ -43,8 +43,7 @@ bomb_indicator_update :: proc(a : ^Ability, dt : f32){
         pos = rl.GetScreenToWorld2D(rl.GetMousePosition(), game.camera),
     }
     if rl.IsMouseButtonPressed(.LEFT){
-        game.player.ability.casting = true
-        game.player.ability.indicator_active = false
+        a.state = .Charging
     }
 }
 
@@ -54,6 +53,7 @@ bomb_activate :: proc(a : ^Ability, dt : f32){
     data.target_pos = indicator.pos
     // data.target_pos = rl.GetScreenToWorld2D(rl.GetMousePosition(), game.camera)
     data.pos = game.player.pos
+    game.level.indicator = nil
 }
 
 bomb_update :: proc(a : ^Ability, dt : f32){
@@ -69,14 +69,13 @@ bomb_update :: proc(a : ^Ability, dt : f32){
     if data.timer > 0{
         data.timer -= dt
     } else {
-        game.player.ability.finish(a, dt)
+        a.state = .Finished
     }
 }
 
 bomb_finish :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Bomb_Data)
     data.timer = BOMB_TIMER
-    game.player.ability.active = false
 
     for &e in game.level.enemies{
         if e.health.is_dead do continue

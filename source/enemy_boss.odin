@@ -6,7 +6,7 @@ import rl "vendor:raylib"
 import "ui"
 
 Boss_Data :: struct{
-    abilities : [4]Enemy_Ability_Slot,
+    abilities : [4]Ability,
     is_casting : bool,
     current_cast : i32,
 }
@@ -25,10 +25,10 @@ create_test_boss :: proc() -> Enemy{
         take_dmg = take_damage,
     }
     data : Boss_Data
-    data.abilities[0].active = true
-    data.abilities[1].active = true
-    a := &data.abilities[0].ability
-    a.cd = {
+    data.abilities[0].is_available = true
+    data.abilities[1].is_available = true
+    a := &data.abilities[0]
+    a.cooldown_timer = {
         cast_rate = 10,
     }
     a.cast_timer = {
@@ -46,8 +46,8 @@ create_test_boss :: proc() -> Enemy{
 
     a.data = Reinforcment_Data{}
 
-    b := &data.abilities[1].ability
-    b.cd.cast_rate = 3
+    b := &data.abilities[1]
+    b.cooldown_timer.cast_rate = 3
     b.cast_timer.cast_rate = 1
     b.cast_visualizer.tick = 0.2
     b.cast_visualizer.draw = no_casting_draw
@@ -93,11 +93,20 @@ draw_bombardment_projectiles :: proc(p : Ability_Projectile){
 test_boss_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
     data := &d.(Boss_Data)
 
-    if data.is_casting do return
+    if !can_boss_move(data^) do return
     dir := game.player.pos - {e.rec.x, e.rec.y}
     vel := rl.Vector2Normalize(dir) * e.speed
     new_pos : rl.Vector2 = {e.rec.x, e.rec.y}
     new_pos += vel * dt
     e.rec.x = new_pos.x
     e.rec.y = new_pos.y
+}
+
+can_boss_move :: proc(data : Boss_Data) -> bool{
+    for a in data.abilities{
+        if a.state == .Charging{
+            return false
+        }
+    }
+    return true
 }

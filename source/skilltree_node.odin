@@ -42,7 +42,7 @@ apply_node_dmg :: proc(n : ^UI_Skill_Node, refund : bool = true){
 }
 
 apply_node_rl_cd :: proc(n : ^UI_Skill_Node, refund : bool = true){
-    stat := &game.player.ability.cd.cast_rate
+    stat := &game.player.ability.cooldown_timer.cast_rate
     if refund{
         stat^ *= 0.96
     } else{

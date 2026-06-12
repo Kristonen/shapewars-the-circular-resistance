@@ -10,7 +10,7 @@ Dash_Data :: struct{
 
 create_standard_dash :: proc() -> Ability{
     return{
-        cd = {
+        cooldown_timer = {
             cast_rate = 3,
         },
         indicator = no_indicator_update,
@@ -34,8 +34,6 @@ dash_activate :: proc(a : ^Ability, dt : f32){
         game.player.health.invincible_timer = 0.2
     }
     data.timer = 0.2
-    game.player.ability.active = true
-    game.player.ability.activated = false
 }
 
 dash_update :: proc(a : ^Ability, dt : f32){
@@ -56,12 +54,12 @@ dash_update :: proc(a : ^Ability, dt : f32){
             }
         }
     } else {
-        game.player.ability.active = false
+        a.state = .Finished
+        // game.player.ability.active = false
         // dash_finish(a, dt)
     }
 }
 
 dash_finish :: proc(a : ^Ability, dt : f32){
     game.shake = 50
-
 }

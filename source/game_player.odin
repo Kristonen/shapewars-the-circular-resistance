@@ -130,7 +130,7 @@ get_upgrade_target :: proc() {
 }
 
 get_ability_cd :: proc() -> ^Ability_Cooldown{
-    return &game.player.ability.cd
+    return &game.player.ability.cooldown_timer
 }
 
 get_player_health_as_string :: proc() -> string{

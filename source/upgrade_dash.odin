@@ -10,7 +10,7 @@ create_dash_upgrades :: proc(a : ^[dynamic]Upgrade){
 }
 
 apply_dash_cd_upgrade :: proc(u : Upgrade){
-    stat := &game.player.ability.cd.cast_rate
+    stat := &game.player.ability.cooldown_timer.cast_rate
     v := u.value.(f32)
     apply_normal_upgrade(u.type, stat, v)
 }

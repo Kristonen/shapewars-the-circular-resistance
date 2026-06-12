@@ -18,7 +18,7 @@ Radial_Liberation :: struct{
 
 create_standard_radial_liberation :: proc() -> Ability{
     return {
-        cd = {
+        cooldown_timer = {
             cast_rate = 5,
         },
         cast_timer = {
@@ -60,5 +60,4 @@ radial_liberation_activate :: proc(a : ^Ability, dt : f32){
         }
         append(&game.level.player_bullets, b)
     }
-    game.player.ability.active = false
 }
