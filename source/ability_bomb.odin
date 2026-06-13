@@ -80,7 +80,7 @@ bomb_finish :: proc(a : ^Ability, dt : f32){
     for &e in game.level.enemies{
         if e.health.is_dead do continue
         if rl.CheckCollisionCircleRec(data.pos, data.explosion_radius, e.rec){
-            e.health->take_dmg(data.damage)
+            e->on_hit(data.damage)
         }
     }
     rec := rl.Rectangle{data.pos.x, data.pos.y, data.radius*2, data.radius*2}

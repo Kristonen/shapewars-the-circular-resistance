@@ -116,10 +116,15 @@ create_upgrades :: proc(a : ^[dynamic]Upgrade){
     create_dmg_upgrades(a)
     create_movement_speed_upgrades(a)
     create_as_upgrades(a)
+
     create_health_upgrades(a)
+
     create_rl_upgrades(a)
     create_dash_upgrades(a)
+    create_bomb_upgrades(a)
+
     create_bullet_upgrades(a)
+
     create_shard_upgrades(a)
 }
 
@@ -179,6 +184,11 @@ get_upgrade_raster :: proc(r : Rarity) -> i32{
         case .Legendary: return 15
     }
     return 5
+}
+
+apply_upgrade :: proc{
+    apply_normal_upgrade,
+    apply_toogle_upgrade,
 }
 
 apply_normal_upgrade :: proc(type : Upgrade_Type, stat : ^f32, v : f32){
