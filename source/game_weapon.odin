@@ -11,6 +11,7 @@ Weapon :: struct {
     lifesteal : f32,
     amount : f32,
     shoot_sound : rl.Sound,
+    can_shoot : bool,
 }
 
 create_weapon :: proc(){
@@ -26,6 +27,7 @@ create_weapon :: proc(){
     }
     game.player.weapon.amount = 1
     game.player.weapon.shoot_sound = rl.LoadSound(Shoot_Sound)
+    game.player.weapon.can_shoot = true
     rl.SetSoundVolume(game.player.weapon.shoot_sound, 0.30)
 }
 

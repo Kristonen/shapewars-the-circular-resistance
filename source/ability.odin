@@ -20,14 +20,17 @@ Ability_Activate :: #type proc(a : ^Ability, dt : f32)
 Ability_Finish :: #type proc(a : ^Ability, dt : f32)
 Ability_Draw :: #type proc(a : Ability)
 Cast_Draw :: #type proc(pos : rl.Vector2)
-
 Ability_Projectile_Draw :: #type proc(p : Ability_Projectile)
+
+Ability_Shoot_Timer :: 0.5
 
 Ability :: struct{
     //Cooldown for the Ability
     cooldown_timer : Ability_Cooldown,
     //Timer for how long it takes to cast the ability
     cast_timer : Ability_Cooldown,
+
+    shoot_timer : f32,
 
     cast_visualizer : Casting_Visualizer,
 

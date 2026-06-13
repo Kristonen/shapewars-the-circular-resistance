@@ -194,12 +194,19 @@ update_enemy_bullets :: proc(dt : f32){
 }
 
 update_player_shooting :: proc(dt : f32){
-    if game.player.ability.state == .Using do return
+    
     if game.player.weapon.cooldown > 0{
         game.player.weapon.cooldown -= dt
     }
 
-    if rl.IsMouseButtonDown(.LEFT) && game.player.weapon.cooldown <= 0{
+    // if game.player.ability.state == .Using || game.player.ability.state == .Charging do return
+    // if !game.player.weapon.can_shoot do return
+
+    if game.player.ability.shoot_timer > 0 {
+        game.player.ability.shoot_timer -= dt
+    }
+
+    if rl.IsMouseButtonDown(.LEFT) && game.player.weapon.cooldown <= 0 && game.player.ability.shoot_timer <= 0{
         play_sound_varied(game.player.weapon.shoot_sound, 0.75, 1.25)
         game.player.weapon.cooldown = game.player.weapon.fire_rate
 
@@ -228,6 +235,7 @@ update_player_shooting :: proc(dt : f32){
 update_player_casting :: proc(dt : f32){
     if rl.IsKeyPressed(.SPACE) && game.player.ability.state == .None && game.player.ability.cooldown_timer.cooldown <= 0{
         game.player.ability.state = .Using
+        game.player.weapon.can_shoot = false
     }
     update_ability(&game.player.ability, dt, .Player)
 }
@@ -265,6 +273,7 @@ update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavi
     // if a.state == .Charging do return
 
     if a.state == .Activated{
+        a.shoot_timer = Ability_Shoot_Timer
         a.cooldown_timer.cooldown = a.cooldown_timer.cast_rate
         a.activate(a, dt)
         a.state = .Executing
@@ -335,7 +344,8 @@ update_player_indicator :: proc(dt : f32){
     if game.level.indicator == nil do return
     switch &i in game.level.indicator{
         case AoE_Indicator:
-            i.pos = rl.GetMousePosition()
+            pos := rl.GetScreenToWorld2D(rl.GetMousePosition(), game.camera)
+            i.pos = pos//rl.GetMousePosition()
         case Line_Indicator:
     }
 }

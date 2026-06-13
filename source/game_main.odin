@@ -177,10 +177,10 @@ update_game :: proc(dt : f32) {
         game.play_time += dt
         update_player(dt)
         update_player_interact(dt)
+        update_player_casting(dt)
         update_player_shooting(dt)
         update_player_bullets(dt)
         update_player_indicator(dt)
-        update_player_casting(dt)
         update_npc(dt)
         update_enemy_bullets(dt)
         update_spawner(dt)
