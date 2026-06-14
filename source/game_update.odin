@@ -9,6 +9,10 @@ import "collider"
 import "core:math"
 
 update_handler :: proc(dt : f32){
+    if rl.IsMouseButtonPressed(.RIGHT) && game.player.ability.state == .Using{
+        game.player.ability.state = .None
+        game.level.indicator = nil
+    }
     if rl.IsKeyPressed(.ESCAPE){
         if game.player.ability.state == .Using{
             game.player.ability.state = .None

@@ -10,10 +10,12 @@ Bomb_Data :: struct{
     damage : f32,
     speed : f32,
     timer : f32,
+    time_left : f32,
     radius : f32,
     explosion_radius : f32,
     pos : rl.Vector2,
     target_pos : rl.Vector2,
+    can_splitter : bool,
 }
 
 create_standard_bomb :: proc() -> Ability{
@@ -31,7 +33,8 @@ create_standard_bomb :: proc() -> Ability{
             speed = 500,
             radius = 10,
             explosion_radius = 100,
-            timer = 3,
+            timer = BOMB_TIMER,
+            time_left = BOMB_TIMER,
         },
     }
 }
@@ -66,8 +69,8 @@ bomb_update :: proc(a : ^Ability, dt : f32){
         return
     }
 
-    if data.timer > 0{
-        data.timer -= dt
+    if data.time_left > 0{
+        data.time_left -= dt
     } else {
         a.state = .Finished
     }
@@ -75,12 +78,15 @@ bomb_update :: proc(a : ^Ability, dt : f32){
 
 bomb_finish :: proc(a : ^Ability, dt : f32){
     data := &game.player.ability.data.(Bomb_Data)
-    data.timer = BOMB_TIMER
+    data.time_left = data.timer
 
     for &e in game.level.enemies{
         if e.health.is_dead do continue
         if rl.CheckCollisionCircleRec(data.pos, data.explosion_radius, e.rec){
             e->on_hit(data.damage)
+            if data.can_splitter{
+                append(&e.statuses, create_bleed_status(10, 0.2, 3))
+            }
         }
     }
     rec := rl.Rectangle{data.pos.x, data.pos.y, data.radius*2, data.radius*2}
@@ -90,4 +96,5 @@ bomb_finish :: proc(a : ^Ability, dt : f32){
 bomb_draw :: proc(a : Ability){
     data := game.player.ability.data.(Bomb_Data)
     rl.DrawCircleV(data.pos, data.radius, rl.BEIGE)
+    rl.DrawCircleV(data.pos, data.explosion_radius, {0, 0, 0, 100})
 }
