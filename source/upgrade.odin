@@ -87,6 +87,11 @@ get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) ->
     upgrade : ^Upgrade
     rand_idx : i32
     rarity := get_random_rarity()
+
+    for !check_if_upgrade_with_rarity(rarity, used_idx){
+        rarity = get_random_rarity()
+    }
+
     for true{
         rand_idx = rand.int32_range(0, i32(len(u)))
         upgrade = &u[rand_idx]
@@ -95,6 +100,14 @@ get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) ->
         break
     }
     return upgrade, rand_idx
+}
+
+check_if_upgrade_with_rarity :: proc(r : Rarity, used_idx : [3]i32) -> bool{
+    for u, idx in game.level.available_upgrades{
+        if is_upgrade_already_used(i32(idx), used_idx) do continue
+        if u.rarity == r do return true
+    }
+    return false
 }
 
 get_random_rarity :: proc() -> Rarity{
