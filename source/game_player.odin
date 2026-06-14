@@ -117,18 +117,6 @@ apply_lifesteal :: proc(p : ^Player, dmg : f32){
     p.health->heal(add_h)
 }
 
-get_upgrade_target :: proc() {
-    switch a in game.player.ability.data{
-        case Radial_Liberation_Data:
-            game.player.current_ability = .Radial_Liberation
-        case Dash_Data:
-            game.player.current_ability = .Dash
-        case Bomb_Data:
-            game.player.current_ability = .Bomb
-        case Reinforcment_Data:
-    }
-}
-
 get_player_health_as_string :: proc() -> string{
     return fmt.tprintf("Health : %0.0f/%0.0f", game.player.health.current, game.player.health.max)
 }
