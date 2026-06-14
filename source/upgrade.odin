@@ -86,10 +86,16 @@ is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
 get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) -> (^Upgrade, i32){
     upgrade : ^Upgrade
     rand_idx : i32
+    already_used_rarity : [dynamic]Rarity
+    defer delete(already_used_rarity)
     rarity := get_random_rarity()
 
     for !check_if_upgrade_with_rarity(rarity, used_idx){
-        rarity = get_random_rarity()
+        append(&already_used_rarity, rarity)
+        
+        for check_if_rarity_already_checked(rarity, already_used_rarity[:]){
+            rarity = get_random_rarity()
+        }
     }
 
     for true{
@@ -106,6 +112,13 @@ check_if_upgrade_with_rarity :: proc(r : Rarity, used_idx : [3]i32) -> bool{
     for u, idx in game.level.available_upgrades{
         if is_upgrade_already_used(i32(idx), used_idx) do continue
         if u.rarity == r do return true
+    }
+    return false
+}
+
+check_if_rarity_already_checked :: proc(r : Rarity, a : []Rarity) -> bool{
+    for used_r in a{
+        if r == used_r do return true
     }
     return false
 }
