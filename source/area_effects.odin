@@ -14,14 +14,14 @@ on_area_poison_trigger :: proc(a : Area_Effect, entity : ^Entity){
     switch &e in entity {
         case Player:
             s := create_poison_status()
-            if idx := check_if_entity_already_got_status(e.statuses, s); idx == -1{
+            if idx, ok := check_if_entity_already_got_status(e.statuses, s); !ok{
                 append(&e.statuses, s)
             } else{
                 e.statuses[idx].duration = s.duration
             }
         case Enemy:
             s := create_poison_status()
-            if idx := check_if_entity_already_got_status(e.statuses, s); idx == -1{
+            if idx, ok := check_if_entity_already_got_status(e.statuses, s); !ok{
                 append(&e.statuses, s)
             } else{
                 e.statuses[idx].duration = s.duration

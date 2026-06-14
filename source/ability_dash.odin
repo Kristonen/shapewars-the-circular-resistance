@@ -48,7 +48,8 @@ dash_update :: proc(a : ^Ability, dt : f32){
         if data.can_attack{
             for &e in game.level.enemies{
                 confused := create_confused_status(0, 2, 6)
-                if rl.CheckCollisionCircleRec(game.player.pos, game.player.radius, e.rec) && check_if_entity_already_got_status(e.statuses, confused) == -1{
+                idx, ok := check_if_entity_already_got_status(e.statuses, confused)
+                if rl.CheckCollisionCircleRec(game.player.pos, game.player.radius, e.rec) && !ok{
                     append(&e.statuses, confused)
                     e.health->take_dmg(data.damage)
                 }

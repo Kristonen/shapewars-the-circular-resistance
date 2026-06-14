@@ -78,7 +78,7 @@ check_bullet_enemy :: proc(b : ^Bullet){
 add_bullet_status_to_hitted_enemy :: proc(b : ^Bullet, e : ^Enemy){
     for s in b.applied_status{
 
-        if idx := check_if_entity_already_got_status(e.statuses, s); idx == -1{
+        if idx, ok := check_if_entity_already_got_status(e.statuses, s); !ok{
             append(&e.statuses, s)
         } else {
             e.statuses[idx] = s
@@ -86,11 +86,11 @@ add_bullet_status_to_hitted_enemy :: proc(b : ^Bullet, e : ^Enemy){
     }
 }
 
-check_if_entity_already_got_status :: proc(s_array : [dynamic]Status_Effect, s : Status_Effect) -> i32{
+check_if_entity_already_got_status :: proc(s_array : [dynamic]Status_Effect, s : Status_Effect) -> (i32, bool){
     for e_s, idx in s_array{
-        if e_s.type == s.type do return i32(idx)
+        if e_s.type == s.type do return i32(idx), true
     }
-    return -1
+    return -1, false
 }
 
 check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
@@ -150,12 +150,10 @@ check_enemy_enemy :: proc(e : ^Enemy){
     }
 }
 
-
-
 add_enemy_status_to_player :: proc(e : Enemy, p : ^Player){
     for s in e.applied_status{
 
-        if idx := check_if_entity_already_got_status(p.statuses, s); idx == -1{
+        if idx, ok := check_if_entity_already_got_status(p.statuses, s); !ok{
             append(&p.statuses, s)
         } else {
             p.statuses[idx] = s
