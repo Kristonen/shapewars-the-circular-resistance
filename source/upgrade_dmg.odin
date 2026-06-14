@@ -17,11 +17,11 @@ create_dmg_upgrades :: proc(a : ^[dynamic]Upgrade){
 apply_dmg_upgrade :: proc(u : Upgrade){
     stat := &game.player.weapon.bullet.damage
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }
 
 apply_lifesteal_upgrade :: proc(u : Upgrade){
     stat := &game.player.weapon.lifesteal
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }

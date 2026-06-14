@@ -3,7 +3,7 @@ package game
 import "core:fmt"
 import rl "vendor:raylib"
 
-Status_Type :: enum{Poison, Burn, Haste, Bleed}
+Status_Type :: enum{Poison, Burn, Haste, Bleed, Confused}
 Status_State :: enum {None, Applied}
 
 Apply_Status :: #type proc(e : any, s : ^Status_Effect, dt : f32)
@@ -60,6 +60,19 @@ create_bleed_status :: proc(strength : f32, tick : f32, duration : f32) -> Statu
     }
 }
 
+create_confused_status :: proc(strength : f32, tick : f32, duration : f32) -> Status_Effect{
+    return{
+        type = .Confused,
+        strength = strength,
+        tick = tick,
+        duration = duration,
+        apply = apply_confused,
+        texture = rl.WHITE,
+        create_particle = create_confused_particle,
+        is_active = true,
+    }
+}
+
 apply_poison :: proc(entity : any, poison : ^Status_Effect, dt : f32){
     
     if poison.duration <= 0{
@@ -80,6 +93,29 @@ apply_poison :: proc(entity : any, poison : ^Status_Effect, dt : f32){
                 c_entity.health->take_dmg(poison.strength)
             case ^Enemy:
                 c_entity.health->take_dmg(poison.strength)
+        }
+    }
+}
+
+apply_confused :: proc(entity : any, confused : ^Status_Effect, dt : f32){
+    if confused.duration <= 0{
+        confused.is_active = false
+    }
+
+    if !confused.is_active do return
+
+    confused.duration -= dt
+
+    if confused.current_tick > 0{
+        confused.current_tick -= dt
+    } else{
+        confused.current_tick = confused.tick
+        confused.state = .Applied
+        switch &e in entity{
+            case ^Player:
+                e.health->take_dmg(confused.strength)
+            case ^Enemy:
+                e.health->take_dmg(confused.strength)
         }
     }
 }

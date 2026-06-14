@@ -18,11 +18,11 @@ create_shard_upgrades :: proc(a : ^[dynamic]Upgrade){
 apply_mul_shard_upgrade :: proc(u : Upgrade){
     stat := &game.player.loot_bag.mul
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }
 
 apply_increase_radius_upgrade :: proc(u : Upgrade){
     stat := &game.player.loot_detector.radius
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }

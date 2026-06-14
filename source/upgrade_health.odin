@@ -20,11 +20,11 @@ create_health_upgrades :: proc(a : ^[dynamic]Upgrade){
 apply_current_health_upgrade :: proc(u : Upgrade){
     stat := &game.player.health.heal_amount
     v := u.value.(f32)
-    apply_normal_upgrade(.Additive, stat, v)
+    apply_upgrade(.Additive, stat, v)
 }
 
 apply_max_health_upgrade :: proc(u : Upgrade){
     stat := &game.player.health.max
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }

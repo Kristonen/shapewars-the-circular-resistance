@@ -136,6 +136,23 @@ create_bleeding_particle :: proc(area : rl.Rectangle){
     }
 }
 
+create_confused_particle :: proc(area : rl.Rectangle){
+    for _ in 0..<3{
+        x := f32(rl.GetRandomValue(i32(area.x), i32(area.x + area.width)))
+        y := f32(rl.GetRandomValue(i32(area.y), i32(area.y + area.height/2)))
+
+        p : Particle = {
+            pos = {x, y},
+            color = rl.WHITE,
+            max_life = 0.5,
+            size = 0.1,
+            alive = true,
+            type = .Expanding,
+        }
+        append(&game.level.particles, p)
+    }
+}
+
 create_destroy_bullet_particle :: proc(area : rl.Rectangle){
     amount := rl.GetRandomValue(10, 20)
     for _ in 0..<amount{

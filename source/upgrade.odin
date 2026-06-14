@@ -7,11 +7,7 @@ import "ui"
 
 Apply_Upgrade :: #type proc(u : Upgrade)
 
-Upgrade_Target :: enum { Player, Radial_Liberation, Dash }
-// Upgrade_Stat :: enum { Move_Speed, Attack_Speed, Damage, CurrentHealth, MaxHealth,
-//     Amount, Lifesteal }
 Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division, Toogle }
-Upgrade_Toogle_Target :: enum{Pierce, LifeStealAbility }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }
 
 UpgradeSlot_State :: enum{
@@ -31,7 +27,6 @@ Upgrade :: struct{
     apply : Apply_Upgrade,
     target : Unlocked_Data_Type,
     type : Upgrade_Type,
-    toogle_target : Upgrade_Toogle_Target,
     max_used : i32,
     count_used : i32,
 }

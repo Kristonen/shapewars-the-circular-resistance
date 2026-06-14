@@ -24,11 +24,11 @@ apply_pierce_upgrade :: proc(u : Upgrade){
 apply_amount_upgrade :: proc(u : Upgrade){
     stat := &game.player.weapon.amount
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }
 
 apply_speed_upgrade :: proc(u : Upgrade){
     stat := &game.player.weapon.bullet.speed
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }

@@ -6,6 +6,8 @@ Dash_Data :: struct{
     dir : rl.Vector2,
     speed : f32,
     timer : f32,
+    can_attack : bool,
+    damage : f32,
 }
 
 create_standard_dash :: proc() -> Ability{
@@ -20,6 +22,7 @@ create_standard_dash :: proc() -> Ability{
         draw = no_draw,
         data = Dash_Data{
             speed = 3000,
+            damage = 10,
         },
     }
 }
@@ -41,6 +44,18 @@ dash_update :: proc(a : ^Ability, dt : f32){
     if data.timer > 0{
         create_dash_particle(game.player.pos, data.dir)
         game.player.pos += data.dir * data.speed * dt
+
+        if data.can_attack{
+            for &e in game.level.enemies{
+                confused := create_confused_status(0, 2, 6)
+                if rl.CheckCollisionCircleRec(game.player.pos, game.player.radius, e.rec) && check_if_entity_already_got_status(e.statuses, confused) == -1{
+                    append(&e.statuses, confused)
+                    e.health->take_dmg(data.damage)
+                }
+            }
+            
+        }
+
         data.timer -= dt
         if game.player.ghost_timer > 0{
             game.player.ghost_timer -= dt

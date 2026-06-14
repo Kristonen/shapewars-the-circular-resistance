@@ -28,21 +28,21 @@ apply_rl_cd_upgrade :: proc(u : Upgrade){
     stat := &get_ability_cd().cast_rate
     // stat := &game.player.ability_cd.cast_rate
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }
 
 apply_rl_dmg_upgrade :: proc(u : Upgrade){
     data := &game.player.ability.data.(Radial_Liberation_Data)
     stat := &data.dmg
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }
 
 apply_rl_amount_upgrade :: proc(u : Upgrade){
     data := &game.player.ability.data.(Radial_Liberation_Data)
     stat := &data.amount
     v := u.value.(f32)
-    apply_normal_upgrade(u.type, stat, v)
+    apply_upgrade(u.type, stat, v)
 }
 
 apply_rl_lifesteal_upgrade :: proc(u : Upgrade){
