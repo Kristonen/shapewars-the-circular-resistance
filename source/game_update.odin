@@ -732,6 +732,10 @@ update_skill_lines :: proc(l : ^UI_Skill_Line){
     if from.count >= to.needed_count{
         to.is_active = true
     }
+
+    if to.is_active && to.needed_count > from.count{
+        to.is_active = false
+    }
 }
 
 update_progress_bar :: proc(bar : ^ui.UI_Progress_Bar, value : f32, max : f32){
