@@ -18,7 +18,7 @@ create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
 apply_pierce_upgrade :: proc(u : Upgrade){
     stat := &game.player.weapon.bullet.can_pierce
     v := u.value.(bool)
-    apply_toogle_upgrade(stat, v)
+    apply_upgrade(stat, v)
 }
 
 apply_amount_upgrade :: proc(u : Upgrade){

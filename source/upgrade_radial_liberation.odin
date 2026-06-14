@@ -49,5 +49,5 @@ apply_rl_lifesteal_upgrade :: proc(u : Upgrade){
     data := &game.player.ability.data.(Radial_Liberation_Data)
     stat := &data.can_lifesteal
     v := u.value.(bool)
-    apply_toogle_upgrade(stat, v)
+    apply_upgrade(stat, v)
 }
