@@ -25,7 +25,7 @@ create_rl_upgrades :: proc(a : ^[dynamic]Upgrade){
     append(a, legendary)
 }
 apply_rl_cd_upgrade :: proc(u : Upgrade){
-    stat := &get_ability_cd().cast_rate
+    stat := &game.player.ability.cooldown_timer.cast_rate//&get_ability_cd().cast_rate
     // stat := &game.player.ability_cd.cast_rate
     v := u.value.(f32)
     apply_upgrade(u.type, stat, v)

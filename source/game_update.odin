@@ -650,7 +650,7 @@ update_in_game_ui :: proc(dt : f32){
                     update_progress_bar(&e, game.player.loot_bag.value, game.player.loot_bag.max_value)
                 }
             case ui.UI_Cooldown:
-                cd := get_ability_cd()
+                cd := game.player.ability.cooldown_timer
                 update_cooldown(&e, cd.cooldown, cd.cast_rate)
             case ui.UI_Button:
             case ui.UI_Menu:
@@ -684,7 +684,7 @@ update_menu :: proc(){
         switch &e in element{
             case ui.UI_Panel:
             case ui.UI_Cooldown:
-                cd := get_ability_cd()
+                cd := game.player.ability.cooldown_timer
                 update_cooldown(&e, cd.cooldown, cd.cast_rate)
             case ui.UI_Button:
                 update_button(&e)
