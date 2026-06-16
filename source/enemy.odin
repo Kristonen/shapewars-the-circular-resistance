@@ -7,12 +7,22 @@ import cl "collider"
 import "ui"
 
 Enemy_Hit_Time :: 0.1
-Enemy_Hurt_Sound_Path :: "assets/audio/standard_hurt.wav"
+Enemy_Hurt_Sound := rl.LoadSound("assets/audio/standard_hurt.wav")
 
 Behavior :: #type proc(e : ^Enemy, b : ^Behavior_Data, dt : f32)
 On_Hit :: #type proc(e : ^Enemy, dmg : f32)
 On_Death :: #type proc(e : Enemy, idx : i32)
 // Apply_Knockback :: #type proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
+
+Enemies : Enemy_List
+
+Enemy_List :: struct{
+    dummy_enemy : Enemy,
+
+    begin_enemy : Enemy,
+    begin_charge_enemy : Enemy,
+    begin_distance_enemy : Enemy,
+}
 
 Melee_Data :: struct{
 
@@ -41,9 +51,6 @@ Enemy :: struct {
     rec : rl.Rectangle,
     origin : rl.Vector2,
     speed : f32,
-    // pos : rl.Vector2,
-    // width : f32,
-    // height : f32,
     visual_scale : rl.Vector2,
     color : rl.Color,
     collidor : cl.Collider_Rectangle,
@@ -98,7 +105,7 @@ apply_no_knockback :: proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Recta
 
 
 create_dummy_enemy :: proc() -> Enemy{
-    e := create_enemy({width = 50, height = 40}, 0, rl.ORANGE)
+    e := create_enemy({width = 50, height = 40}, 50, 0, rl.ORANGE)
     e.health = {
         current = 100,
         max = 200,
@@ -116,56 +123,21 @@ create_dummy_enemy :: proc() -> Enemy{
     return e
 }
 
-create_start_enemy :: proc() -> Enemy{
-    rec := rl.Rectangle{x = 0, y = 0, width = 50, height = 40}
-    e := create_enemy(rec, 200, rl.RED)
-    e.health = {
-        current = 25,
-        max = 25,
-        take_dmg = take_damage,
-    }
+create_melee_enemy :: proc(health, speed : f32, rec : rl.Rectangle, texture : rl.Color) -> Enemy{
+    e := create_enemy(rec, health, speed, texture)
     e.knocback = {
         strength = 400,
         friction = 0.9,
         threshold = 10,
-        apply = apply_knockback,
+        apply = apply_knockback
     }
     e.behave = melee_enemy_behavior
     e.behavior = Melee_Data{}
     return e
 }
 
-create_tank_soldier :: proc() -> Enemy{
-    rec := rl.Rectangle { width = 64, height = 52}
-    e := create_enemy(rec, 75, rl.DARKGRAY)
-    e.health ={
-        current = 80,
-        max = 80,
-        take_dmg = take_damage,
-    }
-    e.knocback = {
-        apply = apply_no_knockback,
-    }
-    e.behavior = Melee_Data{
-
-    }
-    return e
-}
-
-create_second_enemy :: proc() -> Enemy{
-    rect := rl.Rectangle{width = 40, height = 24}
-    e := create_enemy(rect, 100, rl.GOLD)
-    e.health = {
-        current = 10,
-        max = 10,
-        take_dmg = take_damage,
-    }
-    e.knocback = {
-        strength = 500,
-        friction = 0.8,
-        threshold = 10,
-        apply = apply_knockback,
-    }
+create_distance_enemy :: proc(health, speed : f32, rec : rl.Rectangle, texture : rl.Color) -> Enemy{
+    e := create_enemy(rec, health, speed, texture)
     e.behave = distance_enemy_behavior
     e.behavior = Distance_Data{
         max_distance = 350,
@@ -177,16 +149,8 @@ create_second_enemy :: proc() -> Enemy{
     return e
 }
 
-create_third_enemy :: proc() -> Enemy{
-    e := create_enemy({width = 64, height = 54}, 300, rl.BROWN)
-    e.health = {
-        current = 100,
-        max = 100,
-        take_dmg = take_damage,
-    }
-    e.knocback = {
-        apply = apply_no_knockback,
-    }
+create_charge_enemy :: proc(health, speed : f32, rec : rl.Rectangle, texture : rl.Color) -> Enemy{
+    e := create_enemy(rec, health, speed, texture)
     e.behave = charge_enemy_behavior
     e.behavior = Charge_Data{
         max_distance = 500,
@@ -196,29 +160,7 @@ create_third_enemy :: proc() -> Enemy{
     return e
 }
 
-create_poison_moloch :: proc() -> Enemy{
-    rec := rl.Rectangle {width = 32, height = 26}
-    e := create_enemy(rec, 200, rl.LIME)
-    defer clear(&e.applied_status)
-    e.health = {
-        current = 40,
-        max = 40,
-        take_dmg = take_damage,
-    }
-    e.knocback = {
-        strength = 500,
-        friction = 0.8,
-        threshold = 10,
-        apply = apply_knockback,
-    }
-    e.behave = melee_enemy_behavior
-    e.behavior = Melee_Data{}
-    e.on_death = on_death_poison
-    append(&e.applied_status, create_poison_status(3, 0.2, 1))
-    return e
-}
-
-create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy{
+create_enemy :: proc(rec : rl.Rectangle, health, speed : f32, color : rl.Color) -> Enemy{
     e := Enemy{
         rec = rec,
         speed = speed,
@@ -226,9 +168,14 @@ create_enemy :: proc(rec : rl.Rectangle, speed : f32, color : rl.Color) -> Enemy
         visual_scale = {1, 1},
         on_hit = on_hit,
         on_death = on_death,
+        health = {
+            current = health,
+            max = health,
+            take_dmg = take_damage,
+        }
     }
     e.collidor.rec = rec
-    e.hurt_sound = rl.LoadSound(Enemy_Hurt_Sound_Path)
+    e.hurt_sound = Enemy_Hurt_Sound
     rl.SetSoundVolume(e.hurt_sound, 0.15)
     return e
 }
@@ -237,7 +184,7 @@ on_hit :: proc(e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
     play_sound_varied(e.hurt_sound, 0.5, 1.5)
     game.create_hit_particle(e.rec)
-    e.knocback->apply(game.player.pos, &e.rec)
+    // e.knocback->apply(game.player.pos, &e.rec)
     e.health->take_dmg(dmg)
     e.hit_timer = Enemy_Hit_Time
 }

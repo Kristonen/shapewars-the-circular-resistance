@@ -107,7 +107,7 @@ create_start_level :: proc(){
 
 create_first_test_level :: proc(){
     spawner := create_spawner(5, 0.5, 2)
-    spawner.enemy = create_start_enemy()
+    spawner.enemy = Enemies.begin_enemy
     append(&game.level.spawner, spawner)
     game.player.pos = {0, 0}
     create_battle_ui()
@@ -117,7 +117,7 @@ create_first_test_level :: proc(){
         // fill_available_upgrades()
         create_battle_level()
         game.camera.target = game.player.pos
-        game.level.level_visual = level_visual
+    game.level.level_visual = level_visual
     } else{
         panic("Map could not load")
     }
@@ -125,15 +125,11 @@ create_first_test_level :: proc(){
 
 create_test_level :: proc(){
     spawner := create_spawner(100, 0.1, 0)
-    spawner.enemy = create_dummy_enemy()
+    spawner.enemy = Enemies.dummy_enemy
     append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
-    // spawner.enemy = create_poison_moloch()
-    // append(&game.level.spawner, spawner)
-    spawner.enemy = create_second_enemy()
-    // append(&game.level.spawner, spawner)
-    spawner.enemy = create_third_enemy()
-    // append(&game.level.spawner, spawner)
+    spawner.enemy = Enemies.begin_charge_enemy
+    append(&game.level.spawner, spawner)
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual

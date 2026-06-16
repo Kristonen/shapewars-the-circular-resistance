@@ -11,7 +11,7 @@ Reinforcment_Data :: struct{
 }
 
 activate_reinforcement :: proc(a : ^Ability, dt : f32){
-    e := create_start_enemy()
+    e := Enemies.dummy_enemy
     data := a.data.(Reinforcment_Data)
     directions := []rl.Vector2 {{data.pos.x - 150, data.pos.y - 150}, {data.pos.x + 150, data.pos.y - 150}, {data.pos.x + 150, data.pos.y + 150}, {data.pos.x - 150, data.pos.y + 150}}
     for dir in directions{

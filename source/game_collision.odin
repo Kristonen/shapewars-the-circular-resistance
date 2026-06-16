@@ -59,6 +59,9 @@ check_bullet_enemy :: proc(b : ^Bullet){
 
             if !check_if_enemy_already_hitted(&e, b^){
                 e.on_hit(&e, b.damage)
+                if e.knocback.apply != nil{
+                    e.knocback->apply(game.player.pos, &e.rec)
+                }
                 add_bullet_status_to_hitted_enemy(b, &e)
                 if b.can_lifesteal{
                     apply_lifesteal(&game.player, b.damage)

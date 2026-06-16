@@ -38,3 +38,13 @@ init_unlockables :: proc(){
     create_unlockable(10, "", .NormalBullet, .Ability)
     create_unlockable(11, "", .NormalBullet, .Ability)
 }
+
+init_enemies :: proc(){
+
+    Enemies.dummy_enemy = create_melee_enemy(500, 0, {0, 0, 64, 54}, rl.ORANGE)
+    Enemies.dummy_enemy.health.current = 250
+    Enemies.dummy_enemy.knocback.apply = nil
+
+    Enemies.begin_charge_enemy = create_charge_enemy(100, 400, {0, 0, 60, 40}, rl.BROWN)
+    Enemies.begin_distance_enemy = create_distance_enemy(20, 400, {0, 0, 44, 30}, rl.BLUE)
+}

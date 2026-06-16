@@ -18,7 +18,7 @@ Enemy_Ability_Slot :: struct{
 
 create_test_boss :: proc() -> Enemy{
     rec := rl.Rectangle{x = 0, y = 0, width = 100, height = 80}
-    e := create_enemy(rec, 150, rl.BLACK)
+    e := create_enemy(rec, 500, 150, rl.BLACK)
     e.health = {
         current = 5,
         max = 500,
