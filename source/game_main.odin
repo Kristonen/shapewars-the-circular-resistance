@@ -86,9 +86,7 @@ main :: proc(){
         for &e in game.level.enemies{
             delete(e.statuses)
         }
-        for &s in game.level.spawner{
-            delete(s.enemy.applied_status)
-        }
+        delete(Enemies.viper_enemy.applied_status)
         delete(game.level.enemies)
         delete(game.level.npcs)
         delete(game.level.spawner)

@@ -22,6 +22,7 @@ Enemy_List :: struct{
     begin_enemy : Enemy,
     begin_charge_enemy : Enemy,
     begin_distance_enemy : Enemy,
+    viper_enemy : Enemy,
 }
 
 Melee_Data :: struct{

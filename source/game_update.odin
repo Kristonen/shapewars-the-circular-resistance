@@ -271,10 +271,10 @@ update_player_casting :: proc(dt : f32){
         game.player.ability.state = .Using
         game.player.weapon.can_shoot = false
     }
-    update_ability(&game.player.ability, dt, .Player)
+    update_ability(&game.player.ability, dt, .Player, game.player.pos)
 }
 
-update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavior_Data = nil){
+update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, pos : rl.Vector2, d : ^Behavior_Data = nil){
 
     if a.cooldown_timer.cooldown > 0{
         a.cooldown_timer.cooldown -= dt
@@ -282,6 +282,7 @@ update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavi
 
     if a.cast_timer.cooldown > 0{
         update_casting_visualizer(&a.cast_visualizer, dt)
+        if a.cast_visualizer.can_show do a.cast_visualizer.draw(pos)
         a.cast_timer.cooldown -= dt
     }
 
@@ -321,57 +322,6 @@ update_ability :: proc(a : ^Ability, dt : f32, type : Ability_Owner, d : ^Behavi
         a.finish(a, dt)
         a.state = .None
     }
-
-
-
-    // if type == .Player{
-
-    //     if a.indicator_active{
-    //         a.indicator(a, dt)
-    //     }
-
-    //     if rl.IsKeyPressed(.SPACE) && a.cd.cooldown <= 0 && !a.active && !a.casting{
-    //         a.indicator_active = true
-    //     }
-    // } else{
-    //     if a.cd.cooldown <= 0 && !a.active && !a.casting{
-    //         data := &d.(Boss_Data)
-    //         if data.is_casting do return
-    //         a.indicator(a, dt)
-    //         data.is_casting = true
-    //     }
-    // }
-
-    // if a.active{
-    //     a.update(a, dt)
-    // }
-
-    // if a.casting && a.cast_timer.cooldown <= 0 && !a.active{
-    //     a.casting = false
-    //     a.activated = true
-    // }
-
-    // if a.activated{
-    //     a.indicator_active = false
-    //     a.activated = false
-
-    //     a.active = true
-    //     a.cd.cooldown = a.cd.cast_rate
-    //     a.activate(a, dt)
-    //     if type == .Player{
-    //         game.level.indicator = nil
-    //     }
-    // }
-
-    // if a.finished{
-    //     a.finish(a, dt)
-    //     a.active = false
-    //     a.finished = false
-    //     if type == .Enemy{
-    //         data := &d.(Boss_Data)
-    //         data.is_casting = false
-    //     }
-    // }
 }
 
 update_player_indicator :: proc(dt : f32){
@@ -482,7 +432,7 @@ update_enemy :: proc(dt : f32){
                 for &a in data.abilities{
                     if !a.is_available do continue
                     update_enemy_ability(&e, dt)
-                    update_ability(&a, dt, .Enemy, &e.behavior)
+                    update_ability(&a, dt, .Enemy, e.origin, &e.behavior)
                 }
         }
     }

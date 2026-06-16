@@ -129,6 +129,8 @@ create_test_level :: proc(){
     append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
     spawner.enemy = Enemies.begin_charge_enemy
+    // append(&game.level.spawner, spawner)
+    spawner.enemy = Enemies.viper_enemy
     append(&game.level.spawner, spawner)
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
@@ -213,7 +215,6 @@ refresh_level :: proc(){
     clear(&game.level.area_effects)
     for &e in game.level.enemies{
         delete(e.applied_status)
-        delete(e.statuses)
     }
     for &b in game.level.player_bullets{
         delete(b.hitted_enemies)

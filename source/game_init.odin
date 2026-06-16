@@ -47,4 +47,8 @@ init_enemies :: proc(){
 
     Enemies.begin_charge_enemy = create_charge_enemy(100, 400, {0, 0, 60, 40}, rl.BROWN)
     Enemies.begin_distance_enemy = create_distance_enemy(20, 400, {0, 0, 44, 30}, rl.BLUE)
+    
+    Enemies.viper_enemy = create_melee_enemy(40, 600, {0, 0, 40, 30}, rl.GREEN)
+    s := create_poison_status(2, 0.25, 2)
+    append(&Enemies.viper_enemy.applied_status, s)
 }

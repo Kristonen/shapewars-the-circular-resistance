@@ -26,7 +26,7 @@ create_test_boss :: proc() -> Enemy{
     }
     data : Boss_Data
     data.abilities[0].is_available = true
-    data.abilities[1].is_available = true
+    data.abilities[1].is_available = false
     a := &data.abilities[0]
     a.cooldown_timer = {
         cast_rate = 10,

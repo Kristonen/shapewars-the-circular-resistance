@@ -148,7 +148,7 @@ draw_enemies :: proc(){
                 for a in d.abilities{
                     // if !s.active do break
                     if a.state == .None do continue
-                    if a.cast_visualizer.can_show do a.cast_visualizer.draw(e.origin)
+                    // if a.cast_visualizer.can_show do a.cast_visualizer.draw(e.origin)
                     if a.state == .Executing{
                         a.draw(a)
                     }
