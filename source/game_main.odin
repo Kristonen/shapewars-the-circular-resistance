@@ -138,7 +138,8 @@ main :: proc(){
     game.level.portal.texture = rl.LoadTexture("assets/portal.png")
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
-
+    s := create_poison_status(1, 0.2, 10)
+    append(&game.player.statuses, s)
     //Game Loop
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()

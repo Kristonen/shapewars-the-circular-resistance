@@ -60,14 +60,15 @@ apply_node_burn_status :: proc(n : ^UI_Skill_Node, refund : bool = true){
 
 apply_node_burn_dmg :: proc(n : ^UI_Skill_Node, refund : bool = true){
     for &s in game.player.weapon.bullet.applied_status{
-        if s.type != .Burn do continue
-        s.strength += 2
+        if s.desc != .Burn do continue
+        tick_status := &s.type.(TickStatus)
+        tick_status.strength += 2
     }
 }
 
 apply_node_poison_status :: proc(n : ^UI_Skill_Node, refund : bool = true){
     clear(&game.player.weapon.bullet.applied_status)
-    status := create_poison_status()
+    status := create_poison_status(2, 0.2, 2)
     append(&game.player.weapon.bullet.applied_status, status)
 }
 

@@ -214,7 +214,7 @@ create_poison_moloch :: proc() -> Enemy{
     e.behave = melee_enemy_behavior
     e.behavior = Melee_Data{}
     e.on_death = on_death_poison
-    append(&e.applied_status, create_poison_status())
+    append(&e.applied_status, create_poison_status(3, 0.2, 1))
     return e
 }
 

@@ -88,7 +88,7 @@ add_bullet_status_to_hitted_enemy :: proc(b : ^Bullet, e : ^Enemy){
 
 check_if_entity_already_got_status :: proc(s_array : [dynamic]Status_Effect, s : Status_Effect) -> (i32, bool){
     for e_s, idx in s_array{
-        if e_s.type == s.type do return i32(idx), true
+        if e_s.desc == s.desc do return i32(idx), true
     }
     return -1, false
 }

@@ -128,3 +128,24 @@ get_player_damage_as_string :: proc() -> string{
 get_player_attack_speed_as_string :: proc() -> string{
     return fmt.tprintf("Attack Speed : %0.2f", game.player.weapon.fire_rate)
 }
+
+get_rec_from_entity :: proc(e : any) -> rl.Rectangle{
+    rec : rl.Rectangle
+    switch entity in e{
+        case Player:
+            rec.x = entity.pos.x - entity.radius/2
+            rec.y = entity.pos.y - entity.radius/2
+            rec.width = entity.radius
+            rec.height = entity.radius
+        case ^Player:
+            rec.x = entity.pos.x - entity.radius/2
+            rec.y = entity.pos.y - entity.radius/2
+            rec.width = entity.radius
+            rec.height = entity.radius
+        case Enemy:
+            rec = entity.rec
+        case ^Enemy:
+            rec = entity.rec
+    }
+    return rec
+}

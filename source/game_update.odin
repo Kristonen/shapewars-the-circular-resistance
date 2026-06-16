@@ -143,21 +143,51 @@ update_player :: proc(dt : f32){
 
 update_player_status :: proc(dt : f32){
     for &s, idx in game.player.statuses{
-        s.apply(&game.player, &s, dt)
-        if s.state == .Applied{
-            s.state = .None
-            rec := rl.Rectangle {
-                x = game.player.pos.x - game.player.radius/2,
-                y = game.player.pos.y - game.player.radius/2,
-                width = game.player.radius,
-                height = game.player.radius,
-            }
-            s.create_particle(rec)
-        }
+        update_status(&game.player, &s, dt)
         if !s.is_active{
             unordered_remove(&game.player.statuses, idx)
         }
     }
+}
+
+update_status :: proc(e : any, s : ^Status_Effect, dt : f32){
+    switch t in s.type{
+        case TickStatus:
+            update_tick_status(e, s, dt)
+        case OneTimeStatus:
+    }
+}
+
+update_tick_status :: proc(e : any, s : ^Status_Effect, dt : f32){
+    tick_status := &s.type.(TickStatus)
+
+    if tick_status.duration <= 0{
+        s.is_active = false
+    }
+    
+    if !s.is_active{
+        if tick_status.finish != nil{
+            tick_status.finish(e, s, dt)
+        }
+        return
+    }
+    
+    tick_status.duration -= dt
+
+    if tick_status.current_tick > 0{
+        tick_status.current_tick -= dt
+    } else{
+        tick_status.current_tick = tick_status.tick
+        s.state = .Applied
+        if tick_status.apply != nil{
+            tick_status.apply(e, s, dt)
+        }
+        if s.create_particle != nil{
+            rec := get_rec_from_entity(e)
+            s.create_particle(rec)
+        }
+    }
+    
 }
 
 update_npc :: proc(dt : f32){
@@ -461,11 +491,7 @@ update_enemy :: proc(dt : f32){
 update_enemy_status :: proc(e : ^Enemy, dt : f32){
 
     for &s, idx in e.statuses{
-        s.apply(e, &s, dt)
-        if s.state == .Applied{
-            s.state = .None
-            s.create_particle(e.rec)
-        }
+        update_status(e, &s, dt)
         if !s.is_active{
             unordered_remove(&e.statuses, idx)
         }
@@ -788,7 +814,7 @@ update_status_bar :: proc(sbar : ^ui.UI_Status_Bar){
         x := sbar.pos.x + (width + sbar.seperation) * f32(i)
         y := sbar.pos.y
         slot := ui.create_status_slot({x, y}, width, height, game.player.statuses[i].texture)
-        slot.text = fmt.tprintf("%v", game.player.statuses[i].type)
+        slot.text = fmt.tprintf("%v", game.player.statuses[i].desc)
         append(&sbar.slots, slot)
     }
 }
