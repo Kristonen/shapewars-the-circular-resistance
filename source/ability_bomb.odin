@@ -85,7 +85,8 @@ bomb_finish :: proc(a : ^Ability, dt : f32){
         if rl.CheckCollisionCircleRec(data.pos, data.explosion_radius, e.rec){
             e->on_hit(data.damage)
             if data.can_splitter{
-                append(&e.statuses, create_bleed_status(10, 0.2, 3))
+                b := create_bleed_status(10, 0.2, 3)
+                give_entity_status({b}, &e)
             }
         }
     }

@@ -77,6 +77,12 @@ update_handler :: proc(dt : f32){
         activate_portal(game.player.pos + {100, 100})
     }
 
+    
+    if rl.IsKeyPressed(.L){
+        s := create_confused_status(200, 2)
+        give_entity_status({s}, &game.player)
+    }
+
     if rl.IsKeyPressed(.H){
         create_level(.HQ)
     }
@@ -152,10 +158,58 @@ update_player_status :: proc(dt : f32){
 }
 
 update_status :: proc(e : any, s : ^Status_Effect, dt : f32){
+
+    if !s.is_active || s.state == .None{
+        return
+    }
+
+    if s.duration <= 0 && s.state == .Active{
+        s.state = .Finished
+    }
+
+    if s.duration > 0{
+        s.duration -= dt
+    }
+
     switch t in s.type{
         case TickStatus:
-            update_tick_status(e, s, dt)
+
+            if s.state == .Finished{
+                if t.finish != nil{
+                    t.finish(e, s, dt)
+                }
+                s.state = .None
+                s.is_active = false
+            }
+
+            if s.state == .Applied{
+                if t.activate != nil{
+                    t.activate(e, s, dt)
+                }
+                s.state = .Active
+            }
+
+            if s.state == .Active{
+                update_tick_status(e, s, dt)
+            }
         case OneTimeStatus:
+
+            if s.state == .Finished{
+                if t.finish != nil{
+                    t.finish(e, s, dt)
+                }
+                s.state = .None
+                s.is_active = false
+            }
+
+            if s.state == .Applied{
+                if t.activate != nil{
+                    t.activate(e, s, dt)
+                }
+                s.state = .Active
+            } 
+
+            
     }
 }
 
@@ -163,23 +217,17 @@ update_tick_status :: proc(e : any, s : ^Status_Effect, dt : f32){
     tick_status := &s.type.(TickStatus)
 
     if s.duration <= 0{
-        s.is_active = false
+        s.state = .Finished
     }
     
     if !s.is_active{
-        if tick_status.finish != nil{
-            tick_status.finish(e, s, dt)
-        }
         return
     }
-    
-    s.duration -= dt
 
     if tick_status.current_tick > 0{
         tick_status.current_tick -= dt
     } else{
         tick_status.current_tick = tick_status.tick
-        s.state = .Applied
         if tick_status.apply != nil{
             tick_status.apply(e, s, dt)
         }
