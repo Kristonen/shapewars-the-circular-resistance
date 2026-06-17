@@ -77,8 +77,10 @@ create_level :: proc(type : Level_Type){
 }
 
 refresh_player :: proc(){
+    clear(&game.player.statuses)
     game.player.health.max = 100
     game.player.health.current = 100
+    game.player.health.is_dead = false
     game.player.loot_detector.radius = game.player.radius * 4
     clear(&game.player.weapon.bullet.hitted_enemies)
     switch_weapon()
@@ -131,7 +133,7 @@ create_test_level :: proc(){
     spawner.enemy = Enemies.begin_charge_enemy
     // append(&game.level.spawner, spawner)
     spawner.enemy = Enemies.viper_enemy
-    append(&game.level.spawner, spawner)
+    // append(&game.level.spawner, spawner)
     game.player.pos = {0,0}
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual
@@ -213,9 +215,9 @@ create_choose_bullet_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Bul
 refresh_level :: proc(){
     clear(&game.level.npcs)
     clear(&game.level.area_effects)
-    for &e in game.level.enemies{
-        delete(e.applied_status)
-    }
+    // for &e in game.level.enemies{
+    //     delete(e.applied_status)
+    // }
     for &b in game.level.player_bullets{
         delete(b.hitted_enemies)
     }

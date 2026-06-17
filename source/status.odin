@@ -4,7 +4,7 @@ import "core:fmt"
 import rl "vendor:raylib"
 
 Status_Desc :: enum{Poison, Burn, Haste, Bleed, Confused}
-Status_State :: enum {None, Applied}
+Status_State :: enum {None, Applied, Active}
 
 Status_Type :: union{
     TickStatus, OneTimeStatus
@@ -19,6 +19,7 @@ Status_Particle :: #type proc(area : rl.Rectangle)
 Status_Effect :: struct{
     desc : Status_Desc,
     type : Status_Type,
+    duration : f32,
     // apply : Update_Status,
     state : Status_State,
     texture : rl.Color,
@@ -29,7 +30,6 @@ Status_Effect :: struct{
 TickStatus :: struct{
     current_tick : f32,
     tick : f32,
-    duration : f32,
     activate : Status_Proc,
     apply : Status_Proc,
     finish : Status_Proc,
@@ -37,6 +37,7 @@ TickStatus :: struct{
 }
 
 OneTimeStatus :: struct{
+    base_state : f32,
     strength : f32,
     activate : Activate_Status,
     finish : Finish_Status,
@@ -65,17 +66,38 @@ create_poison_status :: proc(strength, tick, duration : f32) -> Status_Effect{
 create_tick_status :: proc(strength, tick, duration : f32, desc : Status_Desc, activate, apply, finish : Status_Proc) -> Status_Effect{
     s := Status_Effect{
         desc = desc,
+        duration = duration,
         type = TickStatus{
             strength = strength,
             tick = tick,
-            duration = duration,
             activate = activate,
             apply = apply,
             finish = finish,
         },
         is_active = true,
     }
-    switch desc{
+    set_particle_to_status(&s)
+    
+    return s
+}
+
+create_onetime_status :: proc(strength, duration : f32, desc : Status_Desc, activate, finish : Status_Proc) -> Status_Effect{
+    s := Status_Effect{
+        duration = duration,
+        type = OneTimeStatus{
+            strength = strength,
+            activate = activate,
+            finish = finish,
+        },
+        is_active = true,
+    }
+    set_particle_to_status(&s)
+
+    return s
+}
+
+set_particle_to_status :: proc(s : ^Status_Effect){
+    switch s.desc{
         case .Poison:
             s.create_particle = create_poison_particle
         case .Burn:
@@ -86,7 +108,6 @@ create_tick_status :: proc(strength, tick, duration : f32, desc : Status_Desc, a
         case .Confused:
             s.create_particle = create_confused_particle
     }
-    return s
 }
 
 create_fire_status :: proc(strength, tick, duration : f32) -> Status_Effect{
@@ -140,4 +161,36 @@ tick_status_damage_update :: proc(e : any, s : ^Status_Effect, dt : f32){
 
 apply_confused :: proc(entity : any, confused : ^Status_Effect, dt : f32){
     
+}
+
+give_entity_status :: proc{
+    give_player_status,
+    give_enemy_status,
+}
+
+give_player_status :: proc(statuses : []Status_Effect, attacked : ^Player){
+    for s in statuses{
+        if idx, ok := check_if_entity_already_got_status(attacked.statuses, s); !ok{
+            append(&attacked.statuses, s)
+        } else{
+            attacked.statuses[idx].duration = s.duration
+        }
+    }
+}
+
+give_enemy_status :: proc(statuses : []Status_Effect, attacked : ^Enemy){
+    for s in statuses{
+        if idx, ok := check_if_entity_already_got_status(attacked.statuses, s); !ok{
+            append(&attacked.statuses, s)
+        } else{
+            attacked.statuses[idx].duration = s.duration
+        }
+    }
+}
+
+check_if_entity_already_got_status :: proc(s_array : [dynamic]Status_Effect, s : Status_Effect) -> (i32, bool){
+    for e_s, idx in s_array{
+        if e_s.desc == s.desc do return i32(idx), true
+    }
+    return -1, false
 }

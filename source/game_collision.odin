@@ -62,7 +62,8 @@ check_bullet_enemy :: proc(b : ^Bullet){
                 if e.knocback.apply != nil{
                     e.knocback->apply(game.player.pos, &e.rec)
                 }
-                add_bullet_status_to_hitted_enemy(b, &e)
+                give_entity_status(b.applied_status[:], &e)
+                // add_bullet_status_to_hitted_enemy(b, &e)
                 if b.can_lifesteal{
                     apply_lifesteal(&game.player, b.damage)
                 }
@@ -89,13 +90,6 @@ add_bullet_status_to_hitted_enemy :: proc(b : ^Bullet, e : ^Enemy){
     }
 }
 
-check_if_entity_already_got_status :: proc(s_array : [dynamic]Status_Effect, s : Status_Effect) -> (i32, bool){
-    for e_s, idx in s_array{
-        if e_s.desc == s.desc do return i32(idx), true
-    }
-    return -1, false
-}
-
 check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
     for &hitted_enemy in b.hitted_enemies{
         if hitted_enemy == e{
@@ -110,6 +104,7 @@ check_bullet_player :: proc(){
         c_player := game.player.hurt_collider
         c_bullet := b.collider
         if rl.CheckCollisionCircles(c_player.pos, c_player.radius, c_bullet.pos, c_bullet.radius){
+            give_entity_status(b.applied_status[:], &game.player)
             game.player.health->take_dmg(5)
             game.player.health.invincible_timer = 2
             b.pos = {-10000, -10000}
@@ -121,7 +116,8 @@ check_bullet_player :: proc(){
 check_enemy_player :: proc(){
     for &e in game.level.enemies{
         if rl.CheckCollisionCircleRec(game.player.hurt_collider.pos, game.player.hurt_collider.radius, e.rec) && game.player.health.invincible_timer <= 0{
-            add_enemy_status_to_player(e, &game.player)
+            // add_enemy_status_to_player(e, &game.player)
+            give_entity_status(e.applied_status[:], &game.player)
             game.player.health.take_dmg(&game.player.health, 10)
             game.player.health.invincible_timer = 2
         }

@@ -20,7 +20,7 @@ on_area_poison_trigger :: proc(a : Area_Effect, entity : ^Entity){
             } else{
                 overwriting_status := &e.statuses[idx].type.(TickStatus)
                 tick_status := s.type.(TickStatus)
-                overwriting_status.duration = tick_status.duration
+                s.duration = s.duration
             }
         case Enemy:
             // s := create_poison_status()
@@ -29,7 +29,7 @@ on_area_poison_trigger :: proc(a : Area_Effect, entity : ^Entity){
             } else{
                 overwriting_status := &e.statuses[idx].type.(TickStatus)
                 tick_status := s.type.(TickStatus)
-                overwriting_status.duration = tick_status.duration
+                s.duration = s.duration
             }
     }
 }

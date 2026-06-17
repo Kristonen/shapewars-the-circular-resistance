@@ -99,7 +99,8 @@ update_camera :: proc(dt : f32){
 
 update_player :: proc(dt : f32){
     if game.player.health.is_dead{
-        game.should_close = true
+        // game.should_close = true
+        create_level(.HQ)
     }
     if game.player.health.invincible_timer >= 0{
         game.player.health.invincible_timer -= dt
@@ -161,7 +162,7 @@ update_status :: proc(e : any, s : ^Status_Effect, dt : f32){
 update_tick_status :: proc(e : any, s : ^Status_Effect, dt : f32){
     tick_status := &s.type.(TickStatus)
 
-    if tick_status.duration <= 0{
+    if s.duration <= 0{
         s.is_active = false
     }
     
@@ -172,7 +173,7 @@ update_tick_status :: proc(e : any, s : ^Status_Effect, dt : f32){
         return
     }
     
-    tick_status.duration -= dt
+    s.duration -= dt
 
     if tick_status.current_tick > 0{
         tick_status.current_tick -= dt
