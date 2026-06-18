@@ -156,6 +156,7 @@ init_game :: proc(){
     init_shaders()
     init_unlockables()
     init_enemies()
+    init_audio()
 }
 
 load_game :: proc(){

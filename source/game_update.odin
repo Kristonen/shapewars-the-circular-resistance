@@ -290,7 +290,7 @@ update_player_shooting :: proc(dt : f32){
     }
 
     if rl.IsMouseButtonDown(.LEFT) && game.player.weapon.cooldown <= 0 && game.player.ability.shoot_timer <= 0{
-        play_sound_varied(game.player.weapon.shoot_sound, 0.75, 1.25)
+        play_sound_varied(audio_manager.player_shoot_sound, 0.75, 1.25)
         game.player.weapon.cooldown = game.player.weapon.fire_rate
 
         mouse_pos := rl.GetMousePosition()

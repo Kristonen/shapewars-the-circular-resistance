@@ -52,3 +52,12 @@ init_enemies :: proc(){
     s := create_poison_status(2, 0.25, 2)
     append(&Enemies.viper_enemy.applied_status, s)
 }
+
+init_audio :: proc(){
+    volume : f32 = 0.15
+    audio_manager.enemy_hurt_sound = rl.LoadSound(Enemy_Hurt_Sound_Path)
+    rl.SetSoundVolume(audio_manager.enemy_hurt_sound, volume)
+
+    audio_manager.player_shoot_sound = rl.LoadSound(Shoot_Sound_Path)
+    rl.SetSoundVolume(audio_manager.player_shoot_sound, volume)
+}
