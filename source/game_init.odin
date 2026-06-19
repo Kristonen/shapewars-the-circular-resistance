@@ -3,6 +3,8 @@ package game
 import "core:fmt"
 import rl "vendor:raylib"
 
+Portal_Texture_Path :: "assets/portal.png"
+
 init_skilltrees :: proc(){
     for type in Unlocked_Data_Type{
         create_skill_tree(type, &game.skilltrees)
@@ -60,4 +62,8 @@ init_audio :: proc(){
 
     audio_manager.player_shoot_sound = rl.LoadSound(Shoot_Sound_Path)
     rl.SetSoundVolume(audio_manager.player_shoot_sound, volume)
+}
+
+init_textures :: proc(){
+    game.level.portal.texture = rl.LoadTexture(Portal_Texture_Path)
 }

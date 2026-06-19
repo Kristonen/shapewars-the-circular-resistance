@@ -63,6 +63,7 @@ main :: proc(){
 
     defer{
         save_game()
+        unload_game()
         for &b in game.level.player_bullets{
             delete(b.hitted_enemies)
         }
@@ -130,10 +131,6 @@ main :: proc(){
         },
         interactable = nil,
     }
-    create_upgrades(&game.level.upgrade_pool)
-    // fill_available_upgrades()
-    game.level.portal = create_portal({0, 0})
-    game.level.portal.texture = rl.LoadTexture("assets/portal.png")
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
     s := create_poison_status(1, 0.2, 10)
@@ -151,12 +148,15 @@ main :: proc(){
     }
 }
 init_game :: proc(){
+    create_upgrades(&game.level.upgrade_pool)
+    game.level.portal = create_portal({0, 0})
     init_player()
     init_skilltrees()
     init_shaders()
     init_unlockables()
     init_enemies()
     init_audio()
+    init_textures()
 }
 
 load_game :: proc(){
@@ -168,6 +168,12 @@ load_game :: proc(){
 save_game :: proc(){
     save_game_data()
     save_skilltree()
+}
+
+unload_game :: proc(){
+    rl.UnloadSound(audio_manager.enemy_hurt_sound)
+    rl.UnloadSound(audio_manager.player_shoot_sound)
+    rl.UnloadTexture(game.level.portal.texture)
 }
 
 update_game :: proc(dt : f32) {
