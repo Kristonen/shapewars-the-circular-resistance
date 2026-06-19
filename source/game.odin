@@ -9,8 +9,6 @@ import "ui"
 
 game : Game_State
 
-Create_Hit_Particle :: #type proc(area : rl.Rectangle)
-
 Entity :: union {Player, Enemy}
 Unlocked_Type :: enum{Weapon, Ability}
 Unlocked_Data_Type :: enum{NormalBullet, PierceBullet, Dash, Radial_Liberation, Bomb}
@@ -80,8 +78,6 @@ Game_State :: struct{
 
     is_paused : bool,
     play_time : f32,
-
-    create_hit_particle : Create_Hit_Particle,
 
     menu : ui.UI_Menu,
     current_menu : ui.Menu_Type,

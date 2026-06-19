@@ -43,14 +43,8 @@ main :: proc(){
         virtual.arena_free_all(&arena)
     }
 
-    game = Game_State {
-        camera = {
-            zoom = 1,
-            offset = {f32(rl.GetScreenWidth())/2, f32(rl.GetScreenHeight())/2},
-        },
-        helper_activated = false,
+    game = {
         current_menu = .Play,
-        create_hit_particle = create_hit_particles,
         current_level = .HQ,
         skill_points = 100,
     }
@@ -133,7 +127,6 @@ main :: proc(){
     }
     
     game.fbo = rl.LoadRenderTexture(rl.GetScreenWidth(), rl.GetScreenHeight())
-    s := create_poison_status(1, 0.2, 10)
     //Game Loop
     for !rl.WindowShouldClose(){
         dt :=  rl.GetFrameTime()
@@ -155,6 +148,7 @@ init_game :: proc(){
     init_shaders()
     init_unlockables()
     init_enemies()
+    init_camera()
     init_audio()
     init_textures()
 }

@@ -55,6 +55,13 @@ init_enemies :: proc(){
     append(&Enemies.viper_enemy.applied_status, s)
 }
 
+init_camera :: proc(){
+    game.camera = {
+        zoom = 1,
+        offset = {f32(rl.GetScreenWidth()/2), f32(rl.GetScreenHeight()/2)},
+    }
+}
+
 init_audio :: proc(){
     volume : f32 = 0.15
     audio_manager.enemy_hurt_sound = rl.LoadSound(Enemy_Hurt_Sound_Path)

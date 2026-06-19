@@ -179,8 +179,7 @@ create_enemy :: proc(rec : rl.Rectangle, health, speed : f32, color : rl.Color) 
 on_hit :: proc(e : ^Enemy, dmg : f32){
     p_pos : rl.Vector2 = {e.rec.x + e.rec.width/2, e.rec.y + e.rec.height/2}
     play_sound_varied(audio_manager.enemy_hurt_sound, 0.5, 1.5)
-    game.create_hit_particle(e.rec)
-    // e.knocback->apply(game.player.pos, &e.rec)
+    create_hit_particles(e.rec)
     e.health->take_dmg(dmg)
     e.hit_timer = Enemy_Hit_Time
 }
