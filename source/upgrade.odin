@@ -67,6 +67,7 @@ create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade){
         game.level.power_level_up = false
         return
     }
+    if count > 3 do count = 3
     for i in 0..<len(used_idx) do used_idx[i] = -1
     for i in 0..<count{
         upgrade, idx := get_random_upgrade_by_rarity(used_idx)

@@ -16,6 +16,7 @@ Bomb_Data :: struct{
     pos : rl.Vector2,
     target_pos : rl.Vector2,
     can_splitter : bool,
+    bleed_status : Status_Effect,
 }
 
 create_standard_bomb :: proc() -> Ability{
@@ -35,6 +36,7 @@ create_standard_bomb :: proc() -> Ability{
             explosion_radius = 100,
             timer = BOMB_TIMER,
             time_left = BOMB_TIMER,
+            bleed_status = create_bleed_status(10, 0.2, 3),
         },
     }
 }
@@ -85,8 +87,7 @@ bomb_finish :: proc(a : ^Ability, dt : f32){
         if rl.CheckCollisionCircleRec(data.pos, data.explosion_radius, e.rec){
             e->on_hit(data.damage)
             if data.can_splitter{
-                b := create_bleed_status(10, 0.2, 3)
-                give_entity_status({b}, &e)
+                give_entity_status({data.bleed_status}, &e)
             }
         }
     }
