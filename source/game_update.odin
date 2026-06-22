@@ -436,6 +436,8 @@ update_spawner :: proc(dt : f32){
         new_e.spawner = &s
         s.count += 1
         s.spawn_timer = s.spawn_time
+        new_e.id = Enemy_Id
+        Enemy_Id += 1
         append(&game.level.enemies, new_e)
     }
 }

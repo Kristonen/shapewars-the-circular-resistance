@@ -125,11 +125,11 @@ activate_confused :: proc(entity : any, confused : ^Status_Effect, dt : f32){
         case ^Player:
             onetime_status.base_state = e.speed
             e.speed -= onetime_status.strength
-            e.health->take_dmg(10)
+            if e.speed < 0 do e.speed = 0
         case ^Enemy:
             onetime_status.base_state = e.speed
             e.speed -= onetime_status.strength
-            e.health->take_dmg(10)
+            if e.speed < 0 do e.speed = 0
     }
 
 }
@@ -162,6 +162,7 @@ give_player_status :: proc(statuses : []Status_Effect, attacked : ^Player){
 }
 
 give_enemy_status :: proc(statuses : []Status_Effect, attacked : ^Enemy){
+    fmt.println(attacked)
     for s in statuses{
         if idx, ok := check_if_entity_already_got_status(attacked.statuses, s); !ok{
             idx, err := append(&attacked.statuses, s)

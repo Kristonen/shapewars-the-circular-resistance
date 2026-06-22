@@ -6,6 +6,7 @@ import rl "vendor:raylib"
 import "ui"
 
 Apply_Upgrade :: #type proc(u : Upgrade)
+Check_Upgrade_Condition :: #type proc() -> bool
 
 Upgrade_Type :: enum{ Additive, Multiplicative, Subtrative, Division, Toogle }
 Rarity :: enum{ Common, Uncommon, Rare, Epic, Legendary }
@@ -25,6 +26,7 @@ Upgrade :: struct{
     texture : rl.Color,
     rarity : Rarity,
     apply : Apply_Upgrade,
+    check_condition : Check_Upgrade_Condition,
     target : Unlocked_Data_Type,
     type : Upgrade_Type,
     max_used : i32,
@@ -96,6 +98,7 @@ get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) ->
     for true{
         rand_idx = rand.int32_range(0, i32(len(u)))
         upgrade = &u[rand_idx]
+        if upgrade.check_condition != nil && !upgrade.check_condition() do continue
         if upgrade.max_used > 0 && upgrade.count_used >= upgrade.max_used do continue
         if rarity != upgrade.rarity || is_upgrade_already_used(rand_idx, used_idx) do continue
         break

@@ -8,6 +8,8 @@ import "ui"
 
 Enemy_Hit_Time :: 0.1
 
+Enemy_Id : i32 = 1
+
 Behavior :: #type proc(e : ^Enemy, b : ^Behavior_Data, dt : f32)
 On_Hit :: #type proc(e : ^Enemy, dmg : f32)
 On_Death :: #type proc(e : Enemy, idx : i32)
@@ -48,6 +50,7 @@ Behavior_Data :: union{
 }
 
 Enemy :: struct {
+    id : i32,
     rec : rl.Rectangle,
     origin : rl.Vector2,
     speed : f32,
@@ -344,4 +347,11 @@ check_enemy_use_boss_ability :: proc(data : Boss_Data) -> bool{
 
 check_other_enemy_data :: proc(data : Melee_Data) -> bool{
     return true
+}
+
+get_enemy_by_id :: proc(id : i32) -> ^Enemy{
+    for &e in game.level.enemies{
+        if e.id == id do return &e
+    }
+    return nil
 }
