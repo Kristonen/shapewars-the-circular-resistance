@@ -524,21 +524,22 @@ fill_available_upgrades :: proc(){
     legendary : i32
     clear(&game.level.available_upgrades)
     for u in game.level.upgrade_pool{
-        if u.target == .NormalBullet{
-            append(&game.level.available_upgrades, u)
-        } else if game.player.current_ability == u.target{
-            append(&game.level.available_upgrades, u)
-        } else if game.player.current_weapon == u.target{
+        // if u.target == .NormalBullet{
+        //     append(&game.level.available_upgrades, u)
+        // } else if game.player.current_ability == u.target{
+        //     append(&game.level.available_upgrades, u)
+        // } else if game.player.current_weapon == u.target{
+        //     append(&game.level.available_upgrades, u)
+        // }
+
+        if game.player.current_ability == u.target{
             append(&game.level.available_upgrades, u)
         }
         
     }
     
-    
+
     for u, idx in game.level.available_upgrades{
-        fmt.println(idx)
-        fmt.println(u.name.content)
-        fmt.println(u.rarity)
         switch u.rarity{
             case .Common: common += 1
             case .Uncommon: uncommon += 1

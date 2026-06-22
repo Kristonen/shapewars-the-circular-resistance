@@ -60,15 +60,25 @@ create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade){
     m.width = f32(rl.GetScreenWidth())
     m.height = f32(rl.GetScreenHeight())
     m.is_active = !rl.IsMouseButtonDown(.LEFT)
+    for i in 0..<len(m.upgrades) do m.upgrades[i].upgrade = nil
+    count := how_many_useable_upgrades()
     used_idx : [3]i32
-    used_idx[0] = -1
-    used_idx[1] = -1
-    used_idx[2] = -1
-    for i in 0..<3{
+    for i in 0..<len(used_idx) do used_idx[i] = -1
+    for i in 0..<count{
         upgrade, idx := get_random_upgrade_by_rarity(used_idx)
         used_idx[i] = idx
         m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
     }
+}
+
+how_many_useable_upgrades :: proc() -> i32{
+    count : i32
+    for u in game.level.available_upgrades{
+        if u.check_condition != nil && !u.check_condition() do continue
+        if u.max_used != 0 && u.count_used >= u.max_used do continue
+        count += 1
+    }
+    return count
 }
 
 is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
@@ -100,10 +110,6 @@ get_random_upgrade_by_rarity :: proc(used_idx : [3]i32) -> (^Upgrade, i32){
         upgrade = &game.level.available_upgrades[rand_idx]
         if upgrade.check_condition != nil && !upgrade.check_condition() do continue
         if upgrade.max_used > 0 && upgrade.count_used >= upgrade.max_used do continue
-        fmt.println(rarity)
-        fmt.println(upgrade.rarity)
-        fmt.println(used_idx)
-        fmt.println(rand_idx)
         if rarity != upgrade.rarity || is_upgrade_already_used(rand_idx, used_idx) do continue
         break
     }

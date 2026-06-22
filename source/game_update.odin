@@ -665,6 +665,7 @@ update_upgrade :: proc(dt : f32){
         game.level.upgrade_menu.upgrades[i] = slot
     }
     for &slot in game.level.upgrade_menu.upgrades{
+        if slot.upgrade == nil do continue
         if slot.state == .Selected{
             on_upgrade(slot.upgrade)
             game.level.power_level_up = false

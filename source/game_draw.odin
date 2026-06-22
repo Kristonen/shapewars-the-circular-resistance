@@ -248,6 +248,7 @@ draw_upgrade :: proc(){
     rl.DrawRectangleV({}, {game.level.upgrade_menu.width, game.level.upgrade_menu.height}, {0, 0, 0, 200})
     draw_glow_shader()
     for slot in game.level.upgrade_menu.upgrades{
+        if slot.upgrade == nil do continue
         gray := rl.GRAY
         gray.a = 150
         if slot.state == .Focused{

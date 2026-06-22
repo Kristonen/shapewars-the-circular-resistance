@@ -19,7 +19,7 @@ create_dash_upgrades :: proc(a : ^[dynamic]Upgrade){
     uncommon.check_condition = check_if_dash_can_attack
 
     append(a, common)
-append(a, uncommon)
+    append(a, uncommon)
     append(a, epic)
 }
 
