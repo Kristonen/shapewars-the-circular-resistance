@@ -63,6 +63,10 @@ create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade){
     for i in 0..<len(m.upgrades) do m.upgrades[i].upgrade = nil
     count := how_many_useable_upgrades()
     used_idx : [3]i32
+    if count < 1{
+        game.level.power_level_up = false
+        return
+    }
     for i in 0..<len(used_idx) do used_idx[i] = -1
     for i in 0..<count{
         upgrade, idx := get_random_upgrade_by_rarity(used_idx)
