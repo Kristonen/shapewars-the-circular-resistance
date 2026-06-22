@@ -65,7 +65,7 @@ create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade){
     used_idx[1] = -1
     used_idx[2] = -1
     for i in 0..<3{
-        upgrade, idx := get_random_upgrade_by_rarity(u, used_idx)
+        upgrade, idx := get_random_upgrade_by_rarity(used_idx)
         used_idx[i] = idx
         m.upgrades[i] = create_upgrade_slot(upgrade, f32(i))
     }
@@ -80,7 +80,7 @@ is_upgrade_already_used :: proc(n : i32, idx_array : [3]i32) -> bool{
     return false
 }
 
-get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) -> (^Upgrade, i32){
+get_random_upgrade_by_rarity :: proc(used_idx : [3]i32) -> (^Upgrade, i32){
     upgrade : ^Upgrade
     rand_idx : i32
     already_used_rarity : [dynamic]Rarity
@@ -96,10 +96,14 @@ get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) ->
     }
 
     for true{
-        rand_idx = rand.int32_range(0, i32(len(u)))
-        upgrade = &u[rand_idx]
+        rand_idx = rand.int32_range(0, i32(len(game.level.available_upgrades)))
+        upgrade = &game.level.available_upgrades[rand_idx]
         if upgrade.check_condition != nil && !upgrade.check_condition() do continue
         if upgrade.max_used > 0 && upgrade.count_used >= upgrade.max_used do continue
+        fmt.println(rarity)
+        fmt.println(upgrade.rarity)
+        fmt.println(used_idx)
+        fmt.println(rand_idx)
         if rarity != upgrade.rarity || is_upgrade_already_used(rand_idx, used_idx) do continue
         break
     }
@@ -109,6 +113,7 @@ get_random_upgrade_by_rarity :: proc(u : [dynamic]Upgrade, used_idx : [3]i32) ->
 check_if_upgrade_with_rarity :: proc(r : Rarity, used_idx : [3]i32) -> bool{
     for u, idx in game.level.available_upgrades{
         if is_upgrade_already_used(i32(idx), used_idx) do continue
+        if u.check_condition != nil && !u.check_condition() do continue
         if u.rarity == r do return true
     }
     return false

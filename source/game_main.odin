@@ -531,6 +531,14 @@ fill_available_upgrades :: proc(){
         } else if game.player.current_weapon == u.target{
             append(&game.level.available_upgrades, u)
         }
+        
+    }
+    
+    
+    for u, idx in game.level.available_upgrades{
+        fmt.println(idx)
+        fmt.println(u.name.content)
+        fmt.println(u.rarity)
         switch u.rarity{
             case .Common: common += 1
             case .Uncommon: uncommon += 1
@@ -539,6 +547,7 @@ fill_available_upgrades :: proc(){
             case .Legendary: legendary += 1
         }
     }
+
     fmt.printfln("Common: %i", common)
     fmt.printfln("Uncommon: %i", uncommon)
     fmt.printfln("Rare: %i", rare)

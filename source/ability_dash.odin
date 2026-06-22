@@ -65,11 +65,6 @@ dash_update :: proc(a : ^Ability, dt : f32){
                         data.touched_enemies[i] = e.id
                         break
                     }
-
-
-                    // give_entity_status({confused}, &e)
-                    // append(&e.statuses, confused)
-                    // e.health->take_dmg(data.damage)
                 }
             }
             

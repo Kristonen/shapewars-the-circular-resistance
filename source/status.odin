@@ -162,7 +162,6 @@ give_player_status :: proc(statuses : []Status_Effect, attacked : ^Player){
 }
 
 give_enemy_status :: proc(statuses : []Status_Effect, attacked : ^Enemy){
-    fmt.println(attacked)
     for s in statuses{
         if idx, ok := check_if_entity_already_got_status(attacked.statuses, s); !ok{
             idx, err := append(&attacked.statuses, s)

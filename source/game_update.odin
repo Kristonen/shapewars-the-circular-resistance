@@ -67,6 +67,11 @@ update_handler :: proc(dt : f32){
         create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
     }
 
+    if rl.IsKeyDown(.O) && game.current_level != .HQ{
+        game.level.power_level_up = true
+        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
+    }
+
     if rl.IsKeyPressed(.TAB){
         game.is_paused = !game.is_paused
         game.current_menu = game.is_paused ? .Stats : .Play
