@@ -9,6 +9,7 @@ Spawner :: struct{
     spawn_timer : f32,
     level_cond : i32,
     is_active : bool,
+    state : InGame_State,
 }
 
 create_spawner :: proc(max_count : i32, spawn_time : f32, increase : i32, cond : i32 = 1) -> Spawner{

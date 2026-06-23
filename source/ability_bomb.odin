@@ -83,7 +83,7 @@ bomb_finish :: proc(a : ^Ability, dt : f32){
     data.time_left = data.timer
 
     for &e in game.level.enemies{
-        if e.health.is_dead do continue
+        if e.health.is_dead || e.state == .None do continue
         if rl.CheckCollisionCircleRec(data.pos, data.explosion_radius, e.rec){
             e->on_hit(data.damage)
             if data.can_splitter{

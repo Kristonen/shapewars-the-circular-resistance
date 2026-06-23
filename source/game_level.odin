@@ -16,7 +16,7 @@ Level_State :: enum{
 }
 
 Level_Data :: struct{
-    spawner : [dynamic]Spawner,
+    spawner : [25]Spawner,
     enemies : [500]Enemy,
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
     enemy_bullets : [dynamic]Bullet,
@@ -110,7 +110,8 @@ create_start_level :: proc(){
 create_first_test_level :: proc(){
     spawner := create_spawner(5, 0.5, 2)
     spawner.enemy = Enemies.begin_enemy
-    append(&game.level.spawner, spawner)
+    add_spawner_to_game(&spawner)
+    // append(&game.level.spawner, spawner)
     game.player.pos = {0, 0}
     create_battle_ui()
     level_up_spawner_update()
@@ -128,7 +129,8 @@ create_first_test_level :: proc(){
 create_test_level :: proc(){
     spawner := create_spawner(100, 0.1, 0)
     spawner.enemy = Enemies.dummy_enemy
-    append(&game.level.spawner, spawner)
+    add_spawner_to_game(&spawner)
+    // append(&game.level.spawner, spawner)
     spawner = create_spawner(1, 1, 0)
     spawner.enemy = Enemies.begin_charge_enemy
     // append(&game.level.spawner, spawner)
@@ -146,7 +148,8 @@ create_test_level :: proc(){
 create_boss_test_level :: proc(){
     spawner := create_spawner(1, 1, 0)
     spawner.enemy = create_test_boss()
-    append(&game.level.spawner, spawner)
+    add_spawner_to_game(&spawner)
+    // append(&game.level.spawner, spawner)
     level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator)
     game.level.level_visual = level_visual
     game.player.pos = {0, 0}
@@ -215,9 +218,6 @@ create_choose_bullet_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Bul
 refresh_level :: proc(){
     clear(&game.level.npcs)
     clear(&game.level.area_effects)
-    // for &e in game.level.enemies{
-    //     delete(e.applied_status)
-    // }
     for &b in game.level.player_bullets{
         delete(b.hitted_enemies)
     }
@@ -232,6 +232,51 @@ refresh_level :: proc(){
         clear(&s.enemy.applied_status)
         clear(&s.enemy.statuses)
     }
-    clear(&game.level.spawner)
+    // clear(&game.level.spawner)
     clear(&game.level.particles)
+}
+
+get_next_free_entity :: proc{
+    get_next_free_enemy,
+    get_next_free_spawner,
+}
+
+get_next_free_enemy :: proc(array : []Enemy) -> i32{
+    for i in 0..<len(game.level.enemies){
+        if game.level.enemies[i].state == .None do return i32(i)
+    }
+    return -1
+}
+
+get_next_free_spawner :: proc(array : []Spawner) -> i32{
+    for i in 0..<len(game.level.spawner){
+        if game.level.spawner[i].state == .None do return i32(i)
+    }
+    return -1
+}
+
+add_entity_to_game :: proc{
+    add_spawner_to_game,
+    add_enemy_to_game,
+}
+
+add_spawner_to_game :: proc(s : ^Spawner){
+    free_spawner_idx := get_next_free_entity(game.level.spawner[:])
+
+    if free_spawner_idx == -1 do return
+
+    s.state = .Active
+    game.level.spawner[free_spawner_idx] = s^
+}
+
+add_enemy_to_game :: proc(e : ^Enemy) -> bool{
+    free_enemy_idx := get_next_free_entity(game.level.enemies[:])
+
+    if free_enemy_idx == -1 do return false
+
+    e.state = .Active
+    e.id = Enemy_Id
+    Enemy_Id += 1
+    game.level.enemies[free_enemy_idx] = e^
+    return true
 }

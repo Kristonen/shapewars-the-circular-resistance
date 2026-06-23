@@ -7,7 +7,7 @@ import rl "vendor:raylib"
 import m "map"
 import "ui"
 
-game : Game_State
+game : Game
 
 Entity :: union {Player, Enemy}
 Unlocked_Type :: enum{Weapon, Ability}
@@ -19,6 +19,10 @@ Unlocked :: struct{
     unlocked : bool,
     blueprints : i32,
     cost : f32,
+}
+
+InGame_State :: enum{
+    None, Active
 }
 
 create_unlockable :: proc(idx : i32, name : string, data : Unlocked_Data_Type, type : Unlocked_Type, unlocked : bool = false, cost : f32 = 0){
@@ -70,7 +74,7 @@ get_unlockable :: proc(type : Unlocked_Data_Type) -> (^Unlocked, int){
     return unlocked, i
 }
 
-Game_State :: struct{
+Game :: struct{
     player : Player,
     camera : rl.Camera2D,
     unlockables : [12]Unlocked,

@@ -55,6 +55,7 @@ check_bullet :: proc(){
 
 check_bullet_enemy :: proc(b : ^Bullet){
     for &e in game.level.enemies{
+        if e.state == .None do continue
         if rl.CheckCollisionCircleRec(b.collider.pos, b.collider.radius, e.rec){
 
             if !check_if_enemy_already_hitted(&e, b^){
@@ -115,6 +116,7 @@ check_bullet_player :: proc(){
 
 check_enemy_player :: proc(){
     for &e in game.level.enemies{
+        if e.state == .None || e.health.is_dead do continue
         if rl.CheckCollisionCircleRec(game.player.hurt_collider.pos, game.player.hurt_collider.radius, e.rec) && game.player.health.invincible_timer <= 0{
             // add_enemy_status_to_player(e, &game.player)
             give_entity_status(e.applied_status[:], &game.player)
@@ -126,6 +128,7 @@ check_enemy_player :: proc(){
 
 check_enemy :: proc(){
     for &e in game.level.enemies{
+        if e.state == .None || e.health.is_dead do continue
         check_enemy_enemy(&e)
     }
 }

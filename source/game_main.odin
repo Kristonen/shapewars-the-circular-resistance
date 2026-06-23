@@ -84,7 +84,7 @@ main :: proc(){
         delete(Enemies.viper_enemy.applied_status)
         // delete(game.level.enemies)
         delete(game.level.npcs)
-        delete(game.level.spawner)
+        // delete(game.level.spawner)
         delete(game.tooltips)
         for &element in game.level.ui_elements{
             switch &e in &element{

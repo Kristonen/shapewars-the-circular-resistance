@@ -49,10 +49,6 @@ Behavior_Data :: union{
     Melee_Data, Distance_Data, Charge_Data, Boss_Data
 }
 
-Enemy_State :: enum{
-    None, Active
-}
-
 Enemy :: struct {
     id : i32,
     rec : rl.Rectangle,
@@ -79,7 +75,7 @@ Enemy :: struct {
     on_hit : On_Hit,
     on_death : On_Death,
 
-    state : Enemy_State,
+    state : InGame_State,
 }
 
 Enemy_Death_Fragment :: struct{
@@ -347,14 +343,8 @@ check_other_enemy_data :: proc(data : Melee_Data) -> bool{
 
 get_enemy_by_id :: proc(id : i32) -> ^Enemy{
     for &e in game.level.enemies{
+        if e.state == .None do continue
         if e.id == id do return &e
     }
     return nil
-}
-
-get_next_free_enemy :: proc() -> i32{
-    for i in 0..<len(game.level.enemies){
-        if game.level.enemies[i].state == .None do return i32(i)
-    }
-    return -1
 }
