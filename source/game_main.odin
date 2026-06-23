@@ -69,7 +69,7 @@ main :: proc(){
         delete(game.level.loot)
         delete(game.level.upgrade_pool)
         delete(game.level.available_upgrades)
-        delete(game.level.particles)
+        // delete(game.level.particles)
         delete(game.level.level_visual.tilesets)
         delete(game.level.level_visual.layers)
         delete(game.level.ui_elements)

@@ -46,6 +46,7 @@ draw_reinforcment :: proc(pos : rl.Vector2){
             alive = true,
             type = .Normal,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
+        // append(&game.level.particles, p)
     }
 }

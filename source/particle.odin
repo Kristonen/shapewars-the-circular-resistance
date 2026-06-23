@@ -19,6 +19,7 @@ Particle :: struct{
     alive : bool,
     use_grav : bool,
     type : Particle_Type,
+    state : InGame_State,
 }
 //Create a random direction as vector 2. (0 - 360 degrees)
 get_random_unit_vector :: proc(speed : f32 = 1.0) -> rl.Vector2{
@@ -43,7 +44,7 @@ create_hit_particles :: proc(area : rl.Rectangle){
             alive = true,
             type = .Normal,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
     }
 }
 
@@ -59,22 +60,7 @@ create_explosion_particles :: proc(area : rl.Rectangle){
         alive = true,
     }
 
-    append(&game.level.particles, p)
-
-    // for _ in 0..<amount{
-    //     angle := f32(rl.GetRandomValue(0, 360)) * (math.PI/100.0)
-    //     speed := f32(rl.GetRandomValue(180, 220))
-    //     p : Particle = {
-    //         pos = {area.x, area.y},
-    //         vel = {math.cos(angle) * speed, math.sin(angle) * speed},
-    //         color = rl.RED,
-    //         max_life = f32(rl.GetRandomValue(10, 15)) / 10,
-    //         size = f32(rl.GetRandomValue(5, 8)),
-    //         alive = true,
-    //         type = .Normal,
-    //     }
-    //     append(&game.level.particles, p)
-    // }
+    add_entity_to_game(&p)
 
     for _ in 0..<25{
         
@@ -90,7 +76,7 @@ create_explosion_particles :: proc(area : rl.Rectangle){
             type = .PlasmaSmoke,
             alive = true,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
     }
 
     for _ in 0..<50{
@@ -108,7 +94,7 @@ create_explosion_particles :: proc(area : rl.Rectangle){
             type = .Line,
             alive = true,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
     }
 }
 
@@ -131,7 +117,7 @@ create_bleeding_particle :: proc(area : rl.Rectangle){
                 alive = true,
                 type = .Normal,
             }
-            append(&game.level.particles, p)
+            add_entity_to_game(&p)
         }
     }
 }
@@ -149,7 +135,7 @@ create_confused_particle :: proc(area : rl.Rectangle){
             alive = true,
             type = .Expanding,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
     }
 }
 
@@ -167,7 +153,7 @@ create_destroy_bullet_particle :: proc(area : rl.Rectangle){
             alive = true,
             type = .Normal,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
     }
 }
 
@@ -196,7 +182,7 @@ create_poison_particle :: proc(area : rl.Rectangle){
                 alive = true,
                 type = .Normal,
             }
-            append(&game.level.particles, p)
+            add_entity_to_game(&p)
         }
     }
 }
@@ -217,7 +203,7 @@ create_death_poison_particle :: proc(pos : rl.Vector2){
             type = .Normal,
         }
 
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
     }
 
 }
@@ -239,11 +225,11 @@ create_fire_particle :: proc(area : rl.Rectangle){
             alive = true,
             type = .Normal,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
         smoke_p := p
         smoke_p.pos.y -= 20
         smoke_p.color = {65, 65, 65, 255}
-        append(&game.level.particles, smoke_p)
+        add_entity_to_game(&smoke_p)
     }
 }
 
@@ -264,7 +250,7 @@ create_dash_particle :: proc(pos : rl.Vector2, dir : rl.Vector2){
                 alive = true,
                 type = .Normal,
             }
-            append(&game.level.particles, p)
+            add_entity_to_game(&p)
         }
     }
     for _ in 0..<amount{
@@ -278,6 +264,6 @@ create_dash_particle :: proc(pos : rl.Vector2, dir : rl.Vector2){
             alive = true,
             type = .Normal,
         }
-        append(&game.level.particles, p)
+        add_entity_to_game(&p)
     }
 }

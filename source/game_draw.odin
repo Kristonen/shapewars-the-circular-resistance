@@ -220,7 +220,7 @@ draw_chest :: proc(){
 
 draw_particles :: proc(){
     for p in game.level.particles{
-
+        if p.state == .None do continue
         alpha := 1.0 - (p.life/p.max_life)
         color := p.color
         color.a = u8(alpha*255)

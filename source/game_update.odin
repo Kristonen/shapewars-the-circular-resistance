@@ -590,13 +590,14 @@ update_animation :: proc(a : ^Animation, dt : f32){
 }
 
 update_particle :: proc(dt : f32){
-    for i := 0; i < len(game.level.particles);{
+    for i in 0..<len(game.level.particles){
         p := &game.level.particles[i]
+        if p.state == .None do continue
         if p.life >= p.max_life{
             p.alive = false
         }
         if !p.alive{
-            unordered_remove(&game.level.particles, i)
+            p.state = .None
             continue
         }
         if p.use_grav{
@@ -617,8 +618,7 @@ update_particle :: proc(dt : f32){
                 p.pos += p.vel * dt
                 p.vel *= 0.99
                 p.size = (1.0 - progress) * 18.0
-        }
-        i += 1  
+        } 
     }
 }
 

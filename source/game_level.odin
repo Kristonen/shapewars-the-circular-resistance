@@ -23,7 +23,7 @@ Level_Data :: struct{
     area_effects : [dynamic]Area_Effect,
     indicator : Indicator,
 
-    particles : [dynamic]Particle,
+    particles : [500]Particle,
 
     npcs : [dynamic]NPC,
 
@@ -233,24 +233,32 @@ refresh_level :: proc(){
         clear(&s.enemy.statuses)
     }
     // clear(&game.level.spawner)
-    clear(&game.level.particles)
+    // clear(&game.level.particles)
 }
 
 get_next_free_entity :: proc{
     get_next_free_enemy,
     get_next_free_spawner,
+    get_next_free_particle,
 }
 
 get_next_free_enemy :: proc(array : []Enemy) -> i32{
-    for i in 0..<len(game.level.enemies){
-        if game.level.enemies[i].state == .None do return i32(i)
+    for i in 0..<len(array){
+        if array[i].state == .None do return i32(i)
     }
     return -1
 }
 
 get_next_free_spawner :: proc(array : []Spawner) -> i32{
-    for i in 0..<len(game.level.spawner){
-        if game.level.spawner[i].state == .None do return i32(i)
+    for i in 0..<len(array){
+        if array[i].state == .None do return i32(i)
+    }
+    return -1
+}
+
+get_next_free_particle :: proc(array : []Particle) -> i32{
+    for i in 0..<len(array){
+        if array[i].state == .None do return i32(i)
     }
     return -1
 }
@@ -258,6 +266,7 @@ get_next_free_spawner :: proc(array : []Spawner) -> i32{
 add_entity_to_game :: proc{
     add_spawner_to_game,
     add_enemy_to_game,
+    add_particle_to_game,
 }
 
 add_spawner_to_game :: proc(s : ^Spawner){
@@ -279,4 +288,14 @@ add_enemy_to_game :: proc(e : ^Enemy) -> bool{
     Enemy_Id += 1
     game.level.enemies[free_enemy_idx] = e^
     return true
+}
+
+add_particle_to_game :: proc(p : ^Particle){
+    free_particle_idx := get_next_free_entity(game.level.particles[:])
+
+    if free_particle_idx == -1 do return
+
+    p.alive = true
+    p.state = .Active
+    game.level.particles[free_particle_idx] = p^
 }
