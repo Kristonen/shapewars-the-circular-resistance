@@ -17,7 +17,7 @@ Level_State :: enum{
 
 Level_Data :: struct{
     spawner : [dynamic]Spawner,
-    enemies : [dynamic]Enemy,
+    enemies : [500]Enemy,
     enemy_fragments : [dynamic]Enemy_Death_Fragment,
     enemy_bullets : [dynamic]Bullet,
     area_effects : [dynamic]Area_Effect,
@@ -221,7 +221,7 @@ refresh_level :: proc(){
     for &b in game.level.player_bullets{
         delete(b.hitted_enemies)
     }
-    clear(&game.level.enemies)
+    // clear(&game.level.enemies)
     clear(&game.level.player_bullets)
     clear(&game.level.enemy_bullets)
     clear(&game.level.enemy_fragments)

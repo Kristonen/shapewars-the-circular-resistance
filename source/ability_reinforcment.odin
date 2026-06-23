@@ -26,7 +26,10 @@ activate_reinforcement :: proc(a : ^Ability, dt : f32){
         e.health_bar = ui.create_progress_bar(rec, rl.BLACK, rl.GRAY, rl.RED)
         e.health_bar.value = e.health.current
         e.health_bar.max = e.health.max
-        append(&game.level.enemies, e)
+        e.state = .Active
+        free_enemy_index := get_next_free_enemy()
+        game.level.enemies[free_enemy_index] = e
+        // append(&game.level.enemies, e)
     }
 }
 

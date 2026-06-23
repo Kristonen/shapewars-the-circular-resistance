@@ -12,7 +12,7 @@ Enemy_Id : i32 = 1
 
 Behavior :: #type proc(e : ^Enemy, b : ^Behavior_Data, dt : f32)
 On_Hit :: #type proc(e : ^Enemy, dmg : f32)
-On_Death :: #type proc(e : Enemy, idx : i32)
+On_Death :: #type proc(e : ^Enemy, idx : i32)
 // Apply_Knockback :: #type proc(k : ^Knockback, a_pos : rl.Vector2, v_pos : ^rl.Vector2)
 
 Enemies : Enemy_List
@@ -49,6 +49,10 @@ Behavior_Data :: union{
     Melee_Data, Distance_Data, Charge_Data, Boss_Data
 }
 
+Enemy_State :: enum{
+    None, Active
+}
+
 Enemy :: struct {
     id : i32,
     rec : rl.Rectangle,
@@ -74,6 +78,8 @@ Enemy :: struct {
 
     on_hit : On_Hit,
     on_death : On_Death,
+
+    state : Enemy_State,
 }
 
 Enemy_Death_Fragment :: struct{
@@ -187,7 +193,7 @@ on_hit :: proc(e : ^Enemy, dmg : f32){
     e.hit_timer = Enemy_Hit_Time
 }
 
-on_death :: proc(e : Enemy, idx : i32){
+on_death :: proc(e : ^Enemy, idx : i32){
     game.shake = 50
     count := rand.int32_range(3, 7)
     spawn_shards(count, e.origin)
@@ -198,18 +204,15 @@ on_death :: proc(e : Enemy, idx : i32){
     if health_rand < 0.2{
         spawn_health_pack(e.origin)
     }
-    create_fragments_death(&game.level.enemy_fragments ,e)
-    unordered_remove(&game.level.enemies, idx)
+    create_fragments_death(&game.level.enemy_fragments, e^)
 }
 
-on_death_boss :: proc(e : Enemy, idx : i32){
+on_death_boss :: proc(e : ^Enemy, idx : i32){
     game.shake = 300
     game.level.state = .Finished
-    // activate_portal(e.origin)
-    unordered_remove(&game.level.enemies, idx)
 }
 
-on_death_poison :: proc(e : Enemy, idx : i32){
+on_death_poison :: proc(e : ^Enemy, idx : i32){
     game.shake = 50
     if spawner := (^Spawner)(e.spawner); spawner != nil{
         spawner.count -= 1
@@ -222,7 +225,7 @@ on_death_poison :: proc(e : Enemy, idx : i32){
         pos = e.origin,
         trigger = on_area_poison_trigger,
     }
-    unordered_remove(&game.level.enemies, idx)
+
     append(&game.level.area_effects, p_area)
 }
 
@@ -326,13 +329,6 @@ charge_enemy_behavior :: proc(e : ^Enemy, d : ^Behavior_Data, dt : f32){
     }
 }
 
-// check_enemy_use_ability :: proc(abilities : []Ability) -> bool{
-//     for a in abilities{
-//         if a.state != .None do return false
-//     }
-//     return true
-// }
-
 check_enemy_use_ability :: proc{
     check_enemy_use_boss_ability,
     check_other_enemy_data,
@@ -354,4 +350,11 @@ get_enemy_by_id :: proc(id : i32) -> ^Enemy{
         if e.id == id do return &e
     }
     return nil
+}
+
+get_next_free_enemy :: proc() -> i32{
+    for i in 0..<len(game.level.enemies){
+        if game.level.enemies[i].state == .None do return i32(i)
+    }
+    return -1
 }

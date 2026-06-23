@@ -425,6 +425,8 @@ update_spawner :: proc(dt : f32){
             s.spawn_timer -= dt
             continue
         }
+        free_enemy_index := get_next_free_enemy()
+        if free_enemy_index == -1 do return
         new_e := s.enemy
         pos := handler.get_random_spawn_pos(game.camera)
         new_e.rec.x = pos.x
@@ -439,19 +441,25 @@ update_spawner :: proc(dt : f32){
         new_e.health_bar.value = new_e.health.current
         new_e.health_bar.max = new_e.health.max
         new_e.spawner = &s
+        new_e.state = .Active
+
         s.count += 1
         s.spawn_timer = s.spawn_time
         new_e.id = Enemy_Id
+
         Enemy_Id += 1
-        append(&game.level.enemies, new_e)
+
+        game.level.enemies[free_enemy_index] = new_e
     }
 }
 
 update_enemy :: proc(dt : f32){
     for &e, idx in game.level.enemies{
+        if e.state == .None do continue
         if e.health.is_dead{
             delete(e.statuses)
-            e.on_death(e, i32(idx))
+            e.on_death(&e, i32(idx))
+            e.state = .None
             continue
         }
         if e.hit_timer > 0{
