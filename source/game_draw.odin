@@ -44,6 +44,7 @@ draw_player_indicator :: proc(){
 
 draw_npc :: proc(){
     for n in game.level.npcs{
+        if n.state == .None do continue
         rl.DrawCircleV(n.pos, n.radius, n.texture)
         if game.helper_activated{
             draw_collider(n.interactable.collider)

@@ -39,6 +39,7 @@ check_player_area_effect :: proc(){
 
 check_player_npc :: proc(pos : rl.Vector2) -> bool{
     for n in game.level.npcs{
+        if n.state == .None do continue
         if rl.CheckCollisionCircles(pos, game.player.physics_collider.radius, n.pos, n.radius){
             return true
         }
@@ -64,7 +65,6 @@ check_bullet_enemy :: proc(b : ^Bullet){
                     e.knocback->apply(game.player.pos, &e.rec)
                 }
                 give_entity_status(b.applied_status[:], &e)
-                // add_bullet_status_to_hitted_enemy(b, &e)
                 if b.can_lifesteal{
                     apply_lifesteal(&game.player, b.damage)
                 }

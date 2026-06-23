@@ -8,6 +8,7 @@ NPC :: struct{
     radius : f32,
     texture : rl.Color,
     interactable : Interactable,
+    state : InGame_State,
 }
 
 create_gunsmith_npc :: proc(pos : rl.Vector2) -> NPC{

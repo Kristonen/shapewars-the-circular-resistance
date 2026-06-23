@@ -25,7 +25,7 @@ Level_Data :: struct{
 
     particles : [500]Particle,
 
-    npcs : [dynamic]NPC,
+    npcs : [10]NPC,
 
     player_bullets : [dynamic]Bullet,
 
@@ -89,15 +89,15 @@ refresh_player :: proc(){
 
 create_start_level :: proc(){
     npc := create_gunsmith_npc({100, 100})
-    append(&game.level.npcs, npc)
+    add_entity_to_game(&npc)
     npc = create_commander_npc({0, 500})
-    append(&game.level.npcs, npc)
+    add_entity_to_game(&npc)
     npc = create_catalyst_npc({400, -200})
-    append(&game.level.npcs, npc)
+    add_entity_to_game(&npc)
     npc = create_quartermaster_npc({400, 400})
-    append(&game.level.npcs, npc)
+    add_entity_to_game(&npc)
     npc = create_craftman_npc({325, 250})
-    append(&game.level.npcs, npc)
+    add_entity_to_game(&npc)
     if level_visual, ok := m.load_map("assets/test_map.json", game.map_allocator); ok{
         game.player.pos = m.get_player_spawn_pos(level_visual)
         game.camera.target = game.player.pos
@@ -216,7 +216,24 @@ create_choose_bullet_skilltree :: proc(rec : rl.Rectangle, type : ^Skilltree_Bul
 }
 
 refresh_level :: proc(){
-    clear(&game.level.npcs)
+
+    for &n in game.level.npcs{
+        n.state = .None
+    }
+
+    for &p in game.level.particles{
+        p.state = .None
+    }
+
+    for &e in game.level.enemies{
+        e.state = .None
+    }
+
+    for &s in game.level.spawner{
+        s.state = .None
+    }
+
+
     clear(&game.level.area_effects)
     for &b in game.level.player_bullets{
         delete(b.hitted_enemies)
@@ -240,6 +257,7 @@ get_next_free_entity :: proc{
     get_next_free_enemy,
     get_next_free_spawner,
     get_next_free_particle,
+    get_next_free_npc,
 }
 
 get_next_free_enemy :: proc(array : []Enemy) -> i32{
@@ -263,10 +281,18 @@ get_next_free_particle :: proc(array : []Particle) -> i32{
     return -1
 }
 
+get_next_free_npc :: proc(array : []NPC) -> i32{
+    for i in 0..<len(array){
+        if array[i].state == .None do return i32(i)
+    }
+    return -1
+}
+
 add_entity_to_game :: proc{
     add_spawner_to_game,
     add_enemy_to_game,
     add_particle_to_game,
+    add_npc_to_game,
 }
 
 add_spawner_to_game :: proc(s : ^Spawner){
@@ -298,4 +324,13 @@ add_particle_to_game :: proc(p : ^Particle){
     p.alive = true
     p.state = .Active
     game.level.particles[free_particle_idx] = p^
+}
+
+add_npc_to_game :: proc(n : ^NPC){
+    free_npc_idx := get_next_free_entity(game.level.npcs[:])
+    
+    if free_npc_idx == -1 do return
+
+    n.state = .Active
+    game.level.npcs[free_npc_idx] = n^
 }
