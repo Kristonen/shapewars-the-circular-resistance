@@ -15,8 +15,12 @@ on_area_poison_trigger :: proc(a : Area_Effect, entity : ^Entity){
     switch &e in entity {
         case Player:
             // s := create_poison_status()
-            if idx, ok := check_if_entity_already_got_status(e.statuses, s); !ok{
-                append(&e.statuses, s)
+            if idx, ok := check_if_entity_already_got_status(e.statuses[:], s); !ok{
+                idx = get_next_free_entity(e.statuses[:])
+                if idx == -1 do return
+                e.statuses[idx] = s
+                e.statuses[idx].game_state = .Active
+                e.statuses[idx].state = .Applied
             } else{
                 overwriting_status := &e.statuses[idx].type.(TickStatus)
                 tick_status := s.type.(TickStatus)
@@ -24,8 +28,12 @@ on_area_poison_trigger :: proc(a : Area_Effect, entity : ^Entity){
             }
         case Enemy:
             // s := create_poison_status()
-            if idx, ok := check_if_entity_already_got_status(e.statuses, s); !ok{
-                append(&e.statuses, s)
+            if idx, ok := check_if_entity_already_got_status(e.statuses[:], s); !ok{
+                idx = get_next_free_entity(e.statuses[:])
+                if idx == -1 do return
+                e.statuses[idx] = s
+                e.statuses[idx].game_state = .Active
+                e.statuses[idx].state = .Applied
             } else{
                 overwriting_status := &e.statuses[idx].type.(TickStatus)
                 tick_status := s.type.(TickStatus)

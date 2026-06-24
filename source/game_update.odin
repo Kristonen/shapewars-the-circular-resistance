@@ -157,7 +157,8 @@ update_player_status :: proc(dt : f32){
     for &s, idx in game.player.statuses{
         update_status(&game.player, &s, dt)
         if !s.is_active{
-            unordered_remove(&game.player.statuses, idx)
+            game.player.statuses[idx].game_state = .None
+            // unordered_remove(&game.player.statuses, idx)
         }
     }
 }
@@ -453,7 +454,6 @@ update_enemy :: proc(dt : f32){
     for &e, idx in game.level.enemies{
         if e.state == .None do continue
         if e.health.is_dead{
-            clear(&e.statuses)
             e.on_death(&e, i32(idx))
             e.state = .None
             continue
@@ -503,7 +503,7 @@ update_enemy_status :: proc(e : ^Enemy, dt : f32){
     for &s, idx in e.statuses{
         update_status(e, &s, dt)
         if !s.is_active{
-            unordered_remove(&e.statuses, idx)
+            e.statuses[idx].game_state = .None
         }
     }
 }

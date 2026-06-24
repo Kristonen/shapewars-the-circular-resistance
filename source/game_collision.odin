@@ -81,17 +81,6 @@ check_bullet_enemy :: proc(b : ^Bullet){
     }
 }
 
-add_bullet_status_to_hitted_enemy :: proc(b : ^Bullet, e : ^Enemy){
-    for s in b.applied_status{
-
-        if idx, ok := check_if_entity_already_got_status(e.statuses, s); !ok{
-            append(&e.statuses, s)
-        } else {
-            e.statuses[idx] = s
-        }
-    }
-}
-
 check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
     for &hitted_enemy in b.hitted_enemies{
         if hitted_enemy == e{
@@ -150,17 +139,6 @@ check_enemy_enemy :: proc(e : ^Enemy){
 
             enemy.rec.x -= push.x
             enemy.rec.y -= push.y
-        }
-    }
-}
-
-add_enemy_status_to_player :: proc(e : Enemy, p : ^Player){
-    for s in e.applied_status{
-
-        if idx, ok := check_if_entity_already_got_status(p.statuses, s); !ok{
-            append(&p.statuses, s)
-        } else {
-            p.statuses[idx] = s
         }
     }
 }

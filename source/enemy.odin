@@ -65,8 +65,8 @@ Enemy :: struct {
 
     knocback : Knockback,
 
-    applied_status : [dynamic]Status_Effect,
-    statuses : [dynamic]Status_Effect,
+    applied_status : [10]Status_Effect,
+    statuses : [10]Status_Effect,
 
     // spawner : rawptr,
     spawner : ^Spawner,

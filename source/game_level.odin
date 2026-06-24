@@ -77,7 +77,6 @@ create_level :: proc(type : Level_Type){
 }
 
 refresh_player :: proc(){
-    clear(&game.player.statuses)
     game.player.health.max = 100
     game.player.health.current = 100
     game.player.health.is_dead = false
@@ -227,6 +226,9 @@ refresh_level :: proc(){
 
     for &e in game.level.enemies{
         e.state = .None
+        for &s in e.statuses{
+            s.game_state = .None
+        }
     }
 
     for &s in game.level.spawner{
@@ -235,6 +237,10 @@ refresh_level :: proc(){
 
     for &b in game.level.player_bullets{
         b.state = .None
+    }
+
+    for &s in game.player.statuses{
+        s.game_state = .None
     }
 
 
@@ -249,10 +255,6 @@ refresh_level :: proc(){
     clear(&game.level.ui_elements)
     clear(&game.level.loot)
     clear(&game.level.available_upgrades)
-    for &s in game.level.spawner{
-        clear(&s.enemy.applied_status)
-        clear(&s.enemy.statuses)
-    }
     // clear(&game.level.spawner)
     // clear(&game.level.particles)
 }
@@ -263,6 +265,7 @@ get_next_free_entity :: proc{
     get_next_free_particle,
     get_next_free_npc,
     get_next_free_bullet,
+    get_next_free_status,
 }
 
 get_next_free_enemy :: proc(array : []Enemy) -> i32{
@@ -296,6 +299,13 @@ get_next_free_npc :: proc(array : []NPC) -> i32{
 get_next_free_bullet :: proc(array : []Bullet) -> i32{
     for i in 0..<len(array){
         if array[i].state == .None do return i32(i)
+    }
+    return -1
+}
+
+get_next_free_status :: proc(array : []Status_Effect) -> i32{
+    for i in 0..<len(array){
+        if array[i].game_state == .None do return i32(i)
     }
     return -1
 }

@@ -76,15 +76,7 @@ main :: proc(){
 
         delete(game.levels)
         delete(game.menu.elements)
-        delete(game.player.statuses)
         delete(game.player.weapon.bullet.applied_status)
-        for &e in game.level.enemies{
-            delete(e.statuses)
-        }
-        delete(Enemies.viper_enemy.applied_status)
-        // delete(game.level.enemies)
-        // delete(game.level.npcs)
-        // delete(game.level.spawner)
         delete(game.tooltips)
         for &element in game.level.ui_elements{
             switch &e in &element{

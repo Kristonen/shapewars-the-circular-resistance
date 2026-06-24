@@ -45,7 +45,7 @@ Player :: struct {
     h_bar : ui.UI_Progress_Bar,
     v_bar : ui.UI_Progress_Bar,
 
-    statuses : [dynamic]Status_Effect,
+    statuses : [10]Status_Effect,
 
     loot_bag : Loot_Bag,
 

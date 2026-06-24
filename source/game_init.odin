@@ -52,7 +52,7 @@ init_enemies :: proc(){
     
     Enemies.viper_enemy = create_melee_enemy(40, 600, {0, 0, 40, 30}, rl.GREEN)
     s := create_poison_status(2, 0.25, 2)
-    append(&Enemies.viper_enemy.applied_status, s)
+    Enemies.viper_enemy.applied_status[0] = s
 }
 
 init_camera :: proc(){

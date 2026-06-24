@@ -58,7 +58,7 @@ dash_update :: proc(a : ^Ability, dt : f32){
             for &e in game.level.enemies{
                 if e.state == .None || e.health.is_dead do continue
                 confused := create_confused_status(500, 10)
-                idx, ok := check_if_entity_already_got_status(e.statuses, confused)
+                idx, ok := check_if_entity_already_got_status(e.statuses[:], confused)
                 if rl.CheckCollisionCircleRec(game.player.pos, game.player.radius, e.rec) && !ok{
                     if is_enemy_already_touched(data.touched_enemies[:], &e) do continue
                     for i in 0..<len(data.touched_enemies){

@@ -25,6 +25,7 @@ Status_Effect :: struct{
     texture : rl.Color,
     is_active : bool,
     create_particle : Status_Particle,
+    game_state : InGame_State,
 }
 
 TickStatus :: struct{
@@ -151,9 +152,11 @@ give_entity_status :: proc{
 
 give_player_status :: proc(statuses : []Status_Effect, attacked : ^Player){
     for s in statuses{
-        if idx, ok := check_if_entity_already_got_status(attacked.statuses, s); !ok{
-            idx, err := append(&attacked.statuses, s)
-            attacked.statuses[idx - 1].state = .Applied
+        if idx, ok := check_if_entity_already_got_status(attacked.statuses[:], s); !ok{
+            idx = get_next_free_entity(attacked.statuses[:])
+            if idx == -1 do continue
+            attacked.statuses[idx] = s
+            attacked.statuses[idx].state = .Applied
             
         } else{
             attacked.statuses[idx].duration = s.duration
@@ -163,17 +166,20 @@ give_player_status :: proc(statuses : []Status_Effect, attacked : ^Player){
 
 give_enemy_status :: proc(statuses : []Status_Effect, attacked : ^Enemy){
     for s in statuses{
-        if idx, ok := check_if_entity_already_got_status(attacked.statuses, s); !ok{
-            idx, err := append(&attacked.statuses, s)
-            attacked.statuses[idx - 1].state = .Applied
+        if idx, ok := check_if_entity_already_got_status(attacked.statuses[:], s); !ok{
+            idx = get_next_free_entity(attacked.statuses[:])
+            if idx == -1 do continue
+            attacked.statuses[idx] = s
+            attacked.statuses[idx].state = .Applied
         } else{
             attacked.statuses[idx].duration = s.duration
         }
     }
 }
 
-check_if_entity_already_got_status :: proc(s_array : [dynamic]Status_Effect, s : Status_Effect) -> (i32, bool){
+check_if_entity_already_got_status :: proc(s_array : []Status_Effect, s : Status_Effect) -> (i32, bool){
     for e_s, idx in s_array{
+        if e_s.game_state == .None do continue
         if e_s.desc == s.desc do return i32(idx), true
     }
     return -1, false
