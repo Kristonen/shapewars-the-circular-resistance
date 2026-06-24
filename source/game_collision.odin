@@ -167,6 +167,7 @@ add_enemy_status_to_player :: proc(e : Enemy, p : ^Player){
 
 check_player_interact :: proc(){
     game.level.interact.interactable = nil
+    if game.current_level != .HQ do return
     for &n in game.level.npcs{
         if rl.CheckCollisionCircles(n.interactable.collider.pos, n.interactable.collider.radius,
         game.player.physics_collider.pos, game.player.radius){

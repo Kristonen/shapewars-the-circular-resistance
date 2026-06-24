@@ -137,3 +137,12 @@ is_in_viewport :: proc(target_rec : rl.Rectangle) -> bool{
 
     return rl.CheckCollisionRecs(camera_rec, target_rec)
 }
+
+get_rec_from_circle :: proc(pos : rl.Vector2, radius : f32) -> rl.Rectangle{
+    return {
+        x = pos.x + radius,
+        y = pos.y + radius,
+        width = radius * 2,
+        height = radius * 2,
+    }
+}

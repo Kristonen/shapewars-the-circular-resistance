@@ -189,6 +189,8 @@ draw_fragments :: proc(){
 
 draw_area_effects :: proc(){
     for &a in game.level.area_effects{
+        rec := get_rec_from_circle(a.pos, a.radius)
+        if !is_in_viewport(rec) do continue
         rl.BeginShaderMode(game.dissolve.shader)
         current_time := f32(rl.GetTime())
         alpha := (a.duration/a.max_duration)
@@ -207,6 +209,7 @@ draw_area_effects :: proc(){
 
 draw_loot :: proc(){
     for l in game.level.loot{
+        if !is_in_viewport(l.rec) do continue
         rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
         // rl.DrawRectangleRec(l.rec, l.color)
         if game.helper_activated{
@@ -225,6 +228,8 @@ draw_chest :: proc(){
 draw_particles :: proc(){
     for p in game.level.particles{
         if p.state == .None do continue
+        rec := get_rec_from_circle(p.pos, p.size)
+        if !is_in_viewport(rec) do continue
         alpha := 1.0 - (p.life/p.max_life)
         color := p.color
         color.a = u8(alpha*255)
