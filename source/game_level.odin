@@ -248,15 +248,11 @@ refresh_level :: proc(){
     for &b in game.level.player_bullets{
         delete(b.hitted_enemies)
     }
-    // clear(&game.level.enemies)
-    // clear(&game.level.player_bullets)
     clear(&game.level.enemy_bullets)
     clear(&game.level.enemy_fragments)
     clear(&game.level.ui_elements)
     clear(&game.level.loot)
     clear(&game.level.available_upgrades)
-    // clear(&game.level.spawner)
-    // clear(&game.level.particles)
 }
 
 get_next_free_entity :: proc{

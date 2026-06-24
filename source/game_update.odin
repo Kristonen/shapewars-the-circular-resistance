@@ -261,7 +261,6 @@ update_player_bullets :: proc(dt :f32){
         }
         if !b.is_active{
             delete(b.hitted_enemies)
-            clear(&b.applied_status)
             b.state = .None
             // unordered_remove(&game.level.player_bullets, idx)
         }

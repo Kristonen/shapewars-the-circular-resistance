@@ -15,7 +15,7 @@ Bullet :: struct {
     can_lifesteal : bool,
     can_pierce : bool,
     hitted_enemies : [dynamic]rawptr,
-    applied_status : [dynamic]Status_Effect,
+    applied_status : [10]Status_Effect,
 
     is_active : bool,
 
@@ -34,4 +34,10 @@ create_bullet :: proc(radius : f32, speed : f32, dmg : f32) -> Bullet{
         radius = b.radius,
     }
     return b
+}
+
+clear_bullet_status :: proc(){
+    for i in 0..<len(game.player.weapon.bullet.applied_status){
+        game.player.weapon.bullet.applied_status[i].game_state = .None
+    }
 }

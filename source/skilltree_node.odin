@@ -51,10 +51,10 @@ apply_node_rl_cd :: proc(n : ^UI_Skill_Node, refund : bool = true){
 }
 
 apply_node_burn_status :: proc(n : ^UI_Skill_Node, refund : bool = true){
-    clear(&game.player.weapon.bullet.applied_status)
+    clear_bullet_status()
     if !refund{
         status := create_fire_status(2, 0.5, 2)
-        append(&game.player.weapon.bullet.applied_status, status)
+        game.player.weapon.bullet.applied_status[0] = status
     }
 }
 
@@ -67,9 +67,9 @@ apply_node_burn_dmg :: proc(n : ^UI_Skill_Node, refund : bool = true){
 }
 
 apply_node_poison_status :: proc(n : ^UI_Skill_Node, refund : bool = true){
-    clear(&game.player.weapon.bullet.applied_status)
+    clear_bullet_status()
     status := create_poison_status(2, 0.2, 2)
-    append(&game.player.weapon.bullet.applied_status, status)
+    game.player.weapon.bullet.applied_status[0] = status
 }
 
 check_if_node_can_be_refund :: proc(from_node : UI_Skill_Node, idx : i32, skilltree_type : string) -> bool{

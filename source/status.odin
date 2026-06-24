@@ -157,7 +157,7 @@ give_player_status :: proc(statuses : []Status_Effect, attacked : ^Player){
             if idx == -1 do continue
             attacked.statuses[idx] = s
             attacked.statuses[idx].state = .Applied
-            
+            attacked.statuses[idx].game_state = .Active
         } else{
             attacked.statuses[idx].duration = s.duration
         }
@@ -171,6 +171,7 @@ give_enemy_status :: proc(statuses : []Status_Effect, attacked : ^Enemy){
             if idx == -1 do continue
             attacked.statuses[idx] = s
             attacked.statuses[idx].state = .Applied
+            attacked.statuses[idx].game_state = .Active
         } else{
             attacked.statuses[idx].duration = s.duration
         }
