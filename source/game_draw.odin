@@ -125,7 +125,8 @@ draw_bullet :: proc(){
 
 draw_enemies :: proc(){
     for e in game.level.enemies{
-
+        if e.state == .None do continue
+        if !is_in_viewport(e.rec) do continue
         width := e.rec.width * e.visual_scale.x
         height := e.rec.height * e.visual_scale.y
         pos : rl.Vector2 = {e.rec.x, e.rec.y}
@@ -136,7 +137,7 @@ draw_enemies :: proc(){
         if e.hit_timer > 0{
             rl.DrawRectangleV(pos, {width, height}, rl.WHITE)
         } else{
-                rl.DrawRectangleV(pos, {width, height}, e.color)
+            rl.DrawRectangleV(pos, {width, height}, e.color)
         }
         draw_progress_bar(e.health_bar)
         if game.helper_activated{

@@ -453,7 +453,7 @@ update_enemy :: proc(dt : f32){
     for &e, idx in game.level.enemies{
         if e.state == .None do continue
         if e.health.is_dead{
-            delete(e.statuses)
+            clear(&e.statuses)
             e.on_death(&e, i32(idx))
             e.state = .None
             continue

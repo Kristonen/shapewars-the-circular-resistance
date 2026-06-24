@@ -127,7 +127,7 @@ create_first_test_level :: proc(){
 }
 
 create_test_level :: proc(){
-    spawner := create_spawner(100, 0.1, 0)
+    spawner := create_spawner(10, 0.1, 0)
     spawner.enemy = Enemies.dummy_enemy
     add_spawner_to_game(&spawner)
     // append(&game.level.spawner, spawner)

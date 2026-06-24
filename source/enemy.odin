@@ -68,7 +68,8 @@ Enemy :: struct {
     applied_status : [dynamic]Status_Effect,
     statuses : [dynamic]Status_Effect,
 
-    spawner : rawptr,
+    // spawner : rawptr,
+    spawner : ^Spawner,
 
     hit_timer : f32,
 
@@ -193,8 +194,8 @@ on_death :: proc(e : ^Enemy, idx : i32){
     game.shake = 50
     count := rand.int32_range(3, 7)
     spawn_shards(count, e.origin)
-    if spawner := (^Spawner)(e.spawner); spawner != nil{
-        spawner.count -= 1
+    if e.spawner != nil{
+        e.spawner.count -= 1
     }
     health_rand := rand.float32()
     if health_rand < 0.2{

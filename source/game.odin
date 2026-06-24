@@ -124,3 +124,16 @@ Game :: struct{
     // glow_shader : rl.Shader,
     // intensity_loc : i32,
 }
+
+is_in_viewport :: proc(target_rec : rl.Rectangle) -> bool{
+    screen_top_left := rl.GetScreenToWorld2D({0, 0}, game.camera)
+    screen_bottom_right := rl.GetScreenToWorld2D({f32(rl.GetScreenWidth()), f32(rl.GetScreenHeight())}, game.camera)
+    camera_rec := rl.Rectangle{
+        x = screen_top_left.x,
+        y = screen_top_left.y,
+        width = screen_bottom_right.x - screen_top_left.x,
+        height = screen_bottom_right.y - screen_top_left.y,
+    }
+
+    return rl.CheckCollisionRecs(camera_rec, target_rec)
+}
