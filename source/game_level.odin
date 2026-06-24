@@ -27,7 +27,7 @@ Level_Data :: struct{
 
     npcs : [10]NPC,
 
-    player_bullets : [dynamic]Bullet,
+    player_bullets : [500]Bullet,
 
     ability_projectiles : [dynamic]Ability_Projectile,
 
@@ -233,13 +233,17 @@ refresh_level :: proc(){
         s.state = .None
     }
 
+    for &b in game.level.player_bullets{
+        b.state = .None
+    }
+
 
     clear(&game.level.area_effects)
     for &b in game.level.player_bullets{
         delete(b.hitted_enemies)
     }
     // clear(&game.level.enemies)
-    clear(&game.level.player_bullets)
+    // clear(&game.level.player_bullets)
     clear(&game.level.enemy_bullets)
     clear(&game.level.enemy_fragments)
     clear(&game.level.ui_elements)
@@ -258,6 +262,7 @@ get_next_free_entity :: proc{
     get_next_free_spawner,
     get_next_free_particle,
     get_next_free_npc,
+    get_next_free_bullet,
 }
 
 get_next_free_enemy :: proc(array : []Enemy) -> i32{
@@ -288,11 +293,19 @@ get_next_free_npc :: proc(array : []NPC) -> i32{
     return -1
 }
 
+get_next_free_bullet :: proc(array : []Bullet) -> i32{
+    for i in 0..<len(array){
+        if array[i].state == .None do return i32(i)
+    }
+    return -1
+}
+
 add_entity_to_game :: proc{
     add_spawner_to_game,
     add_enemy_to_game,
     add_particle_to_game,
     add_npc_to_game,
+    add_bullet_to_game,
 }
 
 add_spawner_to_game :: proc(s : ^Spawner){
@@ -333,4 +346,13 @@ add_npc_to_game :: proc(n : ^NPC){
 
     n.state = .Active
     game.level.npcs[free_npc_idx] = n^
+}
+
+add_bullet_to_game :: proc(b : ^Bullet){
+    free_bullet_idx := get_next_free_entity(game.level.player_bullets[:])
+
+    if free_bullet_idx == -1 do return
+
+    b.state = .Active
+    game.level.player_bullets[free_bullet_idx] = b^
 }

@@ -261,7 +261,8 @@ update_player_bullets :: proc(dt :f32){
         if !b.is_active{
             delete(b.hitted_enemies)
             clear(&b.applied_status)
-            unordered_remove(&game.level.player_bullets, idx)
+            b.state = .None
+            // unordered_remove(&game.level.player_bullets, idx)
         }
     }
 }
@@ -315,7 +316,8 @@ update_player_shooting :: proc(dt : f32){
             b := game.player.weapon.bullet
             b.dir = dir
             b.pos = game.player.pos
-            append(&game.level.player_bullets, b)
+            add_entity_to_game(&b)
+            // append(&game.level.player_bullets, b)
         }
     }
 }

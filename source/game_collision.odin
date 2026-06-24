@@ -49,6 +49,7 @@ check_player_npc :: proc(pos : rl.Vector2) -> bool{
 
 check_bullet :: proc(){
     for &b, idx in game.level.player_bullets{
+        if b.state == .None do continue
         check_bullet_enemy(&b)
         check_bullet_wall(&b)
     }
@@ -102,6 +103,7 @@ check_if_enemy_already_hitted :: proc(e : ^Enemy, b : Bullet) -> bool{
 
 check_bullet_player :: proc(){
     for &b in game.level.enemy_bullets{
+        if b.state == .None do continue
         c_player := game.player.hurt_collider
         c_bullet := b.collider
         if rl.CheckCollisionCircles(c_player.pos, c_player.radius, c_bullet.pos, c_bullet.radius){

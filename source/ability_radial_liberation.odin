@@ -58,6 +58,6 @@ radial_liberation_activate :: proc(a : ^Ability, dt : f32){
             is_active = true,
             can_lifesteal = data.can_lifesteal,
         }
-        append(&game.level.player_bullets, b)
+        add_entity_to_game(&b)
     }
 }

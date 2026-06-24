@@ -18,6 +18,8 @@ Bullet :: struct {
     applied_status : [dynamic]Status_Effect,
 
     is_active : bool,
+
+    state : InGame_State,
 }
 
 create_bullet :: proc(radius : f32, speed : f32, dmg : f32) -> Bullet{

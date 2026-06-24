@@ -61,7 +61,7 @@ main :: proc(){
         for &b in game.level.player_bullets{
             delete(b.hitted_enemies)
         }
-        delete(game.level.player_bullets)
+        // delete(game.level.player_bullets)
         delete(game.level.enemy_bullets)
         delete(game.level.ability_projectiles)
         delete(game.level.enemy_fragments)

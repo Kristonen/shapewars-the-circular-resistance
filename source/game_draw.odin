@@ -107,6 +107,7 @@ draw_map :: proc(){
 
 draw_bullet :: proc(){
     for b in game.level.player_bullets{
+        if b.state == .None do continue
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if game.helper_activated{
             draw_collider(b.collider)
@@ -114,6 +115,7 @@ draw_bullet :: proc(){
     }
 
     for b in game.level.enemy_bullets{
+        if b.state == .None do continue
         rl.DrawCircleV(b.pos, b.radius, rl.RED)
         if game.helper_activated{
             draw_collider(b.collider)
