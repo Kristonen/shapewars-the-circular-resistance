@@ -2,7 +2,7 @@ package game
 
 import rl "vendor:raylib"
 
-create_health_upgrades :: proc(a : ^[dynamic]Upgrade){
+create_health_upgrades :: proc(){
     common_m := create_upgrade("Better Nutrition", "Increase the life by 10.", 10.0, .Additive, .Common)
     common_m.apply = apply_max_health_upgrade
     common_c := create_upgrade("Medicine", "Heals you by 5.", 5, .Additive, .Common)
@@ -11,10 +11,8 @@ create_health_upgrades :: proc(a : ^[dynamic]Upgrade){
     rare.apply = apply_max_health_upgrade
     legendary := create_upgrade("Holy Water", "Heals you by 100.", 100, .Additive, .Legendary)
     legendary.apply = apply_current_health_upgrade
-    append(a, common_m)
-    append(a, common_c)
-    append(a, rare)
-    append(a, legendary)
+    new_upgrades : []Upgrade = {common_m, common_c, rare, legendary}
+    add_entity_to_game(new_upgrades[:], game.level.upgrade_pool[:])
 }
 
 apply_current_health_upgrade :: proc(u : Upgrade){

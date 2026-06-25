@@ -38,8 +38,8 @@ Level_Data :: struct{
 
     power_level_up : bool,
     upgrade_menu : UI_Upgrade_Menu,
-    upgrade_pool : [dynamic]Upgrade,
-    available_upgrades : [dynamic]Upgrade,
+    upgrade_pool : [100]Upgrade,
+    available_upgrades : [50]Upgrade,
 
     ui_elements : [dynamic]ui.UI_Element,
     interact : ui.UI_Interact,
@@ -251,7 +251,6 @@ refresh_level :: proc(){
     clear(&game.level.enemy_bullets)
     clear(&game.level.enemy_fragments)
     clear(&game.level.ui_elements)
-    clear(&game.level.available_upgrades)
 }
 
 get_next_free_entity :: proc{
@@ -262,6 +261,7 @@ get_next_free_entity :: proc{
     get_next_free_bullet,
     get_next_free_status,
     get_next_free_loot,
+    get_next_free_upgrade,
 }
 
 get_next_free_enemy :: proc(array : []Enemy) -> i32{
@@ -313,6 +313,14 @@ get_next_free_loot :: proc(array : []Loot) -> i32{
     return -1
 }
 
+get_next_free_upgrade :: proc(array : []Upgrade) -> i32{
+    for i in 0..<len(array){
+        if array[i].state == .None do return i32(i)
+    }
+    
+    return -1
+}
+
 add_entity_to_game :: proc{
     add_spawner_to_game,
     add_enemy_to_game,
@@ -320,6 +328,8 @@ add_entity_to_game :: proc{
     add_npc_to_game,
     add_bullet_to_game,
     add_loot_to_game,
+    add_upgrade_to_game,
+    add_upgrades_to_game,
 }
 
 add_spawner_to_game :: proc(s : ^Spawner){
@@ -378,4 +388,22 @@ add_loot_to_game :: proc(l : ^Loot){
 
     l.game_state = .Active
     game.level.loot[free_loot_idx] = l^
+}
+
+add_upgrade_to_game :: proc(u : ^Upgrade, array : []Upgrade){
+    free_upgrade_idx := get_next_free_entity(array)
+
+    if free_upgrade_idx == -1 do return
+    u.state = .Active
+    array[free_upgrade_idx] = u^
+}
+
+add_upgrades_to_game :: proc(new_u, array : []Upgrade){
+    for &u in new_u{
+        free_upgrade_idx := get_next_free_entity(array)
+
+        if free_upgrade_idx == -1 do return
+        u.state = .Active
+        array[free_upgrade_idx] = u
+    }
 }

@@ -2,7 +2,7 @@ package game
 
 import rl "vendor:raylib"
 
-create_bomb_upgrades :: proc(a : ^[dynamic]Upgrade){
+create_bomb_upgrades :: proc(){
     common := create_upgrade("TickTack", "Decrease the bomb timer by 10%", 0.9, .Multiplicative, .Common)
     uncommon := create_upgrade("Bigger Bomb", "Increase the radius of the bomb explosion by 15%", 1.15, .Multiplicative, .Uncommon)
     o_uncommon := create_upgrade("Deeper Wounds", "Increase the duration of the bleed status by 10%", 1.1, .Multiplicative, .Uncommon)
@@ -28,13 +28,8 @@ create_bomb_upgrades :: proc(a : ^[dynamic]Upgrade){
     legendary.apply = apply_bomb_splitter_upgrade
 
     legendary.max_used = 1
-
-    append(a, common)
-    append(a, uncommon)
-    append(a, o_uncommon)
-    append(a, rare)
-    append(a, o_rare)
-    append(a, legendary)
+    new_upgrades : []Upgrade = {common, uncommon, o_uncommon, rare, o_rare, legendary}
+    add_entity_to_game(new_upgrades[:], game.level.upgrade_pool[:])
 }
 
 check_if_bomb_can_splitter :: proc() -> bool{

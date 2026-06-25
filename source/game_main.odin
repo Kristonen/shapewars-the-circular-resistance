@@ -66,8 +66,6 @@ main :: proc(){
         delete(game.level.ability_projectiles)
         delete(game.level.enemy_fragments)
         delete(game.level.area_effects)
-        delete(game.level.upgrade_pool)
-        delete(game.level.available_upgrades)
         // delete(game.level.particles)
         delete(game.level.level_visual.tilesets)
         delete(game.level.level_visual.layers)
@@ -131,7 +129,7 @@ main :: proc(){
     }
 }
 init_game :: proc(){
-    create_upgrades(&game.level.upgrade_pool)
+    create_upgrades()
     game.level.portal = create_portal({0, 0})
     init_player()
     init_skilltrees()
@@ -512,14 +510,14 @@ fill_available_upgrades :: proc(){
     rare : i32
     epic : i32
     legendary : i32
-    clear(&game.level.available_upgrades)
-    for u in game.level.upgrade_pool{
+    for &u in game.level.upgrade_pool{
+        if u.state == .None do continue
         if u.target == .NormalBullet{
-            append(&game.level.available_upgrades, u)
+            add_entity_to_game(&u, game.level.available_upgrades[:])
         } else if game.player.current_ability == u.target{
-            append(&game.level.available_upgrades, u)
+            add_entity_to_game(&u, game.level.available_upgrades[:])
         } else if game.player.current_weapon == u.target{
-            append(&game.level.available_upgrades, u)
+            add_entity_to_game(&u, game.level.available_upgrades[:])
         }
     }
     

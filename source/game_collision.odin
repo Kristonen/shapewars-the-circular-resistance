@@ -216,7 +216,7 @@ check_collisions_pickup_loot :: proc(){
             l.state = .Collected
             if game.level.power_level_up{
                 level_up_spawner_update()
-                create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
+                create_upgrade_menu(&game.level.upgrade_menu)
             }
         }
         i += 1

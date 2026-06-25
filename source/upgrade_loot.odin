@@ -2,17 +2,15 @@ package game
 
 import rl "vendor:raylib"
 
-create_shard_upgrades :: proc(a : ^[dynamic]Upgrade){
+create_shard_upgrades :: proc(){
     rare := create_upgrade("Small Pocket Money", "Increase the multiplier by 0.1.", 0.1, .Additive, .Rare)
     rare.apply = apply_mul_shard_upgrade
     epic := create_upgrade("Longer Arm", "Increase the radius to gather loot by 15%", 1.15, .Multiplicative, .Epic)
     epic.apply = apply_increase_radius_upgrade
     legendary := create_upgrade("GREED", "Increase the multiplier by 50%", 1.50, .Multiplicative, .Legendary)
     legendary.apply = apply_mul_shard_upgrade
-
-    append(a, rare)
-    append(a, legendary)
-    append(a, epic)
+    new_upgrades : []Upgrade = {rare, epic, legendary}
+    add_entity_to_game(new_upgrades[:], game.level.upgrade_pool[:])
 }
 
 apply_mul_shard_upgrade :: proc(u : Upgrade){

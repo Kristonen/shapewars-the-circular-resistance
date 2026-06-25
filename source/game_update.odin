@@ -64,12 +64,12 @@ update_handler :: proc(dt : f32){
 
     if rl.IsKeyPressed(.U) && game.current_level != .HQ{
         game.level.power_level_up = true
-        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
+        create_upgrade_menu(&game.level.upgrade_menu)
     }
 
     if rl.IsKeyDown(.O) && game.current_level != .HQ{
         game.level.power_level_up = true
-        create_upgrade_menu(&game.level.upgrade_menu, game.level.available_upgrades)
+        create_upgrade_menu(&game.level.upgrade_menu)
     }
 
     if rl.IsKeyPressed(.TAB){

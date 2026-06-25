@@ -2,7 +2,7 @@ package game
 
 import rl "vendor:raylib"
 
-create_rl_upgrades :: proc(a : ^[dynamic]Upgrade){
+create_rl_upgrades :: proc(){
     epic := create_upgrade("More Bullets", "Increase the amount of bullets by 2.", 2, .Additive, .Epic)
     uncommon := create_upgrade("Radical Damage", "Increase the damage of your ability by 5.", 5, .Additive, .Uncommon)
     rare := create_upgrade("Synthetic Power", "Decrease the cd by 5%", 0.95, .Multiplicative, .Rare)
@@ -19,10 +19,8 @@ create_rl_upgrades :: proc(a : ^[dynamic]Upgrade){
     legendary.apply = apply_rl_lifesteal_upgrade
     legendary.max_used = 1
 
-    append(a, epic)
-    append(a, uncommon)
-    append(a, rare)
-    append(a, legendary)
+    new_upgrades : []Upgrade = {uncommon, epic, rare, legendary}
+    add_entity_to_game(new_upgrades[:], game.level.upgrade_pool[:])
 }
 apply_rl_cd_upgrade :: proc(u : Upgrade){
     stat := &game.player.ability.cooldown_timer.cast_rate//&get_ability_cd().cast_rate

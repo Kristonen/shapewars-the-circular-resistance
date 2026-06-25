@@ -2,7 +2,7 @@ package game
 
 import rl "vendor:raylib"
 
-create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
+create_bullet_upgrades :: proc(){
     common := create_upgrade("Faster projectile", "Increase the speed of your bullet by 25.", 25, .Additive, .Common)
     legendary := create_upgrade("Pierce Bullet", "Bullets will not destroy on hit.", true, .Toogle, .Legendary)
     epic := create_upgrade("Multishot", "Add one bullet to your primary shotting.", 1, .Additive, .Epic)
@@ -10,9 +10,8 @@ create_bullet_upgrades :: proc(a : ^[dynamic]Upgrade){
     legendary.apply = apply_pierce_upgrade
     legendary.max_used = 1
     epic.apply = apply_amount_upgrade
-    append(a, common)
-    append(a, epic)
-    append(a, legendary)
+    new_upgrades : []Upgrade = {common, epic, legendary}
+    add_entity_to_game(new_upgrades[:], game.level.upgrade_pool[:])
 }
 
 apply_pierce_upgrade :: proc(u : Upgrade){

@@ -31,6 +31,7 @@ Upgrade :: struct{
     type : Upgrade_Type,
     max_used : i32,
     count_used : i32,
+    state : InGame_State,
 }
 
 UI_Upgrade_Slot :: struct{
@@ -56,7 +57,7 @@ Upgrade_Shader :: struct{
     timer : f32,
 }
 
-create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu, u : [dynamic]Upgrade){
+create_upgrade_menu :: proc(m : ^UI_Upgrade_Menu){
     m.width = f32(rl.GetScreenWidth())
     m.height = f32(rl.GetScreenHeight())
     m.is_active = !rl.IsMouseButtonDown(.LEFT)
@@ -113,6 +114,7 @@ get_random_upgrade_by_rarity :: proc(used_idx : [3]i32) -> (^Upgrade, i32){
     for true{
         rand_idx = rand.int32_range(0, i32(len(game.level.available_upgrades)))
         upgrade = &game.level.available_upgrades[rand_idx]
+        if upgrade.state == .None do continue
         if upgrade.check_condition != nil && !upgrade.check_condition() do continue
         if upgrade.max_used > 0 && upgrade.count_used >= upgrade.max_used do continue
         if rarity != upgrade.rarity || is_upgrade_already_used(rand_idx, used_idx) do continue
@@ -152,20 +154,19 @@ get_random_rarity :: proc() -> Rarity{
     }
 }
 
-create_upgrades :: proc(a : ^[dynamic]Upgrade){
-    create_dmg_upgrades(a)
-    create_movement_speed_upgrades(a)
-    create_as_upgrades(a)
+create_upgrades :: proc(){
+    create_dmg_upgrades()
+    create_movement_speed_upgrades()
+    create_as_upgrades()
+    create_health_upgrades()
+    create_rl_upgrades()
+    create_dash_upgrades()
 
-    create_health_upgrades(a)
+    create_bomb_upgrades()
 
-    create_rl_upgrades(a)
-    create_dash_upgrades(a)
-    create_bomb_upgrades(a)
+    create_bullet_upgrades()
 
-    create_bullet_upgrades(a)
-
-    create_shard_upgrades(a)
+    create_shard_upgrades()
 }
 
 create_upgrade :: proc(name : string, desc : string, value : Upgrade_Value, type : Upgrade_Type, rarity : Rarity) -> Upgrade{

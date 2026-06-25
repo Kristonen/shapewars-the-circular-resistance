@@ -2,7 +2,7 @@ package game
 
 import rl "vendor:raylib"
 
-create_dash_upgrades :: proc(a : ^[dynamic]Upgrade){
+create_dash_upgrades :: proc(){
     common := create_upgrade("More Dash", "Decrease the cd of your ability by 2%", 0.98, .Multiplicative, .Common)
     uncommon := create_upgrade("Harder Dash", "Increase the damage of your dash by 10", 10, .Additive, .Uncommon)
     epic := create_upgrade("Dash Attack", "Dash now deals damage to every enemy, that u touch while dashing", true, .Toogle, .Epic)
@@ -18,9 +18,8 @@ create_dash_upgrades :: proc(a : ^[dynamic]Upgrade){
 
     uncommon.check_condition = check_if_dash_can_attack
 
-    append(a, common)
-    append(a, uncommon)
-    append(a, epic)
+    new_upgrades : []Upgrade = {common, uncommon, epic}
+    add_entity_to_game(new_upgrades[:], game.level.upgrade_pool[:])
 }
 
 apply_dash_cd_upgrade :: proc(u : Upgrade){
