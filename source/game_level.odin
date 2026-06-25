@@ -31,7 +31,7 @@ Level_Data :: struct{
 
     ability_projectiles : [dynamic]Ability_Projectile,
 
-    loot : [dynamic]Loot,
+    loot : [250]Loot,
     chest : Chest,
 
     portal : Portal,
@@ -251,7 +251,6 @@ refresh_level :: proc(){
     clear(&game.level.enemy_bullets)
     clear(&game.level.enemy_fragments)
     clear(&game.level.ui_elements)
-    clear(&game.level.loot)
     clear(&game.level.available_upgrades)
 }
 
@@ -262,6 +261,7 @@ get_next_free_entity :: proc{
     get_next_free_npc,
     get_next_free_bullet,
     get_next_free_status,
+    get_next_free_loot,
 }
 
 get_next_free_enemy :: proc(array : []Enemy) -> i32{
@@ -306,12 +306,20 @@ get_next_free_status :: proc(array : []Status_Effect) -> i32{
     return -1
 }
 
+get_next_free_loot :: proc(array : []Loot) -> i32{
+    for i in 0..<len(array){
+        if array[i].game_state == .None do return i32(i)
+    }
+    return -1
+}
+
 add_entity_to_game :: proc{
     add_spawner_to_game,
     add_enemy_to_game,
     add_particle_to_game,
     add_npc_to_game,
     add_bullet_to_game,
+    add_loot_to_game,
 }
 
 add_spawner_to_game :: proc(s : ^Spawner){
@@ -361,4 +369,13 @@ add_bullet_to_game :: proc(b : ^Bullet){
 
     b.state = .Active
     game.level.player_bullets[free_bullet_idx] = b^
+}
+
+add_loot_to_game :: proc(l : ^Loot){
+    free_loot_idx := get_next_free_entity(game.level.loot[:])
+
+    if free_loot_idx == -1 do return
+
+    l.game_state = .Active
+    game.level.loot[free_loot_idx] = l^
 }

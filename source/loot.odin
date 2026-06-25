@@ -42,6 +42,7 @@ Loot :: struct{
     on_collect : LootCallback,
     on_spawn : LootSpawn,
     state : Loot_State,
+    game_state : InGame_State,
 }
 
 create_simple_shard :: proc(drops : ^[dynamic]Loot, pos : rl.Vector2){
@@ -59,7 +60,7 @@ spawn_shards :: proc(count : i32, pos : rl.Vector2){
         new_shard.time = rand.float32_range(0.2, 0.5)
         
         give_shard_everything(&new_shard, pos)
-        append(&game.level.loot, new_shard)
+        add_entity_to_game(&new_shard)
     }
 }
 
@@ -71,7 +72,7 @@ spawn_health_pack :: proc(pos : rl.Vector2){
     health_pack.on_collect = on_health_pack_collect
     health_pack.rec.width = 50
     health_pack.rec.height = 70
-    append(&game.level.loot, health_pack)
+    add_entity_to_game(&health_pack)
 }
 
 spawn_bomb_blueprint :: proc(pos : rl.Vector2){
@@ -82,7 +83,7 @@ spawn_bomb_blueprint :: proc(pos : rl.Vector2){
     bp.rec.width = 100
     bp.rec.height = 100
     bp.on_collect = on_blueprint_collect
-    append(&game.level.loot, bp)
+    add_entity_to_game(&bp)
 }
 
 give_shard_everything :: proc(shard : ^Loot, pos : rl.Vector2){

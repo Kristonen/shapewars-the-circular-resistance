@@ -95,6 +95,6 @@ spawn_shards_around_chest :: proc(){
         shard.time = duration
         shard.color = rl.SKYBLUE
         shard.on_spawn = on_normal_spawn
-        append(&game.level.loot, shard)
+        add_entity_to_game(&shard)
     }
 }

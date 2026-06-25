@@ -66,7 +66,6 @@ main :: proc(){
         delete(game.level.ability_projectiles)
         delete(game.level.enemy_fragments)
         delete(game.level.area_effects)
-        delete(game.level.loot)
         delete(game.level.upgrade_pool)
         delete(game.level.available_upgrades)
         // delete(game.level.particles)

@@ -624,22 +624,23 @@ update_particle :: proc(dt : f32){
 }
 
 update_loot :: proc(dt : f32){
-    for i := 0; i < len(game.level.loot);{
+    for i in 0..<len(game.level.loot){
         l := &game.level.loot[i]
+        if l.game_state == .None do continue
 
         if l.state == .Collected{
-            unordered_remove(&game.level.loot, i)
+            l.game_state = .None
             continue
         }
 
         if l.state == .Spawning{//!l.is_active{
             l.on_spawn(l, dt)
-            i += 1
+            // i += 1
             continue
         }
 
         if l.state == .Idle{//!l.is_following{
-            i += 1
+            // i += 1
             continue
         }
         dir := game.player.pos - {l.rec.x + (l.rec.width/2), l.rec.y + (l.rec.height/2)}
@@ -653,7 +654,7 @@ update_loot :: proc(dt : f32){
         l.rec.y = pos.y
         // l.detection.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
         l.pickup.pos = {l.rec.x + l.rec.width/2, l.rec.y + l.rec.height/2}
-        i += 1
+        // i += 1
     }
 }
 

@@ -209,6 +209,7 @@ draw_area_effects :: proc(){
 
 draw_loot :: proc(){
     for l in game.level.loot{
+        if l.game_state == .None do continue
         if !is_in_viewport(l.rec) do continue
         rl.DrawRectangleV({l.rec.x, l.rec.y}, {l.rec.width, l.rec.height}, l.color)
         // rl.DrawRectangleRec(l.rec, l.color)
